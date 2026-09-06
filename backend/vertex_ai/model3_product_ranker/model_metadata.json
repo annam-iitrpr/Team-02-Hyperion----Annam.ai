@@ -1,0 +1,35 @@
+{
+  "model_name": "aasra_ps03_product_ranker",
+  "version": "1.0.0",
+  "framework": "xgboost",
+  "objective": "rank:ndcg",
+  "eval_metrics": {
+    "held_out_accuracy": 79.33,
+    "cibrc_legal_compliance": "100.00%"
+  },
+  "feature_names": [
+    "m1_stress_class",
+    "m1_stress_intensity",
+    "temp_max_c",
+    "temp_min_c",
+    "soil_moisture_pct",
+    "rain_3d_mm",
+    "soil_ec_dsm",
+    "vpd_kpa",
+    "canopy_temp_depression_c",
+    "stage_sensitivity_weight",
+    "mandi_price_inr_q",
+    "product_cost_inr",
+    "efficacy_heat",
+    "efficacy_drought",
+    "efficacy_fungal",
+    "efficacy_insect",
+    "stage_suitability",
+    "is_crop_approved",
+    "stress_match_index",
+    "stage_match_synergy",
+    "crop_legal_affinity",
+    "economic_roi_factor"
+  ],
+  "feature_count": 22
+}

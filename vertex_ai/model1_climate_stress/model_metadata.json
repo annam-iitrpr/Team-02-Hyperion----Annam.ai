@@ -1,0 +1,31 @@
+{
+  "model_name": "aasra_model1_climate_stress",
+  "version": "1.0.0",
+  "framework": "xgboost",
+  "objective": "multi:softprob",
+  "track": "PS-02 (Risk)",
+  "features": [
+    "temp_max_forecast_7d",
+    "temp_night_min_7d",
+    "rh_avg_forecast_7d",
+    "vpd_kpa",
+    "soil_moisture_vol_pct",
+    "consecutive_hot_days",
+    "crop_gdd_accumulated",
+    "rainfall_3d_sum_mm",
+    "soil_clay_pct",
+    "soil_ec_ds_m",
+    "soil_ph"
+  ],
+  "feature_count": 11,
+  "classes": {
+    "0": "Optimal / No Severe Stress",
+    "1": "Heat Stress",
+    "2": "Drought Stress",
+    "3": "Compound Heat-Drought Stress",
+    "4": "Flooding / Waterlogging",
+    "5": "Frost / Cold Shock",
+    "6": "Salinity / Osmotic Shock"
+  },
+  "serving_container_image_uri": "us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest"
+}

@@ -1,0 +1,24 @@
+{
+  "model_name": "aasra_model2_biological_readiness",
+  "version": "1.0.0",
+  "framework": "scikit-learn",
+  "estimator": "CalibratedClassifierCV",
+  "calibration_method": "sigmoid (Platt Scaling)",
+  "track": "PS-02 (Action Gate)",
+  "features": [
+    "soil_moisture_pct",
+    "delta_t_celsius",
+    "wind_speed_kmh",
+    "rain_prob_next_48h",
+    "crop_stage_sensitivity"
+  ],
+  "feature_count": 5,
+  "hard_safety_gates": {
+    "wind_speed_max_kmh": 15.0,
+    "delta_t_safe_min_c": 2.0,
+    "delta_t_safe_max_c": 8.0,
+    "rain_prob_max_pct": 40.0,
+    "soil_moisture_min_pct": 30.0
+  },
+  "serving_container_image_uri": "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-0:latest"
+}

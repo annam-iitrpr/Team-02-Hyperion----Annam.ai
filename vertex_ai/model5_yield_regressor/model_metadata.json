@@ -1,0 +1,40 @@
+{
+  "model_name": "aasra_model5_yield_regressor",
+  "version": "2.0.0",
+  "framework": "xgboost",
+  "objective": "reg:squarederror",
+  "target": "yield_q_per_ha",
+  "target_unit": "Quintals per Hectare (Q/ha)",
+  "n_features": 18,
+  "features": [
+    "district_historical_mean_yield",
+    "gdd_seasonal_total",
+    "rainfall_total_mm",
+    "dry_spell_max_consecutive_days",
+    "extreme_heat_days_count",
+    "soil_clay_pct",
+    "hydrothermal_stress",
+    "effective_water_retention",
+    "heat_shock_penalty",
+    "drought_resilience",
+    "gdd_rain_interaction",
+    "crop_groundnut",
+    "crop_maize",
+    "crop_potato",
+    "crop_rice",
+    "crop_soybean",
+    "crop_sugarcane",
+    "crop_wheat"
+  ],
+  "performance_metrics": {
+    "out_of_sample_accuracy_pct": 74.53,
+    "mape_pct": 25.47,
+    "r2_score": 0.9687,
+    "rmse": 34.4
+  },
+  "data_sources": {
+    "yield_baseline": "Directorate of Economics & Statistics (DES), Ministry of Agriculture",
+    "weather_normals": "India Meteorological Department (IMD) 1991-2020 Normals",
+    "soil_data": "ICAR-NBSS&LUP Regional Soil Series"
+  }
+}
