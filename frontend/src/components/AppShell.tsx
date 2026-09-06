@@ -550,7 +550,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                       className="flex items-center gap-2 px-4 py-2 hover:bg-[#18191a] text-[#d0d6e0] font-medium"
                     >
                       <Settings className="h-3.5 w-3.5 text-[#8a8f98]" />
-                      <span>{t.navSettings || "Farmer Profile"}</span>
+                      <span>{t.navProfile || "Farmer Profile"}</span>
                     </Link>
                     <button
                       onClick={handleLogout}
