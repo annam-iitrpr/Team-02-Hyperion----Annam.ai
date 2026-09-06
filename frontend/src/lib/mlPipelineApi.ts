@@ -20,6 +20,7 @@ export interface UnifiedPipelineResponse {
     wind_speed_kmh: number;
     rain_prob_next_48h: number;
     soil_moisture_pct: number;
+    weather_timestamp?: string;
   };
   model1_risk: {
     stress_type: string;

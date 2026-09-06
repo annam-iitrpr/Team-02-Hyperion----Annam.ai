@@ -59,21 +59,24 @@ class BiologicalReadinessEngine:
                 is_safe = False
                 reasons.append(f"Delta-T {dt:.1f}°C > 8.0°C (rapid droplet evaporation before stomatal uptake)")
             if dt < 2.0:
-                reasons.append(f"Delta-T {dt:.1f}°C < 2.0°C (high humidity, prolonged leaf wetness)")
+                prob = min(prob, 0.08)
+                is_safe = False
+                reasons.append(f"Delta-T {dt:.1f}°C < 2.0°C (high humidity, prolonged leaf wetness & runoff)")
             if rp > 40.0:
                 prob = min(prob, 0.05)
                 is_safe = False
                 reasons.append(f"Rain probability {rp:.1f}% > 40% (risk of active ingredient wash-off)")
             if sm < 30.0:
                 prob = min(prob, 0.10)
-                reasons.append(f"Soil moisture {sm:.1f}% < 30% (root xylem shut down)")
+                is_safe = False
+                reasons.append(f"Soil moisture {sm:.1f}% < 30% (root xylem shut down, stomata closed)")
 
             if is_safe and prob >= 0.50:
                 reasons.append("Optimal stomatal aperture and atmospheric conditions for foliar uptake")
 
             results.append({
                 "readiness_score": round(prob, 4),
-                "spray_window_safe": is_safe and (prob >= 0.35),
+                "spray_window_safe": bool(is_safe and (prob >= 0.50)),
                 "delta_t": round(dt, 2),
                 "reasons": reasons
             })

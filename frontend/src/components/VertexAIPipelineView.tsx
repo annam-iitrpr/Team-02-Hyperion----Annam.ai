@@ -118,17 +118,18 @@ export function VertexAIPipelineView() {
         wind_speed_kmh: 10.5,
         rain_prob_next_48h: 12,
         soil_moisture_pct: 26,
+        weather_timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) + " IST",
       },
       model1_risk: {
         stress_type: "Elevated Heat & Drought Stress",
         stress_class: 2,
-        confidence: 0.84,
+        confidence: 0.82,
         days_to_impact: 4,
         probabilities: {
-          "Extreme Heatwave": 0.84,
-          "Moisture Deficit": 0.58,
-          "Optimal Window": 0.12,
-          "High Drift Risk": 0.08,
+          "Optimal / No Severe Stress": 0.09,
+          "Heat Stress": 0.82,
+          "Drought Stress": 0.05,
+          "Compound Heat-Drought Stress": 0.04,
         },
       },
       model2_readiness: {
@@ -758,7 +759,7 @@ export function VertexAIPipelineView() {
         )}
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-[#23252a]">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${isLiveWeather ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
             <span className="text-xs font-bold text-[#f7f8f8]">
               {isLiveWeather ? "● Real-Time Meteorological Station Grounding Active" : "⚠️ Manual Simulation Mode Active"}
@@ -766,6 +767,12 @@ export function VertexAIPipelineView() {
             <span className="text-[11px] text-[#8a8f98] font-mono">
               ({weatherSource})
             </span>
+            {(weatherTimestamp || data?.telemetry_summary?.weather_timestamp) && (
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#18191a] text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-cyan-400" />
+                <span>Observed: {weatherTimestamp || data?.telemetry_summary?.weather_timestamp}</span>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -1049,9 +1056,17 @@ export function VertexAIPipelineView() {
                       PS-02 Climate Stress Classifier
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono text-[#8a8f98] bg-[#18191a] px-2 py-0.5 rounded border border-[#23252a]">
-                    XGBoost (11 features)
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {data.telemetry_summary.weather_timestamp && (
+                      <span className="text-[10px] font-mono text-cyan-300 bg-[#18191a] px-2 py-0.5 rounded border border-cyan-500/30 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-cyan-400" />
+                        <span>{data.telemetry_summary.weather_timestamp}</span>
+                      </span>
+                    )}
+                    <span className="text-[11px] font-mono text-[#8a8f98] bg-[#18191a] px-2 py-0.5 rounded border border-[#23252a]">
+                      XGBoost (11 features)
+                    </span>
+                  </div>
                 </div>
 
                 <div className="mt-2 flex items-baseline gap-3">
@@ -1067,23 +1082,46 @@ export function VertexAIPipelineView() {
                   Early warning detected {data.model1_risk.days_to_impact > 0 ? `${data.model1_risk.days_to_impact} days in advance` : "optimal conditions"}.
                 </p>
 
-                {/* Probabilities Bars */}
+                {/* Probabilities Bars (Strictly Normalized to 100%) */}
                 <div className="mt-4 space-y-1.5">
-                  <div className="text-[11px] text-[#8a8f98] font-medium mb-1">Stress Class Probabilities:</div>
-                  {Object.entries(data.model1_risk.probabilities).slice(0, 4).map(([name, prob]) => (
-                    <div key={name} className="flex items-center gap-2 text-xs">
-                      <span className="w-36 truncate text-[#8a8f98] text-[11px]">{name}</span>
-                      <div className="flex-1 bg-[#18191a] h-2 rounded-full overflow-hidden border border-[#23252a]">
-                        <div
-                          className="bg-[#5e6ad2] h-full rounded-full transition-all duration-500"
-                          style={{ width: `${Math.round(prob * 100)}%` }}
-                        />
+                  <div className="text-[11px] text-[#8a8f98] font-medium mb-1">
+                    Stress Class Probabilities (100% Normalized):
+                  </div>
+                  {(() => {
+                    const entries = Object.entries(data.model1_risk.probabilities).slice(0, 4);
+                    const rawSum = entries.reduce((s, [, p]) => s + p, 0);
+                    const normalizedEntries = rawSum > 0
+                      ? entries.map(([n, p]) => [n, p / rawSum] as [string, number])
+                      : entries;
+                    
+                    // Integer percentages that sum to exactly 100%
+                    let pctList = normalizedEntries.map(([n, p]) => ({
+                      name: n,
+                      pct: Math.round(p * 100),
+                      raw: p,
+                    }));
+                    const currentSum = pctList.reduce((s, item) => s + item.pct, 0);
+                    const diff = 100 - currentSum;
+                    if (diff !== 0 && pctList.length > 0) {
+                      // Adjust highest probability class to ensure exact 100% sum
+                      pctList[0].pct += diff;
+                    }
+
+                    return pctList.map((item) => (
+                      <div key={item.name} className="flex items-center gap-2 text-xs">
+                        <span className="w-36 truncate text-[#8a8f98] text-[11px]">{item.name}</span>
+                        <div className="flex-1 bg-[#18191a] h-2 rounded-full overflow-hidden border border-[#23252a]">
+                          <div
+                            className="bg-[#5e6ad2] h-full rounded-full transition-all duration-500"
+                            style={{ width: `${item.pct}%` }}
+                          />
+                        </div>
+                        <span className="w-10 text-right font-mono text-[11px] text-[#f7f8f8]">
+                          {item.pct}%
+                        </span>
                       </div>
-                      <span className="w-10 text-right font-mono text-[11px] text-[#f7f8f8]">
-                        {Math.round(prob * 100)}%
-                      </span>
-                    </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
               </div>
 
@@ -1120,7 +1158,7 @@ export function VertexAIPipelineView() {
                   ) : (
                     <div className="flex items-center gap-2 text-rose-400">
                       <AlertTriangle className="w-6 h-6" />
-                      <span className="text-xl font-bold">Spray Prohibited (Gate Active)</span>
+                      <span className="text-xl font-bold">Spray Prohibited (48h Forecast Unsafe)</span>
                     </div>
                   )}
                 </div>
@@ -1169,10 +1207,10 @@ export function VertexAIPipelineView() {
                   </span>
                   <div>
                     <span className="text-xs uppercase tracking-wider font-semibold text-[#8a8f98] block">
-                      PS-03 Product Portfolio Recommendation
+                      PS-03 Product Recommendation
                     </span>
                     <span className="text-sm font-bold text-[#f7f8f8]">
-                      Top 3 Syngenta Biological Solutions (Ranked from 50 Products)
+                      Top 3 Syngenta Crop-Approved Prescriptions (Ranked from 50 Products)
                     </span>
                   </div>
                 </div>
@@ -1205,7 +1243,14 @@ export function VertexAIPipelineView() {
                         </span>
                       </div>
 
-                      <h4 className="font-bold text-sm text-[#f7f8f8]">{prod.name}</h4>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <h4 className="font-bold text-sm text-[#f7f8f8]">{prod.name}</h4>
+                        {prod.category && (
+                          <span className="text-[9px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+                            {prod.category}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[11px] text-[#8a8f98] mt-0.5 line-clamp-2">
                         {prod.active_ingredient}
                       </p>
@@ -1263,7 +1308,7 @@ export function VertexAIPipelineView() {
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#8a8f98]">Climate Weather Impact:</span>
+                    <span className="text-[#8a8f98]">vs District Historical Baseline:</span>
                     <span className={`font-mono font-semibold ${
                       data.model5_baseline.yield_impact_pct >= 0 ? "text-emerald-400" : "text-rose-400"
                     }`}>

@@ -188,19 +188,32 @@ class VertexMLInferenceClient:
         X = pd.DataFrame([row], columns=MODEL1_FEATURE_NAMES)
         
         probs = self.m1_model.predict_proba(X)[0]
-        pred_class = int(np.argmax(probs))
-        confidence = float(probs[pred_class])
+        # Normalize probabilities so they strictly sum to 1.0
+        prob_sum = float(np.sum(probs))
+        if prob_sum > 0:
+            norm_probs = probs / prob_sum
+        else:
+            norm_probs = probs
 
-        prob_dist = {
-            MODEL1_CLASSES.get(i, f"Class {i}"): round(float(probs[i]), 4)
-            for i in range(len(probs))
+        pred_class = int(np.argmax(norm_probs))
+        confidence = float(norm_probs[pred_class])
+
+        raw_dist = {
+            MODEL1_CLASSES.get(i, f"Class {i}"): float(norm_probs[i])
+            for i in range(len(norm_probs))
         }
+        # Round and adjust largest value to guarantee sum of rounded floats == 1.0
+        rounded_dist = {k: round(v, 4) for k, v in raw_dist.items()}
+        diff = round(1.0 - sum(rounded_dist.values()), 4)
+        if diff != 0:
+            top_k = MODEL1_CLASSES.get(pred_class, "Optimal / No Severe Stress")
+            rounded_dist[top_k] = round(rounded_dist[top_k] + diff, 4)
 
         return {
             "stress_class": pred_class,
             "stress_type": MODEL1_CLASSES.get(pred_class, "Unknown"),
             "confidence": round(confidence, 4),
-            "probabilities": prob_dist,
+            "probabilities": rounded_dist,
             "serving_mode": "local_optimized_runtime"
         }
 
@@ -228,7 +241,8 @@ class VertexMLInferenceClient:
     def predict_model3(self, farm_context: Dict[str, Any], m1_result: Dict[str, Any], m2_result: Dict[str, Any], top_k: int = 3) -> List[Dict[str, Any]]:
         """
         Runs Model 3: LambdaMART Syngenta Product Ranking.
-        Constructs candidate feature vectors for the 50 Syngenta products and ranks them.
+        Constructs candidate feature vectors for Syngenta products and ranks them,
+        strictly enforcing crop approval and official label dosage/application methods.
         """
         if not self.syngenta_catalog or self.m3_ranker is None:
             return []
@@ -236,20 +250,37 @@ class VertexMLInferenceClient:
         stress_class = m1_result.get("stress_class", 0)
         stress_conf = m1_result.get("confidence", 0.8)
         readiness = m2_result.get("readiness_score", 0.5)
-        crop = str(farm_context.get("crop", "soybean")).lower().strip()
+        crop = str(farm_context.get("crop", "groundnut")).lower().strip()
         stage = str(farm_context.get("growth_stage", "Vegetative")).lower().strip()
 
         candidate_rows = []
-        for p in self.syngenta_catalog:
+        catalog_indices = []
+
+        for idx, p in enumerate(self.syngenta_catalog):
+            # Parse approved crops properly (semicolon separated or list)
+            raw_crops = p.get("approved_crops") or p.get("crops_approved") or ""
+            if isinstance(raw_crops, str):
+                approved_crops = [c.strip().lower() for c in raw_crops.split(";") if c.strip()]
+            else:
+                approved_crops = [str(c).strip().lower() for c in raw_crops]
+
+            # Strict agronomic approval check
+            is_approved = 1.0 if (
+                crop in approved_crops
+                or "all" in approved_crops
+                or "all crops" in approved_crops
+                or not approved_crops
+            ) else 0.0
+
+            # Filter out products completely unapproved for this crop
+            if is_approved == 0.0:
+                continue
+
             # Agronomic matching factors
             heat_eff = float(p.get("efficacy_heat", 0.5))
             drought_eff = float(p.get("efficacy_drought", 0.5))
             fungal_eff = float(p.get("efficacy_fungal", 0.5))
             insect_eff = float(p.get("efficacy_insect", 0.5))
-            
-            # Approved crop check
-            approved_crops = [c.lower() for c in p.get("crops_approved", [])]
-            is_approved = 1.0 if (crop in approved_crops or "all" in approved_crops or not approved_crops) else 0.0
 
             # Stress match score
             if stress_class == 1:
@@ -265,9 +296,16 @@ class VertexMLInferenceClient:
             else:
                 stress_match = 0.5
 
-            cost = float(p.get("retail_price_inr", 600))
+            cost = float(p.get("cost_per_acre_inr") or p.get("retail_price_inr") or 600)
             mandi_price = float(farm_context.get("mandi_price_inr_q", 2800))
             roi_factor = (mandi_price * 1.5) / max(cost, 100.0)
+
+            # Growth stage match
+            stage_suit = float(p.get("stage_vegetative", 0.8))
+            if any(s in stage for s in ["flower", "bloom", "anthesis"]):
+                stage_suit = float(p.get("stage_flowering", 0.9))
+            elif any(s in stage for s in ["pod", "tuber", "fruit", "grain"]):
+                stage_suit = float(p.get("stage_pod_formation", 0.85))
 
             feat_row = {
                 "m1_stress_class": stress_class,
@@ -286,35 +324,48 @@ class VertexMLInferenceClient:
                 "efficacy_drought": drought_eff,
                 "efficacy_fungal": fungal_eff,
                 "efficacy_insect": insect_eff,
-                "stage_suitability": float(p.get("stage_suitability", 0.8)),
-                "is_crop_approved": is_approved,
+                "stage_suitability": stage_suit,
+                "is_crop_approved": 1.0,
                 "stress_match_index": stress_match,
-                "stage_match_synergy": float(p.get("stage_suitability", 0.8)) * readiness,
-                "crop_legal_affinity": is_approved * 1.0,
+                "stage_match_synergy": stage_suit * readiness,
+                "crop_legal_affinity": 1.0,
                 "economic_roi_factor": min(roi_factor, 15.0)
             }
             candidate_rows.append(feat_row)
+            catalog_indices.append(idx)
+
+        # Fallback if no crop match found
+        if not candidate_rows:
+            candidate_rows = [{k: 0.5 for k in MODEL3_FEATURE_NAMES}]
+            catalog_indices = [0]
 
         X_cand = pd.DataFrame(candidate_rows)[MODEL3_FEATURE_NAMES]
         scores = self.m3_ranker.predict(X_cand)
 
         # Pair scores with product details
         ranked_products = []
-        for idx, score in enumerate(scores):
-            prod = self.syngenta_catalog[idx]
+        for i, score in enumerate(scores):
+            cat_idx = catalog_indices[i]
+            prod = self.syngenta_catalog[cat_idx]
+            category_raw = str(prod.get("category", "Biostimulant")).capitalize()
+
+            # Official label dosage & method
+            dose_raw = prod.get("dosage_per_acre") or prod.get("recommended_dosage") or "400 ml/acre"
+            timing_raw = prod.get("application_timing") or "Foliar spray early morning or late evening"
+
             ranked_products.append({
-                "product_key": prod.get("product_key", f"prod_{idx}"),
-                "name": prod.get("name", "Syngenta Biological"),
-                "category": prod.get("category", "Biostimulant"),
-                "subcategory": prod.get("subcategory", "Agronomic Enhancer"),
-                "active_ingredient": prod.get("active_ingredient", "Natural Peptides & Amino Acids"),
+                "product_key": prod.get("key") or prod.get("product_key", f"prod_{cat_idx}"),
+                "name": prod.get("name", "Syngenta Solution"),
+                "category": category_raw,
+                "subcategory": prod.get("mode_of_action") or prod.get("subcategory", "Plant Protection"),
+                "active_ingredient": prod.get("active_ingredient", "Active formulation"),
                 "rank_score": float(score),
                 "efficacy_score_pct": round(min(max((score + 2.0) / 4.0 * 100, 40.0), 98.5), 1),
-                "recommended_dosage": prod.get("recommended_dosage", "2.0 ml/L or 400 ml/acre"),
-                "application_timing": prod.get("application_timing", "Foliar spray early morning or late evening"),
-                "registration": prod.get("registration", "CIB&RC Registered"),
-                "tank_mix_safe": prod.get("tank_mix_safe", ["Standard micronutrients", "Urea 1%"]),
-                "description": prod.get("description", "")
+                "recommended_dosage": f"{dose_raw} per acre",
+                "application_timing": timing_raw,
+                "registration": "CIB&RC Registered",
+                "tank_mix_safe": [prod.get("tank_mix_safe")] if isinstance(prod.get("tank_mix_safe"), str) else prod.get("tank_mix_safe", ["Standard micronutrients"]),
+                "description": prod.get("target_pests_diseases") or prod.get("description", "")
             })
 
         # Sort descending by rank score

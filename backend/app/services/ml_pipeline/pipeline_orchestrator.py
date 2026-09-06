@@ -206,14 +206,14 @@ def synthesize_gemini_statement(
     fallback_statement = LOCALIZED_STATEMENTS.get(language, LOCALIZED_STATEMENTS["en"])
 
     fallback_payload = {
-        "headline": f"{stress_type} Alert: {prod_name} Recommended" if is_safe else f"Spray Hold: High Delta-T ({delta_t}°C)",
+        "headline": f"{stress_type} Alert: {prod_name} Recommended" if is_safe else f"Spray Hold: Unfavorable Weather Window (Delta-T: {delta_t}°C)",
         "statement": fallback_statement,
         "statement_hi": LOCALIZED_STATEMENTS["hi"],
         "statement_en": LOCALIZED_STATEMENTS["en"],
         "spray_verdict_badge": "SAFE TO SPRAY" if is_safe else "DELAY SPRAY",
-        "timing_guidance": "Early morning (5:30 AM - 8:30 AM) or Late evening after 6:00 PM" if not is_safe else "Optimal spray window open for next 4-6 hours.",
-        "product_summary": f"{prod_name} at {dosage} per acre.",
-        "yield_outlook": f"{exp_yield_acre} Q/acre baseline under current climate.",
+        "timing_guidance": "Adverse weather window — hold spray until atmospheric conditions stabilize" if not is_safe else "Optimal 48h spray window open (early morning / late afternoon).",
+        "product_summary": f"{prod_name} at {dosage}.",
+        "yield_outlook": f"{exp_yield_acre} Q/acre baseline vs District Historical Baseline.",
         "language_used": language,
         "generated_by": "Rule-Based Biophysical Synthesis"
     }
@@ -224,15 +224,17 @@ Synthesize the official findings of 4 Machine Learning models into a concise, au
 - Farmer Name: {farmer_name}
 - District: {district}
 - Crop: {crop} ({growth_stage}, {area_acres} acres)
+- Weather Observation Time: {telemetry.get('weather_timestamp', 'Live')}
 - Model 1 (PS-02 Stress Risk): Stress = {stress_type}, Confidence = {stress_conf:.2f}
-- Model 2 (PS-02 Biological Action Gate): Safe Window = {is_safe}, Readiness Score = {readiness_score:.4f}, Delta-T = {delta_t}°C, Reasons = {reasons}
-- Model 3 (PS-03 Syngenta Product Ranker): Champion = {prod_name}, Dosage = {dosage}, Active Ingredient = {top_prod.get('active_ingredient', '')}, Timing = {top_prod.get('application_timing', '')}
-- Model 5 (PS-07 Yield Baseline): Expected Baseline Yield = {exp_yield} Q/ha ({exp_yield_acre} Q/acre)
+- Model 2 (PS-02 Biological Action Gate): Safe Window = {is_safe} ({'48h Spray Window Open' if is_safe else 'Spray Prohibited / Closed due to weather gating'}), Readiness Score = {readiness_score:.4f}, Delta-T = {delta_t}°C, Reasons = {reasons}
+- Model 3 (PS-03 Syngenta Product Ranker): Champion = {prod_name} ({top_prod.get('category', 'Agri Solution')}), Dosage = {dosage}, Active Ingredient = {top_prod.get('active_ingredient', '')}, Timing = {top_prod.get('application_timing', '')}
+- Model 5 (PS-07 Yield Baseline): Expected Baseline Yield = {exp_yield} Q/ha ({exp_yield_acre} Q/acre) vs District Historical Baseline
+Strict Rule: Do not hallucinate unapproved chemical recommendations. Honor the official approved product name, dosage, and 48h spray safety verdict exactly.
 
 Return strictly valid JSON with these keys:
 {{
   "headline": "Short punchy header in {target_lang_name}",
-  "statement": "Professional advisory statement strictly written in {target_lang_name} addressing {farmer_name} directly, explaining Model 1, Model 2 (Delta-T), Model 3 ({prod_name} at {dosage}), and Model 5 ({exp_yield_acre} Q/acre)",
+  "statement": "Professional advisory statement strictly written in {target_lang_name} addressing {farmer_name} directly, explaining Model 1 ({stress_type}), Model 2 (Delta-T {delta_t}°C and whether spray window is open or delayed), Model 3 ({prod_name} at {dosage}), and Model 5 ({exp_yield_acre} Q/acre vs District Historical Baseline)",
   "statement_en": "English translation",
   "statement_hi": "Hindi translation",
   "spray_verdict_badge": "SAFE TO SPRAY" or "DELAY SPRAY",
@@ -412,6 +414,9 @@ class AASRAPipelineOrchestrator:
         }
         m5_result = self.client.predict_model5(m5_context)
 
+        now_time = time.strftime("%Y-%m-%d %H:%M:%S IST", time.localtime())
+        weather_time_input = request_payload.get("weather_timestamp") or now_time
+
         telemetry_summary = {
             "temp_max_c": temp_max,
             "temp_min_c": temp_min,
@@ -420,7 +425,8 @@ class AASRAPipelineOrchestrator:
             "delta_t_c": round(delta_t, 2),
             "wind_speed_kmh": wind_speed,
             "rain_prob_next_48h": rain_prob,
-            "soil_moisture_pct": soil_moisture
+            "soil_moisture_pct": soil_moisture,
+            "weather_timestamp": weather_time_input
         }
 
         m1_risk_obj = {
