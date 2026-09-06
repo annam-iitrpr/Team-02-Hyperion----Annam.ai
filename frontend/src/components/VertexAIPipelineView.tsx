@@ -32,11 +32,13 @@ import {
   Satellite,
   Radio,
   ExternalLink,
-  ArrowRight
+  ArrowRight,
+  Lock,
 } from "lucide-react";
+import Link from "next/link";
 import { runAASRAPipeline, UnifiedPipelineResponse, fetchPipelineModels } from "@/lib/mlPipelineApi";
 import { useFarm } from "@/context/FarmContext";
-import { getStoredProfile, INDIAN_LANGUAGES } from "@/lib/userStore";
+import { getStoredProfile, INDIAN_LANGUAGES, isUserLoggedIn } from "@/lib/userStore";
 import { useLanguage } from "@/context/LanguageContext";
 import { DISTRICT_COORDINATES } from "@/lib/districtCoords";
 
@@ -82,12 +84,98 @@ export function VertexAIPipelineView() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<UnifiedPipelineResponse | null>(null);
   const [modelsMeta, setModelsMeta] = useState<any>(null);
+  const [isAuthed, setIsAuthed] = useState<boolean>(false);
 
-  // Initial Boot: Sync Database Profile, Fetch Real Weather, and Run Pipeline
+  // Initial Boot: Check Authentication, Fetch Models, and either Run or load Feature Demo
   useEffect(() => {
+    const authed = isUserLoggedIn();
+    setIsAuthed(authed);
     fetchPipelineModels().then(setModelsMeta);
-    syncFromDatabaseAndRun();
+    if (authed) {
+      syncFromDatabaseAndRun();
+    } else {
+      loadEducationalPreview(language);
+    }
   }, []);
+
+  // Educational Preview for non-logged-in visitors (Feature Tour Mode)
+  const loadEducationalPreview = (targetLang?: string) => {
+    const activeLang = targetLang || language || "en";
+    const isHindi = ["hi", "mr", "gu", "pa"].includes(activeLang);
+    setData({
+      success: true,
+      farmer_name: isHindi ? "किसान प्रोफ़ाइल (फ़ीचर टूर पूर्वावलोकन)" : "Farmer Profile (Feature Tour Mode)",
+      district: isHindi ? "भोपाल (मध्य प्रदेश - मालवा पठार)" : "Bhopal (Madhya Pradesh - Malwa Plateau)",
+      crop: "soybean",
+      growth_stage: isHindi ? "फूल व फली आरंभ" : "Flowering / Bloom",
+      area_acres: 5.0,
+      language: activeLang,
+      telemetry: {
+        temp_max_c: 37.8,
+        rh_avg_pct: 42,
+        wind_speed_kmh: 10.5,
+        soil_moisture_pct: 26,
+        rain_prob_pct: 12,
+        stull_delta_t: 7.4,
+        vpd_kpa: 3.1,
+      },
+      models: {
+        model1_risk: {
+          risk_probability: 0.84,
+          primary_hazard: "heatwave",
+          consecutive_hot_days: 4,
+          verdict: "ELEVATED_HEAT_DROUGHT_STRESS",
+          confidence: 0.94,
+        },
+        model2_readiness: {
+          action_permitted: true,
+          delta_t: 7.4,
+          spray_window: "06:00 - 09:30 AM (Safe Thermal Window)",
+          inversion_risk: false,
+          drift_hazard: "LOW",
+        },
+        model3_ranked_products: [
+          {
+            product_id: "quantis",
+            product_name: "Quantis® Osmoprotectant",
+            match_score: 95.8,
+            mode_of_action: "Thermal heat shield & proline amino osmolytes",
+            recommended_dose: "400 ml/acre",
+            spray_interval_days: 12,
+            target_stress: "Extreme Heatwave & Flower Drop Prevention",
+          },
+          {
+            product_id: "isabion",
+            product_name: "Isabion® Biostimulant",
+            match_score: 91.2,
+            mode_of_action: "Amino-acid vigor & root uptake stimulant",
+            recommended_dose: "500 ml/acre",
+            spray_interval_days: 14,
+            target_stress: "Moisture Stress & Cell Wall Strengthening",
+          },
+        ],
+        model5_yield_baseline: {
+          baseline_yield_quintals_per_acre: 6.8,
+          expected_loss_without_intervention_pct: 22.5,
+          protected_yield_quintals_per_acre: 7.45,
+          net_prevented_loss_value_inr: 4250,
+          benefit_cost_ratio: 3.8,
+        },
+      },
+      gemini_statement: {
+        language: activeLang,
+        statement: isHindi
+          ? "नमूना बेंचमार्क सलाह (फ़ीचर टूर): वर्टेक्स AI मॉडल सोयाबीन में अत्यधिक गर्मी तनाव (84% जोखिम) का संकेत देते हैं। सुबह 06:00 से 09:30 बजे के बीच सुरक्षित स्प्रे विंडो में Quantis® (400 मिली/एकड़) का उपयोग करें जिससे अनुमानित ₹4,250 प्रति एकड़ की उपज सुरक्षित होगी। अपने खेत के लिए सटीक लाइव मॉडल चलाने के लिए कृपया लॉग इन या साइन अप करें।"
+          : "SAMPLE BENCHMARK ADVISORY (Feature Tour Mode): Real-time Vertex AI models detect elevated thermal stress (84% probability) in flowering soybean. Atmospheric Delta-T is 7.4°C permitting morning spray. Quantis® (400 ml/acre) is recommended to prevent flower drop, securing an estimated ₹4,250/acre yield protection. Log in or sign up to run live models on your verified field coordinates.",
+        product_summary: "Quantis® Osmoprotectant (400 ml/acre)",
+        timing_guidance: isHindi ? "सुबह 06:00 से 09:30 बजे के बीच तापमान 35°C से नीचे रहने पर स्प्रे करें" : "Spray between 06:00 - 09:30 AM before ambient temperatures exceed 35°C",
+        yield_outlook: isHindi ? "बायोस्टिमुलेंट सुरक्षा के साथ 7.45 क्विंटल/एकड़ अनुमानित पैदावार" : "7.45 Q/acre projected with timely biostimulant shielding",
+        model_version: "AASRA-Vertex-v2.5 (Preview Demo)",
+      },
+      execution_time_ms: 115,
+      timestamp: new Date().toISOString(),
+    });
+  };
 
   // Sync profile when database or farm changes
   const syncFromDatabaseAndRun = async () => {
@@ -232,7 +320,11 @@ export function VertexAIPipelineView() {
   // Switch Language across all 12 Indian Languages & Re-evaluate
   const handleSelectLanguage = (langCode: string) => {
     setLanguage(langCode);
-    executePipeline({ language: langCode });
+    if (isAuthed) {
+      executePipeline({ language: langCode });
+    } else {
+      loadEducationalPreview(langCode);
+    }
   };
 
   // Text-To-Speech Narration in Selected Language
@@ -292,6 +384,42 @@ export function VertexAIPipelineView() {
   return (
     <div className="w-full bg-[#010102] text-[#f7f8f8] p-4 sm:p-6 lg:p-8 rounded-2xl border border-[#23252a] font-sans shadow-2xl pb-32">
       
+      {/* ── 0. Unauthenticated Feature Showcase & Access Gate Banner ──── */}
+      {!isAuthed && (
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#5e6ad2]/20 via-[#0f1011] to-[#141516] border border-[#5e6ad2]/50 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#5e6ad2]/30 text-[#828fff] border border-[#5e6ad2]/40 uppercase tracking-wide flex items-center gap-1">
+                <Lock className="w-3 h-3 text-[#828fff]" />
+                Feature Tour &amp; Architecture Preview
+              </span>
+              <span className="text-[11px] text-[#8a8f98] font-mono">• Read-Only Demo</span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-[#f7f8f8]">
+              AASRA 4-Model Vertex AI Biological Engine
+            </h3>
+            <p className="text-xs text-[#8a8f98] max-w-2xl">
+              Explore how our 4 sequential ML models (Stress Risk, Spray Readiness, Biological Ranker, and Yield Baseline) collaborate with satellite telemetry and Gemini 2.5. To run live model predictions on your own field, log in or sign up.
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Link
+              href="/login"
+              className="px-4 py-2 rounded-xl bg-[#18191a] hover:bg-[#23252a] border border-[#23252a] text-[#f7f8f8] text-xs font-semibold transition-all hover:border-[#5e6ad2]/50 cursor-pointer"
+            >
+              Log In to Farm
+            </Link>
+            <Link
+              href="/signup"
+              className="px-4 py-2 rounded-xl bg-[#5e6ad2] hover:bg-[#828fff] text-white text-xs font-semibold shadow-md shadow-[#5e6ad2]/25 transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Sign Up Free</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* ── 1. Top Header & Authenticated Farm Identity Bar ──── */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-[#23252a]">
         <div>
@@ -312,34 +440,64 @@ export function VertexAIPipelineView() {
           </p>
         </div>
 
-        {/* Authenticated Farm Database Badge */}
+        {/* Authenticated Farm Database Badge / Guest Preview */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-[#0f1011] border border-[#23252a] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-              <User className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <div className="text-[10px] text-[#8a8f98] uppercase font-semibold">
-                Database Farmer Profile
+          {isAuthed ? (
+            <>
+              <div className="bg-[#0f1011] border border-[#23252a] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <User className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#8a8f98] uppercase font-semibold">
+                    Database Farmer Profile
+                  </div>
+                  <div className="font-bold text-[#f7f8f8] flex items-center gap-1.5">
+                    <span>{farmerName}</span>
+                    <span className="text-[#62666d]">•</span>
+                    <span className="capitalize">{crop}</span>
+                    <span className="text-[#62666d]">•</span>
+                    <span>{acres} Ac</span>
+                  </div>
+                </div>
               </div>
-              <div className="font-bold text-[#f7f8f8] flex items-center gap-1.5">
-                <span>{farmerName}</span>
-                <span className="text-[#62666d]">•</span>
-                <span className="capitalize">{crop}</span>
-                <span className="text-[#62666d]">•</span>
-                <span>{acres} Ac</span>
-              </div>
-            </div>
-          </div>
 
-          <button
-            onClick={syncFromDatabaseAndRun}
-            className="px-3 py-2 rounded-xl bg-[#141516] hover:bg-[#18191a] border border-[#23252a] text-[#f7f8f8] text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:border-[#5e6ad2]/50"
-            title="Reload verified profile from database and re-fetch real weather"
-          >
-            <Database className="w-3.5 h-3.5 text-[#5e6ad2]" />
-            <span>Sync Database</span>
-          </button>
+              <button
+                onClick={syncFromDatabaseAndRun}
+                className="px-3 py-2 rounded-xl bg-[#141516] hover:bg-[#18191a] border border-[#23252a] text-[#f7f8f8] text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:border-[#5e6ad2]/50"
+                title="Reload verified profile from database and re-fetch real weather"
+              >
+                <Database className="w-3.5 h-3.5 text-[#5e6ad2]" />
+                <span>Sync Database</span>
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="bg-[#0f1011] border border-[#23252a] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-[#8a8f98] uppercase font-semibold">
+                    Guest Farmer (Tour Preview)
+                  </div>
+                  <div className="font-bold text-[#f7f8f8] flex items-center gap-1.5">
+                    <span>Bhopal Field</span>
+                    <span className="text-[#62666d]">•</span>
+                    <span>Soybean</span>
+                    <span className="text-[#62666d]">•</span>
+                    <span>5.0 Ac</span>
+                  </div>
+                </div>
+              </div>
+              <Link
+                href="/login"
+                className="px-3 py-2 rounded-xl bg-[#5e6ad2] hover:bg-[#828fff] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+              >
+                <span>Log In to Farm</span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -528,19 +686,41 @@ export function VertexAIPipelineView() {
 
         {/* Run Pipeline CTA */}
         <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a] flex items-end">
-          <button
-            onClick={() => executePipeline()}
-            disabled={loading}
-            className="w-full bg-[#5e6ad2] hover:bg-[#828fff] text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#5e6ad2]/20 disabled:opacity-50 cursor-pointer"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-            {loading ? "Evaluating Models..." : "Run ML Pipeline"}
-          </button>
+          {isAuthed ? (
+            <button
+              onClick={() => executePipeline()}
+              disabled={loading}
+              className="w-full bg-[#5e6ad2] hover:bg-[#828fff] text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#5e6ad2]/20 disabled:opacity-50 cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              {loading ? "Evaluating Models..." : "Run ML Pipeline"}
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="w-full bg-[#18191a] hover:bg-[#23252a] border border-[#5e6ad2]/50 hover:border-[#5e6ad2] text-[#828fff] hover:text-white font-semibold py-2 px-2.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm text-center"
+            >
+              <Lock className="w-3.5 h-3.5 text-[#5e6ad2] shrink-0" />
+              <span className="truncate">Log In to Run on Your Farm</span>
+            </Link>
+          )}
         </div>
       </div>
 
       {/* ── 5. Real Meteorological Telemetry Grounding & Simulation Sliders ──── */}
       <div className="bg-[#0f1011] p-4 rounded-xl border border-[#23252a] mb-6">
+        {!isAuthed && (
+          <div className="mb-3 px-3.5 py-2 rounded-xl bg-[#141516] border border-[#23252a] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="text-[#8a8f98] flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5 text-[#5e6ad2] shrink-0" />
+              <span>Weather and biophysical telemetry are in demonstration mode. Log in to stream live satellite weather for your GPS field coordinates.</span>
+            </div>
+            <Link href="/signup" className="text-[#828fff] hover:underline font-semibold text-[11px] shrink-0">
+              Sign Up Free →
+            </Link>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-[#23252a]">
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${isLiveWeather ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
@@ -554,12 +734,16 @@ export function VertexAIPipelineView() {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => fetchRealWeatherTelemetry(district, crop)}
-              disabled={isFetchingWeather}
-              className="text-[11px] px-2.5 py-1 rounded-md bg-[#18191a] hover:bg-[#23252a] border border-[#23252a] text-[#828fff] flex items-center gap-1.5 transition-all cursor-pointer"
+              onClick={() => {
+                if (isAuthed) {
+                  fetchRealWeatherTelemetry(district, crop);
+                }
+              }}
+              disabled={isFetchingWeather || !isAuthed}
+              className="text-[11px] px-2.5 py-1 rounded-md bg-[#18191a] hover:bg-[#23252a] border border-[#23252a] text-[#828fff] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${isFetchingWeather ? "animate-spin" : ""}`} />
-              <span>Fetch Real API Data</span>
+              <span>{isAuthed ? "Fetch Real API Data" : "Real API Data (Locked)"}</span>
             </button>
             <div className="flex items-center gap-1 text-[11px]">
               <span className="text-[#8a8f98]">Presets:</span>
@@ -673,6 +857,22 @@ export function VertexAIPipelineView() {
           {data.gemini_statement && (
             <div className="bg-gradient-to-br from-[#12132b]/95 via-[#0f1013] to-[#0a0a10] rounded-2xl border border-[#5e6ad2]/50 p-6 relative overflow-hidden shadow-2xl shadow-[#5e6ad2]/10">
               <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#5e6ad2]/15 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Educational Preview Notice if Not Logged In */}
+              {!isAuthed && (
+                <div className="mb-4 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span><strong>Sample Benchmark Demonstration:</strong> This statement reflects standard Malwa Vertisol soybean agronomy. Log in to run tailored models for your farm.</span>
+                  </div>
+                  <Link
+                    href="/login"
+                    className="px-3 py-1 rounded-lg bg-[#5e6ad2] hover:bg-[#828fff] text-white font-semibold text-[11px] shrink-0"
+                  >
+                    Log In Now
+                  </Link>
+                </div>
+              )}
 
               {/* Header with Farmer Name, District, Crop, Acreage & Language Tag */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-[#23252a]">

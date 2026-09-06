@@ -294,32 +294,32 @@ export const CropGrowthSimulator: React.FC = () => {
   const pRootTipY = GROUND_Y + pRootDepthPx;
 
   return (
-    <div className="rounded-3xl bg-white border border-[#e3e8ee] shadow-2xl p-4 sm:p-7 space-y-6 select-none font-sans">
+    <div className="rounded-3xl bg-[#0f1011] border border-[#23252a] shadow-2xl p-4 sm:p-7 space-y-6 select-none font-sans text-[#f7f8f8]">
       
       {/* ── 1. Header with Live Status & Time-Lapse Controls ────────────────── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#23252a] pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-indigo-50 text-[#533afd] border border-indigo-200/80 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider">
-              <Sparkles className="h-3.5 w-3.5 text-[#533afd]" />
+            <span className="inline-flex items-center gap-1.5 bg-[#5e6ad2]/10 text-[#828fff] border border-[#5e6ad2]/30 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider">
+              <Sparkles className="h-3.5 w-3.5 text-[#828fff]" />
               <span>Biophysical Phenology Engine · 60 FPS</span>
             </span>
             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold border ${
               interpolated.temp >= 36
-                ? "bg-rose-50 text-rose-700 border-rose-200 animate-pulse"
+                ? "bg-rose-950/40 text-rose-300 border-rose-800/60 animate-pulse"
                 : interpolated.temp >= 32
-                ? "bg-amber-50 text-amber-700 border-amber-200"
-                : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                ? "bg-amber-950/40 text-amber-300 border-amber-800/60"
+                : "bg-emerald-950/40 text-emerald-300 border-emerald-800/60"
             }`}>
               <Thermometer className="h-3.5 w-3.5" />
               <span>{interpolated.temp}°C {interpolated.temp >= 36 ? (isHindi ? "तीव्र लू तनाव" : "Severe Heatwave") : (isHindi ? "तापमान" : "Ambient")}</span>
             </span>
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0d253d] font-display tracking-tight">
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-[#f7f8f8] font-display tracking-tight">
             {isHindi ? "पौधे का वास्तविक विकास व बायोस्टिमुलेंट रक्षा सिमुलेशन" : "Realistic Crop Growth & Biostimulant Protection Simulation"}
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8a8f98] max-w-2xl leading-relaxed">
             {isHindi
               ? "देखें कि कैसे सिंजेंटा बायोस्टिमुलेंट (Quantis® + Isabion®) लू के दौरान कोशिकाओं में पानी बनाए रखते हैं और गहरी जड़ों द्वारा 90cm नीचे के भूजल तक पहुंचते हैं।"
               : "Botanically grounded time-lapse comparing untreated drought-shocked soybean against Syngenta biostimulant-protected crops with deep aquifer root access."}
@@ -327,14 +327,14 @@ export const CropGrowthSimulator: React.FC = () => {
         </div>
 
         {/* Interactive Playback Toolbar */}
-        <div className="flex items-center gap-2.5 bg-[#f6f9fc] border border-[#e3e8ee] p-2 sm:p-2.5 px-3.5 rounded-2xl shrink-0 self-start lg:self-auto shadow-2xs">
+        <div className="flex items-center gap-2.5 bg-[#141516] border border-[#23252a] p-2 sm:p-2.5 px-3.5 rounded-2xl shrink-0 self-start lg:self-auto shadow-2xs">
           <button
             type="button"
             onClick={() => setIsPlaying(!isPlaying)}
             className={`p-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer active-press shadow-xs ${
               isPlaying
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                : "bg-[#533afd] hover:bg-[#4434d4] text-white"
+                : "bg-[#5e6ad2] hover:bg-[#4e5ac0] text-white"
             }`}
           >
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-white" />}
@@ -344,7 +344,7 @@ export const CropGrowthSimulator: React.FC = () => {
           <button
             type="button"
             onClick={() => setPlaybackSpeed(playbackSpeed === 1 ? 2 : 1)}
-            className="px-2.5 py-2 rounded-xl bg-white border border-[#e3e8ee] hover:bg-slate-100 text-slate-700 font-mono font-bold text-xs cursor-pointer transition-all active-press"
+            className="px-2.5 py-2 rounded-xl bg-[#1b1d20] border border-[#23252a] hover:bg-[#26282c] text-[#d0d3d8] font-mono font-bold text-xs cursor-pointer transition-all active-press"
             title="Toggle Simulation Speed"
           >
             {playbackSpeed}x Speed
@@ -356,19 +356,19 @@ export const CropGrowthSimulator: React.FC = () => {
               setCurrentDay(5);
               setIsPlaying(true);
             }}
-            className="p-2 rounded-xl bg-white border border-[#e3e8ee] hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-all cursor-pointer active-press"
+            className="p-2 rounded-xl bg-[#1b1d20] border border-[#23252a] hover:bg-[#26282c] text-[#8a8f98] hover:text-[#f7f8f8] transition-all cursor-pointer active-press"
             title="Reset Simulation"
           >
             <RotateCcw className="h-4 w-4" />
           </button>
 
-          <div className="h-6 w-[1px] bg-slate-200 mx-1" />
+          <div className="h-6 w-[1px] bg-[#23252a] mx-1" />
 
           <div className="text-right">
-            <span className="text-[10px] font-mono text-slate-400 font-bold block uppercase">
+            <span className="text-[10px] font-mono text-[#8a8f98] font-bold block uppercase">
               {isHindi ? "वर्तमान अवस्था" : "Current Day"}
             </span>
-            <span className="text-sm font-black text-[#0d253d] font-mono">
+            <span className="text-sm font-black text-[#f7f8f8] font-mono">
               Day {interpolated.day} / 100
             </span>
           </div>
@@ -376,16 +376,16 @@ export const CropGrowthSimulator: React.FC = () => {
       </div>
 
       {/* ── 2. Fluid Interactive Timeline Scrubber & Stage Jump Buttons ─────── */}
-      <div className="space-y-2.5 bg-[#f8fafc] border border-slate-200/90 rounded-2xl p-3 sm:p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-bold text-slate-700">
+      <div className="space-y-2.5 bg-[#141516] border border-[#23252a] rounded-2xl p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-bold text-[#f7f8f8]">
           <span className="flex items-center gap-2">
-            <Sprout className="h-4 w-4 text-emerald-600" />
-            <span className="text-slate-900 font-display">
+            <Sprout className="h-4 w-4 text-emerald-400" />
+            <span className="text-[#f7f8f8] font-display">
               {isHindi ? interpolated.milestone.stageNameHi : interpolated.milestone.stageNameEn}
             </span>
           </span>
-          <span className="text-xs font-mono text-slate-500">
-            Drag slider to scrub through any day: <strong className="text-[#533afd] font-bold">Day {interpolated.day}</strong>
+          <span className="text-xs font-mono text-[#8a8f98]">
+            Drag slider to scrub through any day: <strong className="text-[#828fff] font-bold">Day {interpolated.day}</strong>
           </span>
         </div>
 
@@ -400,7 +400,7 @@ export const CropGrowthSimulator: React.FC = () => {
             setCurrentDay(Number(e.target.value));
             setIsPlaying(false); // Pause on manual user drag
           }}
-          className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#533afd] focus:outline-none"
+          className="w-full h-2 bg-[#23252a] rounded-lg appearance-none cursor-pointer accent-[#5e6ad2] focus:outline-none"
         />
 
         {/* 5 Quick-Jump Stage Pills */}
@@ -417,8 +417,8 @@ export const CropGrowthSimulator: React.FC = () => {
                 }}
                 className={`py-1.5 px-2 rounded-xl text-left transition-all cursor-pointer border text-[11px] font-bold ${
                   isActive
-                    ? "bg-[#533afd] text-white border-[#533afd] shadow-sm scale-[1.02]"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    ? "bg-[#5e6ad2] text-white border-[#5e6ad2] shadow-sm scale-[1.02]"
+                    : "bg-[#1b1d20] text-[#8a8f98] border-[#23252a] hover:border-[#383b42] hover:text-[#f7f8f8] hover:bg-[#222428]"
                 }`}
               >
                 <span className="font-mono block text-[10px] opacity-80">Day {m.day}</span>
@@ -435,18 +435,18 @@ export const CropGrowthSimulator: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* ── LEFT: Untreated Baseline Crop (Heat Shocked & Drought Parched) ── */}
-        <div className="rounded-3xl border-2 border-rose-200 bg-gradient-to-b from-rose-50/50 via-amber-50/20 to-amber-950/25 p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden shadow-sm">
+        <div className="rounded-3xl border-2 border-rose-900/50 bg-gradient-to-b from-rose-950/40 via-amber-950/20 to-[#0c0d0e] p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden shadow-sm">
           
           {/* Top Pill & Diagnostic Indicator */}
           <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300 text-xs font-bold">
-              <AlertTriangle className="h-3.5 w-3.5 text-rose-600" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-950/80 text-rose-300 border border-rose-800/70 text-xs font-bold">
+              <AlertTriangle className="h-3.5 w-3.5 text-rose-400" />
               <span>{isHindi ? "बिना सुरक्षा (पारंपरिक असुरक्षित फसल)" : "Without Syngenta (Untreated)"}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-mono text-slate-500 uppercase font-bold">Health:</span>
+              <span className="text-[11px] font-mono text-[#8a8f98] uppercase font-bold">Health:</span>
               <span className={`text-xs font-mono font-black px-2 py-0.5 rounded-lg border ${
-                interpolated.uHealth < 40 ? "bg-red-500 text-white border-red-600 animate-pulse" : "bg-white text-rose-700 border-rose-200"
+                interpolated.uHealth < 40 ? "bg-red-900/80 text-red-200 border-red-700 animate-pulse" : "bg-[#141516] text-rose-400 border-rose-900/60"
               }`}>
                 {interpolated.uHealth}%
               </span>
@@ -637,27 +637,27 @@ export const CropGrowthSimulator: React.FC = () => {
           </div>
 
           {/* Untreated Live Diagnostic Readouts */}
-          <div className="rounded-2xl bg-white/95 border border-rose-200 p-3.5 space-y-2 z-10 shadow-xs">
+          <div className="rounded-2xl bg-[#141516]/95 border border-rose-900/60 p-3.5 space-y-2 z-10 shadow-xs">
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-              <div className="bg-rose-50/70 p-1.5 rounded-xl border border-rose-100">
-                <span className="text-[10px] text-slate-500 block">CANOPY</span>
-                <strong className="text-slate-800">{Math.round(interpolated.uHeight)} cm</strong>
+              <div className="bg-rose-950/40 p-1.5 rounded-xl border border-rose-900/50">
+                <span className="text-[10px] text-[#8a8f98] block">CANOPY</span>
+                <strong className="text-[#f7f8f8]">{Math.round(interpolated.uHeight)} cm</strong>
               </div>
-              <div className="bg-rose-50/70 p-1.5 rounded-xl border border-rose-100">
-                <span className="text-[10px] text-slate-500 block">ROOT DEPTH</span>
-                <strong className="text-rose-700">{Math.round(interpolated.uRoot)} cm</strong>
+              <div className="bg-rose-950/40 p-1.5 rounded-xl border border-rose-900/50">
+                <span className="text-[10px] text-[#8a8f98] block">ROOT DEPTH</span>
+                <strong className="text-rose-400">{Math.round(interpolated.uRoot)} cm</strong>
               </div>
-              <div className="bg-rose-50/70 p-1.5 rounded-xl border border-rose-100">
-                <span className="text-[10px] text-slate-500 block">CHLOROPHYLL</span>
-                <strong className="text-amber-700">{interpolated.uSPAD} SPAD</strong>
+              <div className="bg-rose-950/40 p-1.5 rounded-xl border border-rose-900/50">
+                <span className="text-[10px] text-[#8a8f98] block">CHLOROPHYLL</span>
+                <strong className="text-amber-400">{interpolated.uSPAD} SPAD</strong>
               </div>
             </div>
 
-            <div className="pt-1 text-xs text-rose-950 font-medium">
-              <span className="font-bold text-rose-800 block">
+            <div className="pt-1 text-xs text-rose-300 font-medium">
+              <span className="font-bold text-rose-300 block">
                 {isHindi ? interpolated.milestone.untreatedYieldLossHi : interpolated.milestone.untreatedYieldLossEn}
               </span>
-              <span className="text-slate-600 text-[11px] leading-tight block mt-0.5">
+              <span className="text-[#8a8f98] text-[11px] leading-tight block mt-0.5">
                 {isHindi ? interpolated.milestone.untreatedStatusHi : interpolated.milestone.untreatedStatusEn}
               </span>
             </div>
@@ -666,17 +666,17 @@ export const CropGrowthSimulator: React.FC = () => {
         </div>
 
         {/* ── RIGHT: Syngenta Biostimulant Protected Crop (Lush & Deep Roots) ── */}
-        <div className="rounded-3xl border-2 border-emerald-400 bg-gradient-to-b from-emerald-50/60 via-teal-50/30 to-amber-950/25 p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden shadow-lg shadow-emerald-500/10">
+        <div className="rounded-3xl border-2 border-emerald-800/60 bg-gradient-to-b from-emerald-950/40 via-teal-950/20 to-[#0c0d0e] p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden shadow-lg shadow-emerald-500/10">
           
           {/* Top Pill & Diagnostic Indicator */}
           <div className="flex items-center justify-between z-10">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-600 text-white shadow-xs text-xs font-bold">
-              <ShieldCheck className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 shadow-xs text-xs font-bold">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
               <span>{isHindi ? "सिंजेंटा सुरक्षा (Quantis® + Isabion®)" : "With Syngenta (Quantis® Protected)"}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-mono text-slate-500 uppercase font-bold">Health:</span>
-              <span className="text-xs font-mono font-black text-emerald-800 bg-white/95 px-2.5 py-0.5 rounded-lg border border-emerald-300 shadow-2xs">
+              <span className="text-[11px] font-mono text-[#8a8f98] uppercase font-bold">Health:</span>
+              <span className="text-xs font-mono font-black text-emerald-300 bg-[#141516] px-2.5 py-0.5 rounded-lg border border-emerald-800/60 shadow-2xs">
                 {interpolated.pHealth}% Optimal
               </span>
             </div>
@@ -898,27 +898,27 @@ export const CropGrowthSimulator: React.FC = () => {
           </div>
 
           {/* Protected Live Diagnostic Readouts */}
-          <div className="rounded-2xl bg-white/95 border border-emerald-300 p-3.5 space-y-2 z-10 shadow-xs">
+          <div className="rounded-2xl bg-[#141516]/95 border border-emerald-800/60 p-3.5 space-y-2 z-10 shadow-xs">
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-              <div className="bg-emerald-50/70 p-1.5 rounded-xl border border-emerald-100">
-                <span className="text-[10px] text-slate-500 block">CANOPY</span>
-                <strong className="text-emerald-950 font-bold">{Math.round(interpolated.pHeight)} cm</strong>
+              <div className="bg-emerald-950/40 p-1.5 rounded-xl border border-emerald-900/50">
+                <span className="text-[10px] text-[#8a8f98] block">CANOPY</span>
+                <strong className="text-[#f7f8f8] font-bold">{Math.round(interpolated.pHeight)} cm</strong>
               </div>
-              <div className="bg-emerald-50/70 p-1.5 rounded-xl border border-emerald-100">
-                <span className="text-[10px] text-slate-500 block">ROOT DEPTH</span>
-                <strong className="text-emerald-700 font-bold">{Math.round(interpolated.pRoot)} cm (Aquifer)</strong>
+              <div className="bg-emerald-950/40 p-1.5 rounded-xl border border-emerald-900/50">
+                <span className="text-[10px] text-[#8a8f98] block">ROOT DEPTH</span>
+                <strong className="text-emerald-400 font-bold">{Math.round(interpolated.pRoot)} cm (Aquifer)</strong>
               </div>
-              <div className="bg-emerald-50/70 p-1.5 rounded-xl border border-emerald-100">
-                <span className="text-[10px] text-slate-500 block">CHLOROPHYLL</span>
-                <strong className="text-emerald-700 font-bold">{interpolated.pSPAD} SPAD</strong>
+              <div className="bg-emerald-950/40 p-1.5 rounded-xl border border-emerald-900/50">
+                <span className="text-[10px] text-[#8a8f98] block">CHLOROPHYLL</span>
+                <strong className="text-emerald-400 font-bold">{interpolated.pSPAD} SPAD</strong>
               </div>
             </div>
 
-            <div className="pt-1 text-xs text-emerald-950 font-medium">
-              <span className="font-bold text-emerald-800 block">
+            <div className="pt-1 text-xs text-emerald-300 font-medium">
+              <span className="font-bold text-emerald-300 block">
                 {isHindi ? interpolated.milestone.protectedBenefitHi : interpolated.milestone.protectedBenefitEn}
               </span>
-              <span className="text-slate-600 text-[11px] leading-tight block mt-0.5">
+              <span className="text-[#8a8f98] text-[11px] leading-tight block mt-0.5">
                 {isHindi ? interpolated.milestone.protectedStatusHi : interpolated.milestone.protectedStatusEn}
               </span>
             </div>
@@ -929,15 +929,15 @@ export const CropGrowthSimulator: React.FC = () => {
       </div>
 
       {/* ── 4. Biophysical Agronomic Breakdown Card ─────────────────────────── */}
-      <div className="bg-[#f8fafc] border border-[#e3e8ee] rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#141516] border border-[#23252a] rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Award className="h-4 w-4 text-[#533afd]" />
-            <span className="text-xs font-bold text-[#0d253d] uppercase font-mono">
+            <Award className="h-4 w-4 text-[#828fff]" />
+            <span className="text-xs font-bold text-[#f7f8f8] uppercase font-mono">
               {isHindi ? "सिंजेंटा बायोस्टिमुलेंट क्रियाविधि (Mode of Action)" : "Syngenta Biostimulant Mode of Action"}
             </span>
           </div>
-          <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#8a8f98] max-w-2xl leading-relaxed">
             {isHindi
               ? "Quantis® पौधे की कोशिकाओं में ऑस्मोलाइट (प्रोलाइन व पोटैशियम) का स्तर बढ़ाकर 38°C तक गर्मी में रूबिस्को एंजाइम को सक्रिय रखता है। वहीं Vibrance® Trio और Isabion® जड़ों का पृष्ठीय क्षेत्रफल 180% बढ़ाते हैं जिससे पौधा 90 सेमी गहरे भूजल तक पहुंचता है।"
               : "Quantis® up-regulates heat-shock proteins (HSPs) and cellular osmolytes, sustaining rubisco photosynthesis under 38°C heatwaves. Concurrently, Vibrance® Trio and Isabion® increase root absorptive surface area by 180%, tapping deep subsoil aquifers."}
@@ -946,14 +946,14 @@ export const CropGrowthSimulator: React.FC = () => {
 
         <div className="flex items-center gap-3 shrink-0">
           <div className="text-right">
-            <span className="text-[10px] font-mono text-slate-400 font-bold uppercase block">
+            <span className="text-[10px] font-mono text-[#8a8f98] font-bold uppercase block">
               {isHindi ? "शुद्ध उपज लाभ" : "ROBI Yield Benefit"}
             </span>
-            <span className="text-base font-black text-emerald-600 font-mono">
+            <span className="text-base font-black text-emerald-400 font-mono">
               +24% Net Harvest
             </span>
           </div>
-          <div className="h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg shadow-xs">
+          <div className="h-10 w-10 rounded-2xl bg-emerald-950/50 border border-emerald-800/60 text-emerald-400 flex items-center justify-center font-bold text-lg shadow-xs">
             🌾
           </div>
         </div>

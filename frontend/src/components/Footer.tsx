@@ -12,9 +12,9 @@ export const Footer: React.FC = () => {
   const t = getTranslation(language);
 
   return (
-    <footer className="bg-[#0B0F17] text-slate-400 border-t border-slate-800/80 py-14 px-4 sm:px-6 font-sans">
+    <footer className="bg-[#050608] text-[#8a8f98] border-t border-[#23252a] py-14 px-4 sm:px-6 font-sans">
       <div className="max-w-[1240px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-10 border-b border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-10 border-b border-[#23252a]">
           
           {/* Brand Column */}
           <div className="space-y-4 md:col-span-1">

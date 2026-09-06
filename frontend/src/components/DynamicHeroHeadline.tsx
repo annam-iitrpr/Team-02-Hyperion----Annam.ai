@@ -26,55 +26,55 @@ import { PhoneMockup } from "@/components/PhoneMockup";
 
 const featureChips = [
   {
-    icon: <CloudRain className="h-4 w-4 text-[#533afd]" />,
+    icon: <CloudRain className="h-4 w-4 text-sky-400" />,
     label: "रियल-टाइम मौसम टेलीमेट्री",
     sublabel: "14-दिन सटीक सूक्ष्म पूर्वानुमान",
     labelEn: "Micro-Weather Radar",
     sublabelEn: "14-Day Hyperlocal Forecast",
-    bg: "bg-indigo-50/70 hover:bg-indigo-50",
-    border: "border-indigo-100 hover:border-indigo-300",
-    text: "text-indigo-950",
-    subtext: "text-indigo-700/80",
-    iconBg: "bg-indigo-100/80",
+    bg: "bg-[#0f1011] hover:bg-[#141516]",
+    border: "border-[#23252a] hover:border-sky-500/40",
+    text: "text-[#f7f8f8]",
+    subtext: "text-[#8a8f98]",
+    iconBg: "bg-sky-500/15 text-sky-400",
     delay: "300ms",
   },
   {
-    icon: <Store className="h-4 w-4 text-emerald-600" />,
+    icon: <Store className="h-4 w-4 text-emerald-400" />,
     label: "सत्यापित मंडी भाव",
     sublabel: "140+ लाइव APMC सरकारी मंडियां",
     labelEn: "APMC Mandi Network",
     sublabelEn: "140+ Verified Live Markets",
-    bg: "bg-emerald-50/70 hover:bg-emerald-50",
-    border: "border-emerald-100 hover:border-emerald-300",
-    text: "text-emerald-950",
-    subtext: "text-emerald-700/80",
-    iconBg: "bg-emerald-100/80",
+    bg: "bg-[#0f1011] hover:bg-[#141516]",
+    border: "border-[#23252a] hover:border-emerald-500/40",
+    text: "text-[#f7f8f8]",
+    subtext: "text-[#8a8f98]",
+    iconBg: "bg-emerald-500/15 text-emerald-400",
     delay: "400ms",
   },
   {
-    icon: <Leaf className="h-4 w-4 text-amber-600" />,
+    icon: <Leaf className="h-4 w-4 text-amber-400" />,
     label: "बहु-फसली AI सलाहकार",
     sublabel: "60+ फसलों का वैज्ञानिक मार्गदर्शन",
     labelEn: "Multi-Crop AI Advisory",
     sublabelEn: "60+ Certified Crop Protocols",
-    bg: "bg-amber-50/70 hover:bg-amber-50",
-    border: "border-amber-100 hover:border-amber-300",
-    text: "text-amber-950",
-    subtext: "text-amber-700/80",
-    iconBg: "bg-amber-100/80",
+    bg: "bg-[#0f1011] hover:bg-[#141516]",
+    border: "border-[#23252a] hover:border-amber-500/40",
+    text: "text-[#f7f8f8]",
+    subtext: "text-[#8a8f98]",
+    iconBg: "bg-amber-500/15 text-amber-400",
     delay: "500ms",
   },
   {
-    icon: <ShieldAlert className="h-4 w-4 text-violet-600" />,
+    icon: <ShieldAlert className="h-4 w-4 text-[#828fff]" />,
     label: "AI दृष्टि रोग व कीट पहचान",
     sublabel: "पत्ती स्कैन से तुरंत सटीक समाधान",
     labelEn: "Vision Diagnostics",
     sublabelEn: "Instant Leaf Necrosis Analysis",
-    bg: "bg-violet-50/70 hover:bg-violet-50",
-    border: "border-violet-100 hover:border-violet-300",
-    text: "text-violet-950",
-    subtext: "text-violet-700/80",
-    iconBg: "bg-violet-100/80",
+    bg: "bg-[#0f1011] hover:bg-[#141516]",
+    border: "border-[#23252a] hover:border-[#5e6ad2]/40",
+    text: "text-[#f7f8f8]",
+    subtext: "text-[#8a8f98]",
+    iconBg: "bg-[#5e6ad2]/15 text-[#828fff]",
     delay: "600ms",
   },
 ];
@@ -106,24 +106,20 @@ export const DynamicHeroHeadline: React.FC = () => {
 
   return (
     <section
-      className="relative overflow-hidden border-b border-[#e3e8ee]"
+      className="relative overflow-hidden border-b border-[#23252a] bg-[#010102]"
       style={{
-        background: "radial-gradient(120% 120% at 50% 0%, #FFFFFF 0%, #F8FAFC 45%, #EEF2FF 100%)",
+        background: "radial-gradient(120% 120% at 50% 0%, #08090b 0%, #010102 55%, #010102 100%)",
         minHeight: "calc(100vh - 68px)",
       }}
     >
-      {/* Atmospheric Stripe-style gradient mesh */}
+      {/* Atmospheric Linear-style cosmic glow mesh */}
       <div
-        className="absolute top-[-140px] left-[5%] w-[640px] h-[640px] rounded-full opacity-25 pointer-events-none blur-3xl"
-        style={{ background: "radial-gradient(circle, #533afd 0%, #665efd 35%, #b9b9f9 70%, transparent 85%)" }}
+        className="absolute top-[-140px] left-[15%] w-[640px] h-[640px] rounded-full opacity-20 pointer-events-none blur-3xl"
+        style={{ background: "radial-gradient(circle, #5e6ad2 0%, #3e4491 35%, transparent 70%)" }}
       />
       <div
-        className="absolute top-[-60px] right-[10%] w-[520px] h-[520px] rounded-full opacity-20 pointer-events-none blur-3xl"
-        style={{ background: "radial-gradient(circle, #f5e9d4 0%, #f96bee 40%, #533afd 75%, transparent 90%)" }}
-      />
-      <div
-        className="absolute top-[28%] left-[30%] w-[480px] h-[480px] rounded-full opacity-10 pointer-events-none blur-3xl"
-        style={{ background: "radial-gradient(circle, #0ea5e9 0%, #10b981 50%, transparent 80%)" }}
+        className="absolute top-[20%] right-[10%] w-[520px] h-[520px] rounded-full opacity-10 pointer-events-none blur-3xl"
+        style={{ background: "radial-gradient(circle, #10b981 0%, transparent 65%)" }}
       />
 
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -140,16 +136,16 @@ export const DynamicHeroHeadline: React.FC = () => {
                 transition: "opacity 400ms ease 100ms, transform 400ms ease 100ms",
               }}
             >
-              <div className="inline-flex items-center gap-2 bg-white border border-[#e3e8ee] rounded-full px-3.5 py-1.5 text-xs font-bold text-[#0d253d] shadow-xs hover:border-[#533afd]/40 transition-colors">
+              <div className="inline-flex items-center gap-2 bg-[#0f1011] border border-[#23252a] rounded-full px-3.5 py-1.5 text-xs font-bold text-[#f7f8f8] shadow-xs hover:border-[#5e6ad2]/40 transition-colors">
                 <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#533afd] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#533afd]"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5e6ad2] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5e6ad2]"></span>
                 </span>
-                <span className="text-[#0d253d] font-semibold">Google Gemini 2.5 Flash</span>
-                <span className="text-slate-300">·</span>
-                <span className="text-[#533afd] font-mono font-semibold">Open-Meteo Telemetry</span>
-                <span className="text-slate-300">·</span>
-                <span className="text-emerald-700 font-mono font-semibold">140+ APMC Mandis</span>
+                <span className="text-[#f7f8f8] font-semibold">Google Gemini 2.5 Flash</span>
+                <span className="text-[#34343a]">·</span>
+                <span className="text-[#828fff] font-mono font-semibold">Open-Meteo Telemetry</span>
+                <span className="text-[#34343a]">·</span>
+                <span className="text-emerald-400 font-mono font-semibold">140+ APMC Mandis</span>
               </div>
             </div>
 
@@ -162,13 +158,13 @@ export const DynamicHeroHeadline: React.FC = () => {
                 transition: "opacity 500ms ease 200ms, transform 500ms ease 200ms",
               }}
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-[#0d253d] leading-[1.08] tracking-tight font-display">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-[#f7f8f8] leading-[1.08] tracking-tight font-display">
                 {headline1}
               </h1>
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-[#0d253d] leading-[1.08] tracking-tight font-display">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-[#f7f8f8] leading-[1.08] tracking-tight font-display">
                 <span>{headline2} </span>
                 <span
-                  className="bg-gradient-to-r from-[#533afd] via-[#4434d4] to-[#0ea5e9] bg-clip-text text-transparent font-black"
+                  className="bg-gradient-to-r from-[#5e6ad2] via-[#828fff] to-[#38bdf8] bg-clip-text text-transparent font-black"
                 >
                   {highlight}
                 </span>
@@ -177,7 +173,7 @@ export const DynamicHeroHeadline: React.FC = () => {
 
             {/* 3. Description */}
             <p
-              className="text-sm sm:text-base text-[#64748d] leading-relaxed max-w-xl font-normal"
+              className="text-sm sm:text-base text-[#8a8f98] leading-relaxed max-w-xl font-normal"
               style={{
                 opacity: mounted ? 1 : 0,
                 transform: mounted ? "translateY(0)" : "translateY(14px)",
@@ -226,11 +222,7 @@ export const DynamicHeroHeadline: React.FC = () => {
               <div className="flex flex-wrap items-center gap-3.5">
                 <Link
                   href={isLoggedIn ? "/dashboard" : "/signup"}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                  style={{
-                    background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-                    boxShadow: "0 6px 20px rgba(83, 58, 253, 0.28)",
-                  }}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer bg-[#5e6ad2] hover:bg-[#828fff] shadow-[#5e6ad2]/30"
                 >
                   <UserPlus className="h-4 w-4" />
                   <span>{ctaPrimary}</span>
@@ -239,22 +231,22 @@ export const DynamicHeroHeadline: React.FC = () => {
 
                 <Link
                   href="/how-it-works"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold text-[#0d253d] bg-white border border-[#e3e8ee] hover:border-[#533afd]/40 hover:text-[#533afd] shadow-xs hover:shadow-sm transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-sm font-bold text-[#f7f8f8] bg-[#141516] border border-[#23252a] hover:border-[#5e6ad2]/50 hover:bg-[#18191a] shadow-xs transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                 >
-                  <Sparkles className="h-4 w-4 text-[#533afd]" />
+                  <Sparkles className="h-4 w-4 text-[#828fff]" />
                   <span>{ctaSecondary}</span>
                 </Link>
               </div>
 
               {/* Dynamic location pill + trust note */}
-              <div className="flex items-center gap-2.5 text-xs text-slate-500 pt-1">
+              <div className="flex items-center gap-2.5 text-xs text-[#8a8f98] pt-1">
                 {mounted && activeFarm?.district ? (
-                  <span className="inline-flex items-center gap-1 bg-white border border-[#e3e8ee] rounded-full px-2.5 py-1 text-[11px] font-medium text-slate-700 shadow-2xs">
-                    <MapPin className="h-3 w-3 text-[#533afd]" />
+                  <span className="inline-flex items-center gap-1 bg-[#0f1011] border border-[#23252a] rounded-full px-2.5 py-1 text-[11px] font-medium text-[#f7f8f8] shadow-2xs">
+                    <MapPin className="h-3 w-3 text-[#5e6ad2]" />
                     <span>{activeFarm.district}{activeFarm.state ? `, ${activeFarm.state}` : ""}</span>
                   </span>
                 ) : null}
-                <span className="text-[11px] text-slate-500 font-medium">✓ {ctaNote}</span>
+                <span className="text-[11px] text-[#8a8f98] font-mono">✓ {ctaNote}</span>
               </div>
             </div>
 

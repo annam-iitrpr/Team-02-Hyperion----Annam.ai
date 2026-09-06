@@ -226,46 +226,46 @@ export function ROIBiophysicalSimulator() {
   };
 
   return (
-    <div className="w-full bg-white border border-[#e3e8ee] rounded-3xl shadow-xl overflow-hidden select-none">
+    <div className="w-full bg-[#0f1011] border border-[#23252a] rounded-3xl shadow-xl overflow-hidden select-none text-[#f7f8f8]">
       
       {/* ── Enterprise Financial Header ─────────────────────────────── */}
-      <div className="bg-[#f6f9fc] border-b border-[#e3e8ee] px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#141516] border-b border-[#23252a] px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono font-bold text-[#533afd] uppercase tracking-wider">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-mono font-bold text-[#828fff] uppercase tracking-wider">
               Syngenta Biologicals • Quantitative Yield Shield
             </span>
-            <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono font-bold text-[#8a8f98] bg-[#1f2125] border border-[#2d3036] px-2 py-0.5 rounded-full">
               ROBI™ Financial Engine
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-[#0d253d] font-display tracking-tight">
+          <h3 className="text-xl sm:text-2xl font-bold text-[#f7f8f8] font-display tracking-tight">
             {isHindi ? "बायोस्टिमुलेंट उपज सुरक्षा व शुद्ध लाभ विश्लेषक" : "Biological Yield Protection & Net ROI Modeling"}
           </h3>
-          <p className="text-xs text-[#64748d] flex items-center gap-1.5 flex-wrap">
+          <p className="text-xs text-[#8a8f98] flex items-center gap-1.5 flex-wrap">
             <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-            <span className="font-medium text-slate-700">{isHindi ? current.regionHi : current.regionEn}</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500">{isHindi ? current.stressVulnerabilityHi : current.stressVulnerabilityEn}</span>
+            <span className="font-medium text-[#d0d3d8]">{isHindi ? current.regionHi : current.regionEn}</span>
+            <span className="text-[#3b3e45]">•</span>
+            <span className="text-[#8a8f98]">{isHindi ? current.stressVulnerabilityHi : current.stressVulnerabilityEn}</span>
           </p>
         </div>
 
         {/* Live APMC Benchmark & Progress Indicator */}
         <div className="flex items-center gap-4 self-start sm:self-auto shrink-0">
           <div className="text-right">
-            <span className="text-[10px] font-mono text-slate-400 uppercase font-bold block">
+            <span className="text-[10px] font-mono text-[#8a8f98] uppercase font-bold block">
               Agmarknet Benchmark
             </span>
-            <span className="text-sm font-black text-[#0d253d] font-mono">
-              ₹{current.mandiPricePerQtl.toLocaleString("en-IN")} <span className="text-[10px] font-normal text-slate-500">/ Quintal</span>
+            <span className="text-sm font-black text-[#f7f8f8] font-mono">
+              ₹{current.mandiPricePerQtl.toLocaleString("en-IN")} <span className="text-[10px] font-normal text-[#8a8f98]">/ Quintal</span>
             </span>
           </div>
 
-          <div className="w-20 sm:w-28 h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div className="w-20 sm:w-28 h-2 bg-[#23252a] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#533afd] transition-all duration-75 rounded-full"
+              className="h-full bg-[#5e6ad2] transition-all duration-75 rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -282,10 +282,10 @@ export function ROIBiophysicalSimulator() {
           {/* 6 High-Fidelity Crop Badges */}
           <div className="lg:col-span-7 space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <label className="text-xs font-bold text-[#8a8f98] uppercase tracking-wider">
                 {isHindi ? "फसल चुनें (Select Commodity):" : "Select Agricultural Commodity:"}
               </label>
-              <span className="text-[11px] font-mono text-[#533afd] font-bold">
+              <span className="text-[11px] font-mono text-[#828fff] font-bold">
                 {current.category}
               </span>
             </div>
@@ -300,22 +300,22 @@ export function ROIBiophysicalSimulator() {
                     onClick={() => handleSelectCrop(idx)}
                     className={`p-3 rounded-2xl border text-left transition-all duration-200 cursor-pointer relative overflow-hidden ${
                       isSelected
-                        ? "bg-white border-[#533afd] shadow-lg shadow-[#533afd]/10 ring-2 ring-[#533afd]/20 scale-[1.02]"
-                        : "bg-[#f6f9fc] hover:bg-slate-100/80 border-[#e3e8ee] text-slate-700"
+                        ? "bg-[#1b1d22] border-[#5e6ad2] shadow-lg shadow-[#5e6ad2]/20 ring-1 ring-[#5e6ad2]/40 scale-[1.02]"
+                        : "bg-[#141516] hover:bg-[#1a1c1e] border-[#23252a] text-[#8a8f98]"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${isSelected ? cr.accentBg : "bg-white text-slate-500 border-slate-200"}`}>
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${isSelected ? "bg-emerald-950/60 text-emerald-300 border-emerald-700/60" : "bg-[#1f2125] text-[#8a8f98] border-[#2d3036]"}`}>
                         +{cr.deltaYieldQtlPerAcre} q/ac
                       </span>
                       {isSelected && (
-                        <CheckCircle2 className="h-4 w-4 text-[#533afd]" />
+                        <CheckCircle2 className="h-4 w-4 text-[#828fff]" />
                       )}
                     </div>
-                    <span className="text-sm font-bold text-[#0d253d] font-display block">
+                    <span className="text-sm font-bold text-[#f7f8f8] font-display block">
                       {isHindi ? cr.nameHi : cr.nameEn}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono block">
+                    <span className="text-[10px] text-[#8a8f98] font-mono block">
                       ₹{cr.mandiPricePerQtl}/qtl
                     </span>
                   </button>
@@ -325,15 +325,15 @@ export function ROIBiophysicalSimulator() {
           </div>
 
           {/* Farm Acreage Precision Slider */}
-          <div className="lg:col-span-5 p-5 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] space-y-3">
-            <div className="flex justify-between items-center text-xs font-bold text-[#0d253d]">
-              <span className="flex items-center gap-1.5 text-slate-700">
-                <Sliders className="h-3.5 w-3.5 text-[#533afd]" />
+          <div className="lg:col-span-5 p-5 rounded-2xl bg-[#141516] border border-[#23252a] space-y-3">
+            <div className="flex justify-between items-center text-xs font-bold text-[#f7f8f8]">
+              <span className="flex items-center gap-1.5 text-[#d0d3d8]">
+                <Sliders className="h-3.5 w-3.5 text-[#828fff]" />
                 <span>{isHindi ? "खेत का क्षेत्रफल (Farm Size):" : "Operational Farm Acreage:"}</span>
               </span>
-              <span className="font-mono text-base text-[#533afd] font-black bg-indigo-50 px-3 py-0.5 rounded-xl border border-indigo-200">
+              <span className="font-mono text-base text-[#828fff] font-black bg-[#5e6ad2]/15 px-3 py-0.5 rounded-xl border border-[#5e6ad2]/30">
                 {acres} {isHindi ? "एकड़" : "Acres"}
-                <span className="text-[10px] font-normal text-slate-500 ml-1">({(acres * 0.4047).toFixed(1)} Ha)</span>
+                <span className="text-[10px] font-normal text-[#8a8f98] ml-1">({(acres * 0.4047).toFixed(1)} Ha)</span>
               </span>
             </div>
 
@@ -344,10 +344,10 @@ export function ROIBiophysicalSimulator() {
               step="1"
               value={acres}
               onChange={(e) => setAcres(Number(e.target.value))}
-              className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#533afd]"
+              className="w-full h-2 bg-[#23252a] rounded-lg appearance-none cursor-pointer accent-[#5e6ad2]"
             />
 
-            <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+            <div className="flex justify-between text-[10px] text-[#8a8f98] font-mono">
               <span>1 Acre (Smallholder)</span>
               <span>25 Acres</span>
               <span>50+ Acres (Commercial)</span>
@@ -357,13 +357,13 @@ export function ROIBiophysicalSimulator() {
         </div>
 
         {/* Row 2: Biological Yield Protection Waterfall */}
-        <div className="p-5 rounded-2xl bg-white border border-[#e3e8ee] shadow-sm space-y-3">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700 flex-wrap gap-2">
+        <div className="p-5 rounded-2xl bg-[#141516] border border-[#23252a] shadow-sm space-y-3">
+          <div className="flex items-center justify-between text-xs font-bold text-[#f7f8f8] flex-wrap gap-2">
             <span className="flex items-center gap-1.5">
-              <BarChart3 className="h-4 w-4 text-[#533afd]" />
+              <BarChart3 className="h-4 w-4 text-[#828fff]" />
               <span>{isHindi ? "बायोलॉजिकल उपज सुरक्षा तुलना (Yield Protection Buffer):" : "Biological Yield Protection Comparison:"}</span>
             </span>
-            <span className="text-[11px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <span className="text-[11px] font-mono text-emerald-300 font-bold bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/60">
               +{yieldLiftPct}% Net Protected Yield Lift ({totalDeltaYieldQtl} Quintals Buffer)
             </span>
           </div>
@@ -374,12 +374,12 @@ export function ROIBiophysicalSimulator() {
             {/* Untreated Baseline */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] font-mono">
-                <span className="text-slate-500">{isHindi ? "बिना सुरक्षा के आधारभूत उत्पादन (Untreated):" : "Untreated Baseline (Heat Stressed):"}</span>
-                <span className="font-bold text-slate-700">{totalBaselineYieldQtl} Quintals</span>
+                <span className="text-[#8a8f98]">{isHindi ? "बिना सुरक्षा के आधारभूत उत्पादन (Untreated):" : "Untreated Baseline (Heat Stressed):"}</span>
+                <span className="font-bold text-[#d0d3d8]">{totalBaselineYieldQtl} Quintals</span>
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-3 bg-[#23252a] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-slate-300 rounded-full transition-all duration-300"
+                  className="h-full bg-[#464a53] rounded-full transition-all duration-300"
                   style={{ width: `${(totalBaselineYieldQtl / totalProtectedYieldQtl) * 100}%` }}
                 />
               </div>
@@ -388,12 +388,12 @@ export function ROIBiophysicalSimulator() {
             {/* Syngenta Bio-Protected */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] font-mono">
-                <span className="text-[#533afd] font-bold">{isHindi ? "सिंजेंटा क्वांटिस® सुरक्षित उत्पादन (Protected):" : "Syngenta Quantis® Bio-Protected:"}</span>
-                <span className="font-black text-emerald-700">{totalProtectedYieldQtl} Quintals (+{totalDeltaYieldQtl} Qtl)</span>
+                <span className="text-[#828fff] font-bold">{isHindi ? "सिंजेंटा क्वांटिस® सुरक्षित उत्पादन (Protected):" : "Syngenta Quantis® Bio-Protected:"}</span>
+                <span className="font-black text-emerald-400">{totalProtectedYieldQtl} Quintals (+{totalDeltaYieldQtl} Qtl)</span>
               </div>
-              <div className="h-3.5 bg-slate-100 rounded-full overflow-hidden p-0.5">
+              <div className="h-3.5 bg-[#23252a] rounded-full overflow-hidden p-0.5">
                 <div
-                  className="h-full bg-gradient-to-r from-[#533afd] to-emerald-500 rounded-full transition-all duration-300 shadow-sm"
+                  className="h-full bg-gradient-to-r from-[#5e6ad2] to-emerald-400 rounded-full transition-all duration-300 shadow-sm"
                   style={{ width: "100%" }}
                 />
               </div>
@@ -406,37 +406,37 @@ export function ROIBiophysicalSimulator() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
           {/* Tile 1: Gross Protected Harvest Value */}
-          <div className="p-5 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-500 uppercase font-mono block">
+          <div className="p-5 rounded-2xl bg-[#141516] border border-[#23252a] space-y-1.5">
+            <span className="text-[11px] font-bold text-[#8a8f98] uppercase font-mono block">
               {isHindi ? "संरक्षित उपज का सकल मूल्य" : "Gross Protected Value"}
             </span>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl sm:text-3xl font-black text-[#0d253d] font-mono">
+              <span className="text-2xl sm:text-3xl font-black text-[#f7f8f8] font-mono">
                 ₹{grossProtectedValueINR.toLocaleString("en-IN")}
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 font-mono">
+            <p className="text-[11px] text-[#8a8f98] font-mono">
               {totalDeltaYieldQtl} Qtl @ ₹{current.mandiPricePerQtl.toLocaleString("en-IN")}/Qtl
             </p>
           </div>
 
           {/* Tile 2: Treatment Protocol Cost */}
-          <div className="p-5 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] space-y-1.5">
-            <span className="text-[11px] font-bold text-slate-500 uppercase font-mono block">
+          <div className="p-5 rounded-2xl bg-[#141516] border border-[#23252a] space-y-1.5">
+            <span className="text-[11px] font-bold text-[#8a8f98] uppercase font-mono block">
               {isHindi ? "बायोस्टिमुलेंट उपचार खर्च" : "Input Intervention Cost"}
             </span>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl sm:text-3xl font-black text-slate-700 font-mono">
+              <span className="text-2xl sm:text-3xl font-black text-[#d0d3d8] font-mono">
                 ₹{totalInputCostINR.toLocaleString("en-IN")}
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 font-mono">
+            <p className="text-[11px] text-[#8a8f98] font-mono">
               {acres} Acres × ₹{current.quantisCostPerAcre}/Acre (Quantis®)
             </p>
           </div>
 
           {/* Tile 3: Net Cash Surplus in Farmer Pocket */}
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#0d253d] via-[#1a237e] to-[#0d253d] text-white border border-indigo-400/40 shadow-xl space-y-1.5 relative overflow-hidden">
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#101322] via-[#161a33] to-[#0f1011] text-white border border-[#5e6ad2]/50 shadow-xl space-y-1.5 relative overflow-hidden">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-emerald-400 uppercase font-mono block">
                 {isHindi ? "किसान की जेब में शुद्ध लाभ" : "Net Farmer Surplus"}
@@ -455,7 +455,7 @@ export function ROIBiophysicalSimulator() {
               +₹{netEconomicSurplusINR.toLocaleString("en-IN")}
             </motion.div>
 
-            <p className="text-[10px] text-slate-300 font-mono">
+            <p className="text-[10px] text-[#8a8f98] font-mono">
               {isHindi
                 ? "सभी इनपुट खर्च घटाने के बाद शुद्ध अतिरिक्त बैंक बैलेंस"
                 : "Net cash profit after deducting biostimulant application costs"}
@@ -465,10 +465,10 @@ export function ROIBiophysicalSimulator() {
         </div>
 
         {/* Row 4: Scientific Trial Citation & Navigation Action */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 text-xs">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#23252a] text-xs">
           
-          <div className="flex items-center gap-2 text-slate-500">
-            <Award className="h-4 w-4 text-[#533afd] shrink-0" />
+          <div className="flex items-center gap-2 text-[#8a8f98]">
+            <Award className="h-4 w-4 text-[#828fff] shrink-0" />
             <span className="font-mono text-[11px]">
               {current.icarTrialCitation}
             </span>
@@ -476,8 +476,7 @@ export function ROIBiophysicalSimulator() {
 
           <Link
             href={isLoggedIn ? "/what-if" : "/signup"}
-            className="px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] shrink-0"
-            style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
+            className="px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] shrink-0 bg-[#5e6ad2] hover:bg-[#4e5ac0]"
           >
             <span>{isHindi ? "विस्तृत वॉट-इफ सिमुलेटर खोलें" : "Launch Advanced What-If Simulator"}</span>
             <ArrowRight className="h-3.5 w-3.5" />

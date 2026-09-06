@@ -426,28 +426,28 @@ export default function HowItWorksPage() {
 
   return (
     <AppShell>
-      <div className="min-h-screen bg-[#f6f9fc] text-[#0d253d] font-sans pb-20 select-none relative overflow-hidden">
+      <div className="min-h-screen bg-[#010102] text-[#f7f8f8] font-sans pb-20 select-none relative overflow-hidden">
         
         {/* ── Atmospheric Radial Meshes ─────────────────────────────── */}
         <div
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-25 blur-3xl pointer-events-none rounded-full"
-          style={{ background: "radial-gradient(circle, #533afd 0%, #0ea5e9 60%, transparent 80%)" }}
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-15 blur-3xl pointer-events-none rounded-full"
+          style={{ background: "radial-gradient(circle, #5e6ad2 0%, #0ea5e9 60%, transparent 80%)" }}
         />
 
         {/* ── 1. Header & Page Mission ──────────────────────────────── */}
         <section className="pt-12 sm:pt-20 pb-8 px-4 sm:px-6 max-w-5xl mx-auto text-center space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-[#e3e8ee] shadow-2xs text-xs font-mono font-bold text-[#533afd]">
-            <Sparkles className="h-3.5 w-3.5 text-[#533afd]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#141516] border border-[#23252a] text-xs font-mono font-bold text-[#828fff]">
+            <Sparkles className="h-3.5 w-3.5 text-[#5e6ad2]" />
             <span>{isHindi ? "संपूर्ण उपयोगकर्ता गाइड व कार्यप्रणाली" : "Complete AASRA Operational Manual & Architecture"}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-[#0d253d] tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-[#f7f8f8] tracking-tight leading-tight">
             {isHindi
               ? "AASRA का उपयोग कैसे करें: हर फीचर की विस्तृत गाइड"
               : "How to Use AASRA: The Complete Step-by-Step Guide"}
           </h1>
 
-          <p className="text-sm sm:text-base lg:text-lg text-[#64748d] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-[#8a8f98] max-w-3xl mx-auto leading-relaxed">
             {isHindi
               ? "खेत जोड़ने से लेकर वॉयस AI, पत्ती स्कैनर, मौसम रडार, लाइव मंडी भाव और मुनाफा सिमुलेटर तक — जानें हर टूल का सही उपयोग।"
               : "From satellite field mapping and voice diagnostics to micro-weather radar and live Mandi arbitrage — master every module of the agricultural operating system."}
@@ -460,14 +460,14 @@ export default function HowItWorksPage() {
           {/* Module Selector Ribbon */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono">
+              <span className="text-xs font-bold text-[#8a8f98] uppercase tracking-wider font-mono">
                 {isHindi ? "सभी 7 कृषि मॉड्यूल (क्लिक करके देखें):" : "Explore All 7 Operating Modules (Click to inspect):"}
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-slate-400">Auto Tour:</span>
-                <div className="w-20 sm:w-28 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <span className="text-[11px] font-mono text-[#8a8f98]">Auto Tour:</span>
+                <div className="w-20 sm:w-28 h-2 bg-[#141516] border border-[#23252a] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#533afd] transition-all duration-75 rounded-full"
+                    className="h-full bg-[#5e6ad2] transition-all duration-75 rounded-full"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -490,15 +490,15 @@ export default function HowItWorksPage() {
                     }}
                     className={`p-3 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-2 ${
                       isSelected
-                        ? "bg-[#0d253d] text-white border-[#0d253d] shadow-lg shadow-indigo-950/20 scale-[1.03] ring-2 ring-[#533afd]"
-                        : "bg-white hover:bg-slate-50 border-[#e3e8ee] text-slate-700"
+                        ? "bg-[#18191a] text-white border-[#5e6ad2] shadow-lg shadow-[#5e6ad2]/20 scale-[1.02] ring-1 ring-[#5e6ad2]"
+                        : "bg-[#0f1011] hover:bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8]"
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${isSelected ? "bg-white/10 text-indigo-200" : "bg-slate-100 text-slate-500"}`}>
+                      <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${isSelected ? "bg-[#5e6ad2]/20 text-[#828fff]" : "bg-[#141516] text-[#8a8f98]"}`}>
                         {mod.num}
                       </span>
-                      <Icon className={`h-4 w-4 ${isSelected ? "text-emerald-400" : "text-slate-400"}`} />
+                      <Icon className={`h-4 w-4 ${isSelected ? "text-[#828fff]" : "text-[#8a8f98]"}`} />
                     </div>
                     <span className="text-xs font-bold block truncate w-full">
                       {isHindi ? mod.titleHi.split(" ")[0] + " " + (mod.titleHi.split(" ")[1] || "") : mod.titleEn.split(" ").slice(0, 2).join(" ")}
@@ -510,7 +510,7 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Active Module Full Presentation Card */}
-          <div className="rounded-3xl bg-white border border-[#e3e8ee] shadow-2xl p-6 sm:p-10 space-y-8 overflow-hidden">
+          <div className="rounded-3xl bg-[#0f1011] border border-[#23252a] shadow-2xl p-6 sm:p-10 space-y-8 overflow-hidden">
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
@@ -519,36 +519,36 @@ export default function HowItWorksPage() {
                 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-[#533afd] bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 uppercase">
+                    <span className="text-[10px] font-mono font-bold text-[#828fff] bg-[#5e6ad2]/20 px-3 py-1 rounded-full border border-[#5e6ad2]/40 uppercase">
                       {isHindi ? activeModule.badgeHi : activeModule.badge}
                     </span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-black text-[#0d253d] font-display tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-black text-[#f7f8f8] font-display tracking-tight">
                     {isHindi ? activeModule.titleHi : activeModule.titleEn}
                   </h2>
-                  <p className="text-xs sm:text-sm text-[#64748d] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#8a8f98] leading-relaxed">
                     {isHindi ? activeModule.summaryHi : activeModule.summaryEn}
                   </p>
                 </div>
 
                 {/* 3 Click-by-Click Steps */}
                 <div className="space-y-3">
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono block">
+                  <span className="text-xs font-bold text-[#8a8f98] uppercase tracking-wider font-mono block">
                     {isHindi ? "उपयोग करने का तरीका (Step-by-Step):" : "How to Use in the App:"}
                   </span>
                   
                   {activeModule.howToSteps.map((s, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] space-y-1"
+                      className="p-3.5 rounded-2xl bg-[#141516] border border-[#23252a] space-y-1"
                     >
-                      <span className="text-xs font-bold text-[#0d253d] block flex items-center gap-2">
-                        <span className="h-5 w-5 rounded-full bg-[#533afd] text-white text-[10px] font-mono flex items-center justify-center shrink-0">
+                      <span className="text-xs font-bold text-[#f7f8f8] block flex items-center gap-2">
+                        <span className="h-5 w-5 rounded-full bg-[#5e6ad2] text-white text-[10px] font-mono flex items-center justify-center shrink-0">
                           {idx + 1}
                         </span>
                         <span>{isHindi ? s.stepHi : s.step}</span>
                       </span>
-                      <p className="text-[11px] text-slate-600 pl-7 leading-relaxed">
+                      <p className="text-[11px] text-[#8a8f98] pl-7 leading-relaxed">
                         {isHindi ? s.detailHi : s.detail}
                       </p>
                     </div>
@@ -556,13 +556,13 @@ export default function HowItWorksPage() {
                 </div>
 
                 {/* Key Farmer Benefit */}
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
-                  <Award className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
+                <div className="p-4 rounded-2xl bg-[#141516] border border-emerald-500/30 flex items-start gap-3">
+                  <Award className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <span className="text-xs font-bold text-emerald-900 block">
+                    <span className="text-xs font-bold text-emerald-300 block">
                       {isHindi ? "किसान को सीधा लाभ (Key Outcome):" : "Direct Farmer Impact:"}
                     </span>
-                    <p className="text-[11px] text-emerald-800">
+                    <p className="text-[11px] text-emerald-400/90 leading-relaxed">
                       {isHindi ? activeModule.farmerOutcomeHi : activeModule.farmerOutcomeEn}
                     </p>
                   </div>
@@ -580,27 +580,27 @@ export default function HowItWorksPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={{ duration: 0.25 }}
-                    className="rounded-3xl bg-gradient-to-br from-[#0d253d] via-[#112d4e] to-[#0d253d] border border-indigo-500/30 text-white p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden"
+                    className="rounded-3xl bg-[#08090b] border border-[#23252a] text-white p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden"
                   >
                     {/* Header Bar */}
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <div className="flex items-center justify-between border-b border-[#23252a] pb-3">
                       <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-rose-500/80" />
                         <div className="h-3 w-3 rounded-full bg-amber-500/80" />
                         <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
-                        <span className="text-[10px] font-mono text-slate-400 ml-2">AASRA OS 2.5 • INTERFACE</span>
+                        <span className="text-[10px] font-mono text-[#8a8f98] ml-2">AASRA OS 2.5 • INTERFACE</span>
                       </div>
-                      <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                         {activeModule.simulatedScreen.badge}
                       </span>
                     </div>
 
                     {/* Title & Sub */}
                     <div className="space-y-1">
-                      <h4 className="text-lg sm:text-xl font-bold font-display text-white">
+                      <h4 className="text-lg sm:text-xl font-bold font-display text-[#f7f8f8]">
                         {activeModule.simulatedScreen.title}
                       </h4>
-                      <p className="text-xs text-slate-300 font-mono">
+                      <p className="text-xs text-[#8a8f98] font-mono">
                         {activeModule.simulatedScreen.sub}
                       </p>
                     </div>
@@ -610,12 +610,12 @@ export default function HowItWorksPage() {
                       {activeModule.simulatedScreen.metrics.map((m, idx) => (
                         <div
                           key={idx}
-                          className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-1"
+                          className="p-3.5 rounded-2xl bg-[#141516] border border-[#23252a] space-y-1"
                         >
-                          <span className="text-[10px] font-mono text-slate-400 uppercase block">
+                          <span className="text-[10px] font-mono text-[#8a8f98] uppercase block">
                             {m.label}
                           </span>
-                          <span className={`text-xs sm:text-sm font-bold block ${m.color || "text-white"}`}>
+                          <span className={`text-xs sm:text-sm font-bold block ${m.color || "text-[#f7f8f8]"}`}>
                             {m.val}
                           </span>
                         </div>
@@ -626,8 +626,7 @@ export default function HowItWorksPage() {
                     <div className="pt-2">
                       <Link
                         href={isLoggedInUser ? "/dashboard" : "/signup"}
-                        className="w-full py-3 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.01]"
-                        style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
+                        className="w-full py-3 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 bg-[#5e6ad2] hover:bg-[#828fff] cursor-pointer"
                       >
                         <Zap className="h-3.5 w-3.5" />
                         <span>{isLoggedInUser ? (isHindi ? "इस टूल को डैशबोर्ड में खोलें" : "Open This Tool in Dashboard") : (isHindi ? "अपने खेत पर निःशुल्क शुरू करें" : "Try This Tool on Your Land")}</span>
@@ -649,13 +648,13 @@ export default function HowItWorksPage() {
         {/* ── 3. Day-in-the-Life Farmer Journey (सुबह से शाम तक) ──────── */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 my-16 space-y-8">
           <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <span className="text-xs font-mono font-bold text-[#533afd] uppercase">
+            <span className="text-xs font-mono font-bold text-[#828fff] uppercase">
               Operational Routine
             </span>
-            <h3 className="text-2xl sm:text-4xl font-black text-[#0d253d] font-display">
+            <h3 className="text-2xl sm:text-4xl font-black text-[#f7f8f8] font-display">
               {isHindi ? "एक किसान की दिनचर्या: सुबह से शाम तक AASRA का उपयोग" : "A Farmer's Daily Routine with AASRA"}
             </h3>
-            <p className="text-xs sm:text-sm text-[#64748d]">
+            <p className="text-xs sm:text-sm text-[#8a8f98]">
               {isHindi
                 ? "देखें कि कैसे AASRA किसान के हर घंटे के निर्णय को आसान और वैज्ञानिक बनाता है।"
                 : "Experience how AASRA seamlessly guides precision decisions throughout the crop day."}
@@ -671,7 +670,7 @@ export default function HowItWorksPage() {
                   ? "सुबह उठते ही देखें कि आज हवा की गति और बारिश का क्या रुख है और स्प्रे करना सुरक्षित है या नहीं।"
                   : "Check wind velocity, rain risk, and Delta-T to confirm whether the morning spray window is open.",
                 icon: CloudSun,
-                color: "text-amber-600 bg-amber-50 border-amber-200",
+                color: "text-amber-400 bg-amber-500/10 border-amber-500/30",
               },
               {
                 time: "08:30 AM",
@@ -680,7 +679,7 @@ export default function HowItWorksPage() {
                   ? "खेत में किसी पौधे पर पीलापन या कीट दिखने पर तुरंत फोन से फोटो खींचकर बीमारी की पहचान करें।"
                   : "Spot any discolored leaf or pest and snap a 3-second photo for instant optical AI diagnosis.",
                 icon: Camera,
-                color: "text-emerald-600 bg-emerald-50 border-emerald-200",
+                color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
               },
               {
                 time: "12:00 PM",
@@ -689,7 +688,7 @@ export default function HowItWorksPage() {
                   ? "दुपहर में बोलकर पूछें कि आज आसपास की किस मंडी में सबसे ज्यादा भाव मिल रहा है।"
                   : "Ask the voice assistant in your dialect for today's highest APMC rates across nearby districts.",
                 icon: Mic,
-                color: "text-purple-600 bg-purple-50 border-purple-200",
+                color: "text-purple-400 bg-purple-500/10 border-purple-500/30",
               },
               {
                 time: "06:00 PM",
@@ -698,25 +697,25 @@ export default function HowItWorksPage() {
                   ? "शाम को किए गए स्प्रे का रिकॉर्ड डायरी में दर्ज करें और बची हुई उपज का मुनाफा देखें।"
                   : "Archive the spray dose in your digital journal and track your cumulative net profit.",
                 icon: BookOpen,
-                color: "text-blue-600 bg-blue-50 border-blue-200",
+                color: "text-blue-400 bg-blue-500/10 border-blue-500/30",
               },
             ].map((step, idx) => {
               const Icon = step.icon;
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-3xl bg-white border border-[#e3e8ee] shadow-sm space-y-3 hover:shadow-md transition-shadow"
+                  className="p-6 rounded-3xl bg-[#0f1011] border border-[#23252a] space-y-3 hover:border-[#34343a] transition-all"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-[#533afd] bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200">
+                    <span className="text-xs font-mono font-bold text-[#828fff] bg-[#5e6ad2]/20 px-2.5 py-0.5 rounded-full border border-[#5e6ad2]/30">
                       {step.time}
                     </span>
-                    <div className={`h-8 w-8 rounded-xl ${step.color} flex items-center justify-center`}>
+                    <div className={`h-8 w-8 rounded-xl ${step.color} border flex items-center justify-center`}>
                       <Icon className="h-4 w-4" />
                     </div>
                   </div>
-                  <h4 className="text-sm font-bold text-[#0d253d] font-display">{step.title}</h4>
-                  <p className="text-xs text-[#64748d] leading-relaxed">{step.desc}</p>
+                  <h4 className="text-sm font-bold text-[#f7f8f8] font-display">{step.title}</h4>
+                  <p className="text-xs text-[#8a8f98] leading-relaxed">{step.desc}</p>
                 </div>
               );
             })}
@@ -726,10 +725,10 @@ export default function HowItWorksPage() {
         {/* ── 4. Frequently Asked Questions (FAQ) ──────────────────────── */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 my-16 space-y-6">
           <div className="text-center space-y-2">
-            <span className="text-xs font-mono font-bold text-[#533afd] uppercase">
+            <span className="text-xs font-mono font-bold text-[#828fff] uppercase">
               Frequently Asked Questions
             </span>
-            <h3 className="text-2xl sm:text-3xl font-bold text-[#0d253d] font-display">
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#f7f8f8] font-display">
               {isHindi ? "अक्सर पूछे जाने वाले महत्वपूर्ण सवाल" : "Frequently Asked Questions"}
             </h3>
           </div>
@@ -763,13 +762,13 @@ export default function HowItWorksPage() {
             ].map((faq, idx) => (
               <div
                 key={idx}
-                className="p-5 rounded-2xl bg-white border border-[#e3e8ee] shadow-xs space-y-1.5"
+                className="p-5 rounded-2xl bg-[#0f1011] border border-[#23252a] space-y-1.5"
               >
-                <h4 className="text-sm font-bold text-[#0d253d] flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-[#533afd] shrink-0" />
+                <h4 className="text-sm font-bold text-[#f7f8f8] flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-[#5e6ad2] shrink-0" />
                   <span>{isHindi ? faq.qHi : faq.qEn}</span>
                 </h4>
-                <p className="text-xs text-[#64748d] pl-6 leading-relaxed">
+                <p className="text-xs text-[#8a8f98] pl-6 leading-relaxed">
                   {isHindi ? faq.aHi : faq.aEn}
                 </p>
               </div>
@@ -779,12 +778,12 @@ export default function HowItWorksPage() {
 
         {/* ── 5. Bottom Connected Next Steps Bar ────────────────────────── */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-          <div className="p-8 rounded-3xl bg-gradient-to-r from-white via-indigo-50/40 to-white border border-[#e3e8ee] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="p-8 rounded-3xl bg-gradient-to-r from-[#0f1011] via-[#141516] to-[#0f1011] border border-[#23252a] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center sm:text-left">
-              <h3 className="text-xl sm:text-2xl font-bold text-[#0d253d] font-display">
+              <h3 className="text-xl sm:text-2xl font-bold text-[#f7f8f8] font-display">
                 {isHindi ? "तैयार हैं? अपने खेत के लिए शुरू करें" : "Ready to Modernize Your Farm?"}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-[#8a8f98]">
                 {isHindi
                   ? "निःशुल्क खाता बनाएं या उत्पाद की सभी 50 सिंजेंटा तकनीकों का विवरण देखें।"
                   : "Create your free farmer account or explore our full 50-product scientific capability catalog."}
@@ -794,16 +793,15 @@ export default function HowItWorksPage() {
             <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
               <Link
                 href="/product"
-                className="px-5 py-3 rounded-xl bg-white border border-[#e3e8ee] hover:border-[#533afd] text-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
+                className="px-5 py-3 rounded-xl bg-[#141516] border border-[#23252a] hover:border-[#5e6ad2] text-[#f7f8f8] text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
               >
-                <Layers className="h-4 w-4 text-[#533afd]" />
+                <Layers className="h-4 w-4 text-[#5e6ad2]" />
                 <span>{isHindi ? "उत्पाद कैटलॉग" : "Product Catalog"}</span>
               </Link>
               
               <Link
                 href={isLoggedInUser ? "/dashboard" : "/signup"}
-                className="px-6 py-3.5 rounded-xl text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 hover:scale-105"
-                style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
+                className="px-6 py-3.5 rounded-xl text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 bg-[#5e6ad2] hover:bg-[#828fff]"
               >
                 <UserPlus className="h-4 w-4" />
                 <span>{isLoggedInUser ? (isHindi ? "मेरा डैशबोर्ड" : "Open Dashboard") : (isHindi ? "निःशुल्क शुरू करें" : "Sign Up Free")}</span>
