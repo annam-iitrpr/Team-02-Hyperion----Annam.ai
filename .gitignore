@@ -52,6 +52,7 @@ logs/
 # Scratch & temporary files
 *scratch*
 scratch*/
-frontend/scratch*/
-backend/scratch*/
+# Executables & Tunnels
+cloudflared.exe
+*.exe
 
