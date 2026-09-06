@@ -419,30 +419,30 @@ export function VertexAIPipelineView() {
   };
 
   return (
-    <div className="w-full bg-[#010102] text-[#f7f8f8] p-4 sm:p-6 lg:p-8 rounded-2xl border border-[#23252a] font-sans shadow-2xl pb-32">
+    <div className="w-full bg-white text-[#0d253d] p-4 sm:p-6 lg:p-8 rounded-2xl border border-[#e3e8ee] font-sans shadow-2xl pb-32">
       
       {/* ── 0. Unauthenticated Feature Showcase & Access Gate Banner ──── */}
       {!isAuthed && (
-        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#5e6ad2]/20 via-[#0f1011] to-[#141516] border border-[#5e6ad2]/50 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/80 via-white to-purple-50/60 border border-[#5e6ad2]/50 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#5e6ad2]/30 text-[#828fff] border border-[#5e6ad2]/40 uppercase tracking-wide flex items-center gap-1">
-                <Lock className="w-3 h-3 text-[#828fff]" />
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#5e6ad2]/30 text-[#533afd] border border-[#5e6ad2]/40 uppercase tracking-wide flex items-center gap-1">
+                <Lock className="w-3 h-3 text-[#533afd]" />
                 Feature Tour &amp; Architecture Preview
               </span>
-              <span className="text-[11px] text-[#8a8f98] font-mono">• Read-Only Demo</span>
+              <span className="text-[11px] text-[#64748d] font-mono">• Read-Only Demo</span>
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-[#f7f8f8]">
+            <h3 className="text-base sm:text-lg font-bold text-[#0d253d]">
               AASRA 4-Model Vertex AI Biological Engine
             </h3>
-            <p className="text-xs text-[#8a8f98] max-w-2xl">
+            <p className="text-xs text-[#64748d] max-w-2xl">
               Explore how our 4 sequential ML models (Stress Risk, Spray Readiness, Biological Ranker, and Yield Baseline) collaborate with satellite telemetry and Gemini 2.5. To run live model predictions on your own field, log in or sign up.
             </p>
           </div>
           <div className="flex items-center gap-2.5 shrink-0">
             <Link
               href="/login"
-              className="px-4 py-2 rounded-xl bg-[#18191a] hover:bg-[#23252a] border border-[#23252a] text-[#f7f8f8] text-xs font-semibold transition-all hover:border-[#5e6ad2]/50 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#f6f9fc] hover:bg-slate-100 border border-[#e3e8ee] text-[#0d253d] text-xs font-semibold transition-all hover:border-[#5e6ad2]/50 cursor-pointer"
             >
               Log In to Farm
             </Link>
@@ -458,21 +458,21 @@ export function VertexAIPipelineView() {
       )}
 
       {/* ── 1. Top Header & Authenticated Farm Identity Bar ──── */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-[#23252a]">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-[#e3e8ee]">
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#5e6ad2]/20 border border-[#5e6ad2]/40 text-[#828fff] text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#5e6ad2]/20 border border-[#5e6ad2]/40 text-[#533afd] text-xs font-semibold">
               <Cpu className="w-3.5 h-3.5 text-[#5e6ad2]" /> Vertex AI Model Registry
             </span>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#18191a] text-[#8a8f98] border border-[#23252a]">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#f6f9fc] text-[#64748d] border border-[#e3e8ee]">
               4-Model Sequential Pipeline
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#f7f8f8]">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#0d253d]">
             AASRA Core ML Intelligence Engine
           </h2>
-          <p className="text-xs text-[#8a8f98] mt-0.5 max-w-2xl">
+          <p className="text-xs text-[#64748d] mt-0.5 max-w-2xl">
             Decoupled biological intelligence: Models 1 (Risk), 2 (Readiness), 3 (Product Ranker), and 5 (Yield Baseline) synthesized with Google Gemini.
           </p>
         </div>
@@ -481,19 +481,19 @@ export function VertexAIPipelineView() {
         <div className="flex flex-wrap items-center gap-2">
           {isAuthed ? (
             <>
-              <div className="bg-[#0f1011] border border-[#23252a] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
+              <div className="bg-[#f6f9fc] border border-[#e3e8ee] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
                 <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
                   <User className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-[#8a8f98] uppercase font-semibold">
+                  <div className="text-[10px] text-[#64748d] uppercase font-semibold">
                     Database Farmer Profile
                   </div>
-                  <div className="font-bold text-[#f7f8f8] flex items-center gap-1.5">
+                  <div className="font-bold text-[#0d253d] flex items-center gap-1.5">
                     <span>{farmerName}</span>
-                    <span className="text-[#62666d]">•</span>
+                    <span className="text-[#64748d]">•</span>
                     <span className="capitalize">{crop}</span>
-                    <span className="text-[#62666d]">•</span>
+                    <span className="text-[#64748d]">•</span>
                     <span>{acres} Ac</span>
                   </div>
                 </div>
@@ -501,7 +501,7 @@ export function VertexAIPipelineView() {
 
               <button
                 onClick={syncFromDatabaseAndRun}
-                className="px-3 py-2 rounded-xl bg-[#141516] hover:bg-[#18191a] border border-[#23252a] text-[#f7f8f8] text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:border-[#5e6ad2]/50"
+                className="px-3 py-2 rounded-xl bg-white hover:bg-[#f6f9fc] border border-[#e3e8ee] text-[#0d253d] text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:border-[#5e6ad2]/50"
                 title="Reload verified profile from database and re-fetch real weather"
               >
                 <Database className="w-3.5 h-3.5 text-[#5e6ad2]" />
@@ -510,19 +510,19 @@ export function VertexAIPipelineView() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <div className="bg-[#0f1011] border border-[#23252a] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
+              <div className="bg-[#f6f9fc] border border-[#e3e8ee] px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs">
                 <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
                   <Lock className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-[#8a8f98] uppercase font-semibold">
+                  <div className="text-[10px] text-[#64748d] uppercase font-semibold">
                     Guest Farmer (Tour Preview)
                   </div>
-                  <div className="font-bold text-[#f7f8f8] flex items-center gap-1.5">
+                  <div className="font-bold text-[#0d253d] flex items-center gap-1.5">
                     <span>Bhopal Field</span>
-                    <span className="text-[#62666d]">•</span>
+                    <span className="text-[#64748d]">•</span>
                     <span>Soybean</span>
-                    <span className="text-[#62666d]">•</span>
+                    <span className="text-[#64748d]">•</span>
                     <span>5.0 Ac</span>
                   </div>
                 </div>
@@ -539,9 +539,9 @@ export function VertexAIPipelineView() {
       </div>
 
       {/* ── 2. Sequential Pipeline Architecture Flow Stepper (Clarity) ──── */}
-      <div className="my-6 p-4 rounded-xl bg-[#0f1011] border border-[#23252a]">
+      <div className="my-6 p-4 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee]">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#8a8f98] flex items-center gap-1.5">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#64748d] flex items-center gap-1.5">
             <Layers className="w-3.5 h-3.5 text-[#5e6ad2]" /> Sequential Pipeline Architecture
           </span>
           <span className="text-[11px] font-mono text-[#5e6ad2]">
@@ -551,87 +551,87 @@ export function VertexAIPipelineView() {
 
         <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
           {/* Step 1 */}
-          <div className="bg-[#141516] p-2.5 rounded-lg border border-[#23252a] flex flex-col justify-between">
+          <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between text-[10px] text-[#8a8f98] mb-1">
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
                 <span className="font-bold text-sky-400">STAGE 1</span>
                 <Satellite className="w-3 h-3 text-sky-400" />
               </div>
-              <div className="font-bold text-[#f7f8f8] text-[11px]">Real Telemetry</div>
-              <p className="text-[10px] text-[#8a8f98] mt-0.5">Meteoblue & Satellite observations</p>
+              <div className="font-bold text-[#0d253d] text-[11px]">Real Telemetry</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Meteoblue & Satellite observations</p>
             </div>
           </div>
 
           {/* Step 2 */}
-          <div className="bg-[#141516] p-2.5 rounded-lg border border-[#23252a] flex flex-col justify-between">
+          <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between text-[10px] text-[#8a8f98] mb-1">
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
                 <span className="font-bold text-amber-400">MODEL 1</span>
                 <Flame className="w-3 h-3 text-amber-400" />
               </div>
-              <div className="font-bold text-[#f7f8f8] text-[11px]">Stress Risk</div>
-              <p className="text-[10px] text-[#8a8f98] mt-0.5">Heat & drought biophysical classifier</p>
+              <div className="font-bold text-[#0d253d] text-[11px]">Stress Risk</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Heat & drought biophysical classifier</p>
             </div>
           </div>
 
           {/* Step 3 */}
-          <div className="bg-[#141516] p-2.5 rounded-lg border border-[#23252a] flex flex-col justify-between">
+          <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between text-[10px] text-[#8a8f98] mb-1">
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
                 <span className="font-bold text-emerald-400">MODEL 2</span>
                 <Gauge className="w-3 h-3 text-emerald-400" />
               </div>
-              <div className="font-bold text-[#f7f8f8] text-[11px]">Action Gate</div>
-              <p className="text-[10px] text-[#8a8f98] mt-0.5">Stull Delta-T spray safety verification</p>
+              <div className="font-bold text-[#0d253d] text-[11px]">Action Gate</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Stull Delta-T spray safety verification</p>
             </div>
           </div>
 
           {/* Step 4 */}
-          <div className="bg-[#141516] p-2.5 rounded-lg border border-[#23252a] flex flex-col justify-between">
+          <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between text-[10px] text-[#8a8f98] mb-1">
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
                 <span className="font-bold text-indigo-400">MODEL 3</span>
                 <Droplets className="w-3 h-3 text-indigo-400" />
               </div>
-              <div className="font-bold text-[#f7f8f8] text-[11px]">Portfolio Ranker</div>
-              <p className="text-[10px] text-[#8a8f98] mt-0.5">Syngenta biological matching algorithm</p>
+              <div className="font-bold text-[#0d253d] text-[11px]">Portfolio Ranker</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Syngenta biological matching algorithm</p>
             </div>
           </div>
 
           {/* Step 5 */}
-          <div className="bg-[#141516] p-2.5 rounded-lg border border-[#23252a] flex flex-col justify-between">
+          <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between text-[10px] text-[#8a8f98] mb-1">
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
                 <span className="font-bold text-teal-400">MODEL 5</span>
                 <TrendingUp className="w-3 h-3 text-teal-400" />
               </div>
-              <div className="font-bold text-[#f7f8f8] text-[11px]">Yield Baseline</div>
-              <p className="text-[10px] text-[#8a8f98] mt-0.5">Harvest loss impact and Q/acre outlook</p>
+              <div className="font-bold text-[#0d253d] text-[11px]">Yield Baseline</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Harvest loss impact and Q/acre outlook</p>
             </div>
           </div>
 
           {/* Step 6 */}
-          <div className="bg-[#141516] p-2.5 rounded-lg border border-[#5e6ad2]/50 flex flex-col justify-between shadow-sm">
+          <div className="bg-white p-2.5 rounded-lg border border-[#5e6ad2]/50 flex flex-col justify-between shadow-sm">
             <div>
-              <div className="flex items-center justify-between text-[10px] text-[#8a8f98] mb-1">
-                <span className="font-bold text-[#828fff]">SYNTHESIS</span>
-                <Sparkles className="w-3 h-3 text-[#828fff]" />
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
+                <span className="font-bold text-[#533afd]">SYNTHESIS</span>
+                <Sparkles className="w-3 h-3 text-[#533afd]" />
               </div>
-              <div className="font-bold text-[#828fff] text-[11px]">Gemini 2.5</div>
-              <p className="text-[10px] text-[#8a8f98] mt-0.5">Multilingual authoritative farmer statement</p>
+              <div className="font-bold text-[#533afd] text-[11px]">Gemini 2.5</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Multilingual authoritative farmer statement</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* ── 3. 12-Language Selector Pill Bar ──── */}
-      <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a] mb-6">
+      <div className="bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee] mb-6">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#f7f8f8]">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#0d253d]">
             <Languages className="w-3.5 h-3.5 text-[#5e6ad2]" />
             <span>Select Output Language (12 Indian Regional Languages Supported)</span>
           </div>
-          <span className="text-[11px] font-mono text-[#828fff]">
+          <span className="text-[11px] font-mono text-[#533afd]">
             Active: {currentLangObj.name} ({currentLangObj.native})
           </span>
         </div>
@@ -646,7 +646,7 @@ export function VertexAIPipelineView() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 border ${
                   isSelected
                     ? "bg-[#5e6ad2] text-white border-[#5e6ad2] shadow-sm shadow-[#5e6ad2]/30"
-                    : "bg-[#141516] text-[#8a8f98] hover:text-[#f7f8f8] border-[#23252a] hover:border-[#34343a]"
+                    : "bg-white text-[#64748d] hover:text-[#0d253d] border-[#e3e8ee] hover:border-[#34343a]"
                 }`}
               >
                 <span>{l.native}</span>
@@ -660,8 +660,8 @@ export function VertexAIPipelineView() {
       {/* ── 4. Parameter Overrides & Live Controls ──── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* District */}
-        <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a]">
-          <label className="text-[11px] uppercase tracking-wider text-[#8a8f98] font-semibold block mb-1">
+        <div className="bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
+          <label className="text-[11px] uppercase tracking-wider text-[#64748d] font-semibold block mb-1">
             District / Agro-Zone
           </label>
           <select
@@ -671,7 +671,7 @@ export function VertexAIPipelineView() {
               setDistrict(newDist);
               fetchRealWeatherTelemetry(newDist, crop);
             }}
-            className="w-full bg-[#18191a] border border-[#23252a] text-sm text-[#f7f8f8] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#5e6ad2]"
+            className="w-full bg-[#f6f9fc] border border-[#e3e8ee] text-sm text-[#0d253d] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#5e6ad2]"
           >
             {DISTRICTS.map((d) => (
               <option key={d.id} value={d.id}>
@@ -682,8 +682,8 @@ export function VertexAIPipelineView() {
         </div>
 
         {/* Crop */}
-        <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a]">
-          <label className="text-[11px] uppercase tracking-wider text-[#8a8f98] font-semibold block mb-1">
+        <div className="bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
+          <label className="text-[11px] uppercase tracking-wider text-[#64748d] font-semibold block mb-1">
             Crop
           </label>
           <select
@@ -693,7 +693,7 @@ export function VertexAIPipelineView() {
               setCrop(newCrop);
               fetchRealWeatherTelemetry(district, newCrop);
             }}
-            className="w-full bg-[#18191a] border border-[#23252a] text-sm text-[#f7f8f8] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#5e6ad2]"
+            className="w-full bg-[#f6f9fc] border border-[#e3e8ee] text-sm text-[#0d253d] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#5e6ad2]"
           >
             {CROPS.map((c) => (
               <option key={c} value={c}>
@@ -704,14 +704,14 @@ export function VertexAIPipelineView() {
         </div>
 
         {/* Growth Stage */}
-        <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a]">
-          <label className="text-[11px] uppercase tracking-wider text-[#8a8f98] font-semibold block mb-1">
+        <div className="bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
+          <label className="text-[11px] uppercase tracking-wider text-[#64748d] font-semibold block mb-1">
             Crop Stage
           </label>
           <select
             value={growthStage}
             onChange={(e) => setGrowthStage(e.target.value)}
-            className="w-full bg-[#18191a] border border-[#23252a] text-sm text-[#f7f8f8] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#5e6ad2]"
+            className="w-full bg-[#f6f9fc] border border-[#e3e8ee] text-sm text-[#0d253d] rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#5e6ad2]"
           >
             {STAGES.map((s) => (
               <option key={s} value={s}>
@@ -722,7 +722,7 @@ export function VertexAIPipelineView() {
         </div>
 
         {/* Run Pipeline CTA */}
-        <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a] flex items-end">
+        <div className="bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee] flex items-end">
           {isAuthed ? (
             <button
               onClick={() => executePipeline()}
@@ -735,7 +735,7 @@ export function VertexAIPipelineView() {
           ) : (
             <Link
               href="/login"
-              className="w-full bg-[#18191a] hover:bg-[#23252a] border border-[#5e6ad2]/50 hover:border-[#5e6ad2] text-[#828fff] hover:text-white font-semibold py-2 px-2.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm text-center"
+              className="w-full bg-[#f6f9fc] hover:bg-slate-100 border border-[#5e6ad2]/50 hover:border-[#5e6ad2] text-[#533afd] hover:text-white font-semibold py-2 px-2.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm text-center"
             >
               <Lock className="w-3.5 h-3.5 text-[#5e6ad2] shrink-0" />
               <span className="truncate">Log In to Run on Your Farm</span>
@@ -745,30 +745,30 @@ export function VertexAIPipelineView() {
       </div>
 
       {/* ── 5. Real Meteorological Telemetry Grounding & Simulation Sliders ──── */}
-      <div className="bg-[#0f1011] p-4 rounded-xl border border-[#23252a] mb-6">
+      <div className="bg-[#f6f9fc] p-4 rounded-xl border border-[#e3e8ee] mb-6">
         {!isAuthed && (
-          <div className="mb-3 px-3.5 py-2 rounded-xl bg-[#141516] border border-[#23252a] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-            <div className="text-[#8a8f98] flex items-center gap-2">
+          <div className="mb-3 px-3.5 py-2 rounded-xl bg-white border border-[#e3e8ee] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="text-[#64748d] flex items-center gap-2">
               <Lock className="w-3.5 h-3.5 text-[#5e6ad2] shrink-0" />
               <span>Weather and biophysical telemetry are in demonstration mode. Log in to stream live satellite weather for your GPS field coordinates.</span>
             </div>
-            <Link href="/signup" className="text-[#828fff] hover:underline font-semibold text-[11px] shrink-0">
+            <Link href="/signup" className="text-[#533afd] hover:underline font-semibold text-[11px] shrink-0">
               Sign Up Free →
             </Link>
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-[#23252a]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-[#e3e8ee]">
           <div className="flex flex-wrap items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${isLiveWeather ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
-            <span className="text-xs font-bold text-[#f7f8f8]">
+            <span className="text-xs font-bold text-[#0d253d]">
               {isLiveWeather ? "● Real-Time Meteorological Station Grounding Active" : "⚠️ Manual Simulation Mode Active"}
             </span>
-            <span className="text-[11px] text-[#8a8f98] font-mono">
+            <span className="text-[11px] text-[#64748d] font-mono">
               ({weatherSource})
             </span>
             {(weatherTimestamp || data?.telemetry_summary?.weather_timestamp) && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#18191a] text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#f6f9fc] text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
                 <Clock className="w-3 h-3 text-cyan-400" />
                 <span>Observed: {weatherTimestamp || data?.telemetry_summary?.weather_timestamp}</span>
               </span>
@@ -783,16 +783,16 @@ export function VertexAIPipelineView() {
                 }
               }}
               disabled={isFetchingWeather || !isAuthed}
-              className="text-[11px] px-2.5 py-1 rounded-md bg-[#18191a] hover:bg-[#23252a] border border-[#23252a] text-[#828fff] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+              className="text-[11px] px-2.5 py-1 rounded-md bg-[#f6f9fc] hover:bg-slate-100 border border-[#e3e8ee] text-[#533afd] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${isFetchingWeather ? "animate-spin" : ""}`} />
               <span>{isAuthed ? "Fetch Real API Data" : "Real API Data (Locked)"}</span>
             </button>
             <div className="flex items-center gap-1 text-[11px]">
-              <span className="text-[#8a8f98]">Presets:</span>
-              <button onClick={() => applyPreset("heatwave")} className="px-2 py-0.5 bg-[#18191a] hover:bg-[#23252a] rounded text-[#8a8f98] hover:text-[#f7f8f8] border border-[#23252a]">Heat</button>
-              <button onClick={() => applyPreset("spray_safe")} className="px-2 py-0.5 bg-[#18191a] hover:bg-[#23252a] rounded text-emerald-400 border border-[#23252a]">Safe</button>
-              <button onClick={() => applyPreset("windy")} className="px-2 py-0.5 bg-[#18191a] hover:bg-[#23252a] rounded text-[#8a8f98] hover:text-[#f7f8f8] border border-[#23252a]">Drift</button>
+              <span className="text-[#64748d]">Presets:</span>
+              <button onClick={() => applyPreset("heatwave")} className="px-2 py-0.5 bg-[#f6f9fc] hover:bg-slate-100 rounded text-[#64748d] hover:text-[#0d253d] border border-[#e3e8ee]">Heat</button>
+              <button onClick={() => applyPreset("spray_safe")} className="px-2 py-0.5 bg-[#f6f9fc] hover:bg-slate-100 rounded text-emerald-400 border border-[#e3e8ee]">Safe</button>
+              <button onClick={() => applyPreset("windy")} className="px-2 py-0.5 bg-[#f6f9fc] hover:bg-slate-100 rounded text-[#64748d] hover:text-[#0d253d] border border-[#e3e8ee]">Drift</button>
             </div>
           </div>
         </div>
@@ -801,7 +801,7 @@ export function VertexAIPipelineView() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#8a8f98]">TMax (Real)</span>
+              <span className="text-[#64748d]">TMax (Real)</span>
               <span className="font-mono font-bold text-amber-400">{tempMax}°C</span>
             </div>
             <input
@@ -820,7 +820,7 @@ export function VertexAIPipelineView() {
 
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#8a8f98]">Relative Humidity</span>
+              <span className="text-[#64748d]">Relative Humidity</span>
               <span className="font-mono font-bold text-sky-400">{humidity}%</span>
             </div>
             <input
@@ -838,7 +838,7 @@ export function VertexAIPipelineView() {
 
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#8a8f98]">Wind Speed</span>
+              <span className="text-[#64748d]">Wind Speed</span>
               <span className="font-mono font-bold text-cyan-400">{windSpeed} km/h</span>
             </div>
             <input
@@ -857,7 +857,7 @@ export function VertexAIPipelineView() {
 
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#8a8f98]">Soil Moisture</span>
+              <span className="text-[#64748d]">Soil Moisture</span>
               <span className="font-mono font-bold text-emerald-400">{soilMoisture}%</span>
             </div>
             <input
@@ -875,7 +875,7 @@ export function VertexAIPipelineView() {
 
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#8a8f98]">Rain Prob (48h)</span>
+              <span className="text-[#64748d]">Rain Prob (48h)</span>
               <span className="font-mono font-bold text-indigo-400">{rainProb}%</span>
             </div>
             <input
@@ -898,7 +898,7 @@ export function VertexAIPipelineView() {
         <div className="space-y-6">
           {/* Gemini 2.5 Agro-Intelligence Advisory Statement Card */}
           {data.gemini_statement && (
-            <div className="bg-gradient-to-br from-[#12132b]/95 via-[#0f1013] to-[#0a0a10] rounded-2xl border border-[#5e6ad2]/50 p-6 relative overflow-hidden shadow-2xl shadow-[#5e6ad2]/10">
+            <div className="bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/40 rounded-2xl border border-[#5e6ad2]/50 p-6 relative overflow-hidden shadow-2xl shadow-[#5e6ad2]/10">
               <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#5e6ad2]/15 rounded-full blur-3xl pointer-events-none" />
 
               {/* Educational Preview Notice if Not Logged In */}
@@ -918,17 +918,17 @@ export function VertexAIPipelineView() {
               )}
 
               {/* Header with Farmer Name, District, Crop, Acreage & Language Tag */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-[#23252a]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-[#e3e8ee]">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#5e6ad2]/20 text-[#828fff] flex items-center justify-center border border-[#5e6ad2]/40 shrink-0">
-                    <Sparkles className="w-5 h-5 text-[#828fff]" />
+                  <div className="w-9 h-9 rounded-xl bg-[#5e6ad2]/20 text-[#533afd] flex items-center justify-center border border-[#5e6ad2]/40 shrink-0">
+                    <Sparkles className="w-5 h-5 text-[#533afd]" />
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-base font-bold text-[#f7f8f8]">
+                      <span className="text-base font-bold text-[#0d253d]">
                         Gemini 2.5 Agro-Intelligence Advisory Statement
                       </span>
-                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#5e6ad2]/20 text-[#828fff] border border-[#5e6ad2]/40 font-semibold">
+                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#5e6ad2]/20 text-[#533afd] border border-[#5e6ad2]/40 font-semibold">
                         Grounded on Models 1, 2, 3, 5
                       </span>
                       <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold">
@@ -936,8 +936,8 @@ export function VertexAIPipelineView() {
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-[#8a8f98] mt-1">
-                      <span className="flex items-center gap-1 text-[#f7f8f8] font-semibold">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[#64748d] mt-1">
+                      <span className="flex items-center gap-1 text-[#0d253d] font-semibold">
                         <User className="w-3.5 h-3.5 text-[#5e6ad2]" />
                         {data.farmer_name || farmerName}
                       </span>
@@ -968,7 +968,7 @@ export function VertexAIPipelineView() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
                       isSpeaking
                         ? "bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse"
-                        : "bg-[#18191c] hover:bg-[#23252a] text-[#f7f8f8] border-[#23252a]"
+                        : "bg-white hover:bg-slate-100 text-[#0d253d] border-[#e3e8ee]"
                     }`}
                   >
                     {isSpeaking ? (
@@ -998,13 +998,13 @@ export function VertexAIPipelineView() {
                   >
                     {data.gemini_statement.spray_verdict_badge}
                   </span>
-                  <h3 className="text-base sm:text-lg font-bold text-[#f7f8f8]">
+                  <h3 className="text-base sm:text-lg font-bold text-[#0d253d]">
                     {data.gemini_statement.headline}
                   </h3>
                 </div>
 
                 {/* Localized Body Statement */}
-                <div className="text-xs sm:text-sm text-[#f0f2f5] leading-relaxed bg-[#111216]/80 p-4 rounded-xl border border-[#23252a] font-normal tracking-wide">
+                <div className="text-xs sm:text-sm text-[#273951] leading-relaxed bg-white p-4 rounded-xl border border-[#e3e8ee] font-normal tracking-wide">
                   {data.gemini_statement.statement ||
                     (language === "hi"
                       ? data.gemini_statement.statement_hi
@@ -1013,26 +1013,26 @@ export function VertexAIPipelineView() {
               </div>
 
               {/* 3 Model Key Takeaway Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-[#23252a]/80 text-xs">
-                <div className="bg-[#141518]/90 p-3 rounded-lg border border-[#23252a]">
-                  <div className="text-[#8a8f98] text-[11px] mb-0.5">Spray Timing Window (Model 2)</div>
-                  <div className="text-[#f7f8f8] font-medium flex items-center gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-[#e3e8ee]/80 text-xs">
+                <div className="bg-white p-3 rounded-lg border border-[#e3e8ee]">
+                  <div className="text-[#64748d] text-[11px] mb-0.5">Spray Timing Window (Model 2)</div>
+                  <div className="text-[#0d253d] font-medium flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span className="truncate">{data.gemini_statement.timing_guidance}</span>
                   </div>
                 </div>
 
-                <div className="bg-[#141518]/90 p-3 rounded-lg border border-[#23252a]">
-                  <div className="text-[#8a8f98] text-[11px] mb-0.5">Syngenta Prescription (Model 3)</div>
-                  <div className="text-[#f7f8f8] font-medium flex items-center gap-1.5">
+                <div className="bg-white p-3 rounded-lg border border-[#e3e8ee]">
+                  <div className="text-[#64748d] text-[11px] mb-0.5">Syngenta Prescription (Model 3)</div>
+                  <div className="text-[#0d253d] font-medium flex items-center gap-1.5">
                     <Droplets className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                     <span className="truncate">{data.gemini_statement.product_summary}</span>
                   </div>
                 </div>
 
-                <div className="bg-[#141518]/90 p-3 rounded-lg border border-[#23252a]">
-                  <div className="text-[#8a8f98] text-[11px] mb-0.5">Harvest Outlook (Model 5)</div>
-                  <div className="text-[#f7f8f8] font-medium flex items-center gap-1.5">
+                <div className="bg-white p-3 rounded-lg border border-[#e3e8ee]">
+                  <div className="text-[#64748d] text-[11px] mb-0.5">Harvest Outlook (Model 5)</div>
+                  <div className="text-[#0d253d] font-medium flex items-center gap-1.5">
                     <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span className="truncate">{data.gemini_statement.yield_outlook}</span>
                   </div>
@@ -1044,7 +1044,7 @@ export function VertexAIPipelineView() {
           {/* Model 1 & Model 2 Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Model 1 Card */}
-            <div className="bg-[#0f1011] rounded-xl border border-[#23252a] p-5 relative overflow-hidden flex flex-col justify-between">
+            <div className="bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5 relative overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -1052,25 +1052,25 @@ export function VertexAIPipelineView() {
                     <span className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs font-bold border border-amber-500/30">
                       M1
                     </span>
-                    <span className="text-xs uppercase tracking-wider font-semibold text-[#8a8f98]">
+                    <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d]">
                       PS-02 Climate Stress Classifier
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     {data.telemetry_summary.weather_timestamp && (
-                      <span className="text-[10px] font-mono text-cyan-300 bg-[#18191a] px-2 py-0.5 rounded border border-cyan-500/30 flex items-center gap-1">
+                      <span className="text-[10px] font-mono text-cyan-300 bg-[#f6f9fc] px-2 py-0.5 rounded border border-cyan-500/30 flex items-center gap-1">
                         <Clock className="w-3 h-3 text-cyan-400" />
                         <span>{data.telemetry_summary.weather_timestamp}</span>
                       </span>
                     )}
-                    <span className="text-[11px] font-mono text-[#8a8f98] bg-[#18191a] px-2 py-0.5 rounded border border-[#23252a]">
+                    <span className="text-[11px] font-mono text-[#64748d] bg-[#f6f9fc] px-2 py-0.5 rounded border border-[#e3e8ee]">
                       XGBoost (11 features)
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-2 flex items-baseline gap-3">
-                  <span className="text-2xl font-bold text-[#f7f8f8]">
+                  <span className="text-2xl font-bold text-[#0d253d]">
                     {data.model1_risk.stress_type}
                   </span>
                   <span className="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -1078,13 +1078,13 @@ export function VertexAIPipelineView() {
                   </span>
                 </div>
 
-                <p className="text-xs text-[#8a8f98] mt-1">
+                <p className="text-xs text-[#64748d] mt-1">
                   Early warning detected {data.model1_risk.days_to_impact > 0 ? `${data.model1_risk.days_to_impact} days in advance` : "optimal conditions"}.
                 </p>
 
                 {/* Probabilities Bars (Strictly Normalized to 100%) */}
                 <div className="mt-4 space-y-1.5">
-                  <div className="text-[11px] text-[#8a8f98] font-medium mb-1">
+                  <div className="text-[11px] text-[#64748d] font-medium mb-1">
                     Stress Class Probabilities (100% Normalized):
                   </div>
                   {(() => {
@@ -1109,14 +1109,14 @@ export function VertexAIPipelineView() {
 
                     return pctList.map((item) => (
                       <div key={item.name} className="flex items-center gap-2 text-xs">
-                        <span className="w-36 truncate text-[#8a8f98] text-[11px]">{item.name}</span>
-                        <div className="flex-1 bg-[#18191a] h-2 rounded-full overflow-hidden border border-[#23252a]">
+                        <span className="w-36 truncate text-[#64748d] text-[11px]">{item.name}</span>
+                        <div className="flex-1 bg-[#f6f9fc] h-2 rounded-full overflow-hidden border border-[#e3e8ee]">
                           <div
                             className="bg-[#5e6ad2] h-full rounded-full transition-all duration-500"
                             style={{ width: `${item.pct}%` }}
                           />
                         </div>
-                        <span className="w-10 text-right font-mono text-[11px] text-[#f7f8f8]">
+                        <span className="w-10 text-right font-mono text-[11px] text-[#0d253d]">
                           {item.pct}%
                         </span>
                       </div>
@@ -1125,26 +1125,26 @@ export function VertexAIPipelineView() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-[#23252a] flex items-center justify-between text-[11px] text-[#8a8f98]">
+              <div className="mt-4 pt-3 border-t border-[#e3e8ee] flex items-center justify-between text-[11px] text-[#64748d]">
                 <span>VPD: {data.telemetry_summary.vpd_kpa} kPa</span>
                 <span>TMax 7d: {data.telemetry_summary.temp_max_c}°C</span>
               </div>
             </div>
 
             {/* Model 2 Card */}
-            <div className="bg-[#0f1011] rounded-xl border border-[#23252a] p-5 relative overflow-hidden flex flex-col justify-between">
+            <div className="bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5 relative overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#5e6ad2]/5 rounded-full blur-2xl pointer-events-none" />
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#5e6ad2]/20 text-[#828fff] flex items-center justify-center text-xs font-bold border border-[#5e6ad2]/30">
+                    <span className="w-6 h-6 rounded-lg bg-[#5e6ad2]/20 text-[#533afd] flex items-center justify-center text-xs font-bold border border-[#5e6ad2]/30">
                       M2
                     </span>
-                    <span className="text-xs uppercase tracking-wider font-semibold text-[#8a8f98]">
+                    <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d]">
                       PS-02 Biological Action Gate
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono text-[#8a8f98] bg-[#18191a] px-2 py-0.5 rounded border border-[#23252a]">
+                  <span className="text-[11px] font-mono text-[#64748d] bg-[#f6f9fc] px-2 py-0.5 rounded border border-[#e3e8ee]">
                     Platt Calibrated LogReg
                   </span>
                 </div>
@@ -1164,14 +1164,14 @@ export function VertexAIPipelineView() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="bg-[#18191a] p-2.5 rounded-lg border border-[#23252a]">
-                    <div className="text-[11px] text-[#8a8f98]">Stomatal Readiness</div>
-                    <div className="text-lg font-bold font-mono text-[#f7f8f8]">
+                  <div className="bg-[#f6f9fc] p-2.5 rounded-lg border border-[#e3e8ee]">
+                    <div className="text-[11px] text-[#64748d]">Stomatal Readiness</div>
+                    <div className="text-lg font-bold font-mono text-[#0d253d]">
                       {(data.model2_readiness.readiness_score * 100).toFixed(1)}%
                     </div>
                   </div>
-                  <div className="bg-[#18191a] p-2.5 rounded-lg border border-[#23252a]">
-                    <div className="text-[11px] text-[#8a8f98]">Stull's Delta-T</div>
+                  <div className="bg-[#f6f9fc] p-2.5 rounded-lg border border-[#e3e8ee]">
+                    <div className="text-[11px] text-[#64748d]">Stull's Delta-T</div>
                     <div className={`text-lg font-bold font-mono ${data.model2_readiness.delta_t > 8 ? "text-rose-400" : "text-emerald-400"}`}>
                       {data.model2_readiness.delta_t}°C
                     </div>
@@ -1181,7 +1181,7 @@ export function VertexAIPipelineView() {
                 {/* Safety reasons checklist */}
                 <div className="mt-3 space-y-1">
                   {data.model2_readiness.safety_reasons.map((r, i) => (
-                    <div key={i} className="text-xs flex items-center gap-2 text-[#8a8f98]">
+                    <div key={i} className="text-xs flex items-center gap-2 text-[#64748d]">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#5e6ad2]" />
                       <span>{r}</span>
                     </div>
@@ -1189,7 +1189,7 @@ export function VertexAIPipelineView() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-[#23252a] flex items-center justify-between text-[11px] text-[#8a8f98]">
+              <div className="mt-4 pt-3 border-t border-[#e3e8ee] flex items-center justify-between text-[11px] text-[#64748d]">
                 <span>Wind Limit: &lt; 15 km/h</span>
                 <span>Delta-T Safe Window: 2.0°C - 8.0°C</span>
               </div>
@@ -1199,22 +1199,22 @@ export function VertexAIPipelineView() {
           {/* Model 3 & Model 5 Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Model 3 Card (2 cols) */}
-            <div className="lg:col-span-2 bg-[#0f1011] rounded-xl border border-[#23252a] p-5">
+            <div className="lg:col-span-2 bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold border border-indigo-500/30">
                     M3
                   </span>
                   <div>
-                    <span className="text-xs uppercase tracking-wider font-semibold text-[#8a8f98] block">
+                    <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d] block">
                       PS-03 Product Recommendation
                     </span>
-                    <span className="text-sm font-bold text-[#f7f8f8]">
+                    <span className="text-sm font-bold text-[#0d253d]">
                       Top 3 Syngenta Crop-Approved Prescriptions (Ranked from 50 Products)
                     </span>
                   </div>
                 </div>
-                <span className="text-[11px] font-mono text-[#8a8f98] bg-[#18191a] px-2 py-0.5 rounded border border-[#23252a]">
+                <span className="text-[11px] font-mono text-[#64748d] bg-[#f6f9fc] px-2 py-0.5 rounded border border-[#e3e8ee]">
                   LambdaMART Ranker
                 </span>
               </div>
@@ -1225,8 +1225,8 @@ export function VertexAIPipelineView() {
                     key={prod.product_key}
                     className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all ${
                       prod.rank === 1
-                        ? "bg-[#18191a] border-[#5e6ad2]/50 shadow-lg shadow-[#5e6ad2]/5"
-                        : "bg-[#141516] border-[#23252a]"
+                        ? "bg-[#f6f9fc] border-[#5e6ad2]/50 shadow-lg shadow-[#5e6ad2]/5"
+                        : "bg-white border-[#e3e8ee]"
                     }`}
                   >
                     <div>
@@ -1234,7 +1234,7 @@ export function VertexAIPipelineView() {
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                           prod.rank === 1
                             ? "bg-[#5e6ad2] text-white"
-                            : "bg-[#23252a] text-[#8a8f98]"
+                            : "bg-[#23252a] text-[#64748d]"
                         }`}>
                           #{prod.rank} RANK
                         </span>
@@ -1244,28 +1244,28 @@ export function VertexAIPipelineView() {
                       </div>
 
                       <div className="flex items-center gap-1.5 mb-1">
-                        <h4 className="font-bold text-sm text-[#f7f8f8]">{prod.name}</h4>
+                        <h4 className="font-bold text-sm text-[#0d253d]">{prod.name}</h4>
                         {prod.category && (
                           <span className="text-[9px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
                             {prod.category}
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-[#8a8f98] mt-0.5 line-clamp-2">
+                      <p className="text-[11px] text-[#64748d] mt-0.5 line-clamp-2">
                         {prod.active_ingredient}
                       </p>
 
                       <div className="mt-2.5 space-y-1 text-[11px]">
-                        <div className="text-[#8a8f98]">
-                          <span className="text-[#62666d]">Dosage:</span> {prod.recommended_dosage}
+                        <div className="text-[#64748d]">
+                          <span className="text-[#64748d]">Dosage:</span> {prod.recommended_dosage}
                         </div>
-                        <div className="text-[#8a8f98]">
-                          <span className="text-[#62666d]">CIB&RC:</span> {prod.registration}
+                        <div className="text-[#64748d]">
+                          <span className="text-[#64748d]">CIB&RC:</span> {prod.registration}
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-[#23252a] text-[10px] text-[#8a8f98]">
+                    <div className="mt-3 pt-2 border-t border-[#e3e8ee] text-[10px] text-[#64748d]">
                       {prod.application_timing}
                     </div>
                   </div>
@@ -1274,41 +1274,41 @@ export function VertexAIPipelineView() {
             </div>
 
             {/* Model 5 Card (1 col) */}
-            <div className="bg-[#0f1011] rounded-xl border border-[#23252a] p-5 flex flex-col justify-between">
+            <div className="bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-bold border border-teal-500/30">
                       M5
                     </span>
-                    <span className="text-xs uppercase tracking-wider font-semibold text-[#8a8f98]">
+                    <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d]">
                       PS-07 Yield Baseline
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono text-[#8a8f98] bg-[#18191a] px-2 py-0.5 rounded border border-[#23252a]">
+                  <span className="text-[11px] font-mono text-[#64748d] bg-[#f6f9fc] px-2 py-0.5 rounded border border-[#e3e8ee]">
                     XGBoost Regressor
                   </span>
                 </div>
 
                 <div className="mt-2">
-                  <span className="text-xs text-[#8a8f98]">Predicted Baseline Harvest:</span>
-                  <div className="text-2xl font-bold font-mono text-[#f7f8f8] mt-0.5">
-                    {data.model5_baseline.expected_baseline_yield_q_ha} <span className="text-sm font-normal text-[#8a8f98]">Q/ha</span>
+                  <span className="text-xs text-[#64748d]">Predicted Baseline Harvest:</span>
+                  <div className="text-2xl font-bold font-mono text-[#0d253d] mt-0.5">
+                    {data.model5_baseline.expected_baseline_yield_q_ha} <span className="text-sm font-normal text-[#64748d]">Q/ha</span>
                   </div>
-                  <div className="text-xs text-[#8a8f98] mt-0.5">
+                  <div className="text-xs text-[#64748d] mt-0.5">
                     ({data.model5_baseline.expected_baseline_yield_q_acre} Q/acre)
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 rounded-lg bg-[#18191a] border border-[#23252a] space-y-2">
+                <div className="mt-4 p-3 rounded-lg bg-[#f6f9fc] border border-[#e3e8ee] space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#8a8f98]">District 10y Average:</span>
-                    <span className="font-mono text-[#f7f8f8]">
+                    <span className="text-[#64748d]">District 10y Average:</span>
+                    <span className="font-mono text-[#0d253d]">
                       {data.model5_baseline.historical_district_average_q_ha} Q/ha
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#8a8f98]">vs District Historical Baseline:</span>
+                    <span className="text-[#64748d]">vs District Historical Baseline:</span>
                     <span className={`font-mono font-semibold ${
                       data.model5_baseline.yield_impact_pct >= 0 ? "text-emerald-400" : "text-rose-400"
                     }`}>
@@ -1318,16 +1318,16 @@ export function VertexAIPipelineView() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-[#23252a] text-[11px] text-[#8a8f98]">
+              <div className="mt-4 pt-3 border-t border-[#e3e8ee] text-[11px] text-[#64748d]">
                 Benchmarking baseline yield without intervention under current season conditions.
               </div>
             </div>
           </div>
 
           {/* Footer Metadata */}
-          <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#62666d] pt-2 border-t border-[#23252a]">
+          <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#64748d] pt-2 border-t border-[#e3e8ee]">
             <div>
-              Execution Mode: <span className="text-[#8a8f98] font-mono">{data.execution_metadata.serving_mode}</span> | Models: {data.execution_metadata.models_executed.join(", ")}
+              Execution Mode: <span className="text-[#64748d] font-mono">{data.execution_metadata.serving_mode}</span> | Models: {data.execution_metadata.models_executed.join(", ")}
             </div>
             <div>
               Pipeline Latency: <span className="text-emerald-400 font-mono font-semibold">{data.execution_metadata.latency_ms} ms</span>
