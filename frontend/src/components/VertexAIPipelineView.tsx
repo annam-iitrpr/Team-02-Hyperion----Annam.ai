@@ -276,7 +276,7 @@ export function VertexAIPipelineView() {
         {/* Run CTA */}
         <div className="bg-[#0f1011] p-3 rounded-xl border border-[#23252a] flex items-end">
           <button
-            onClick={executePipeline}
+            onClick={() => executePipeline()}
             disabled={loading}
             className="w-full bg-[#5e6ad2] hover:bg-[#828fff] text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#5e6ad2]/20 disabled:opacity-50"
           >

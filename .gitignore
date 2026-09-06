@@ -56,3 +56,4 @@ scratch*/
 cloudflared.exe
 *.exe
 
+.vercel
