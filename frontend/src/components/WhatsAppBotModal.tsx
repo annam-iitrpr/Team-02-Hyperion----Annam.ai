@@ -126,10 +126,13 @@ export const WhatsAppBotModal: React.FC<WhatsAppBotModalProps> = ({
         text: m.text,
       }));
 
+      const lat = activeFarm?.center?.[0] || 27.81;
+      const lon = activeFarm?.center?.[1] || 78.65;
+
       const res = await sendChatMessage(
         query,
-        activeFarm.lat || 27.81,
-        activeFarm.lon || 78.65,
+        lat,
+        lon,
         crop.toLowerCase(),
         isHindi ? "hi" : "en",
         `${district}, Uttar Pradesh`,
@@ -145,12 +148,9 @@ export const WhatsAppBotModal: React.FC<WhatsAppBotModalProps> = ({
         conversationHistory,
         undefined,
         {
-          district,
-          crop,
-          field_acres: acres,
-          farmer_name: farmerName,
           temperature: 38.5,
           soil_moisture: 28.0,
+          field_name: activeFarm?.name || "Main Field",
         }
       );
 
@@ -215,10 +215,11 @@ export const WhatsAppBotModal: React.FC<WhatsAppBotModalProps> = ({
 
       try {
         const diagRes = await analyzeCropLeafImage(
-          base64Data,
-          activeFarm.lat || 27.81,
-          activeFarm.lon || 78.65,
-          crop.toLowerCase()
+          file,
+          crop.toLowerCase(),
+          isHindi ? "hi" : "en",
+          "",
+          district
         );
 
         const replyText = diagRes?.diagnosis || diagRes?.findings || (isHindi
@@ -264,8 +265,9 @@ export const WhatsAppBotModal: React.FC<WhatsAppBotModalProps> = ({
       stopGoogleSpeech();
       setPlayingAudioId(msgId);
       const cleanText = text.replace(/[*#]/g, "");
-      await playGoogleNeuralSpeech(cleanText, isHindi ? "hi" : "en", () => {
-        setPlayingAudioId(null);
+      await playGoogleNeuralSpeech(cleanText, isHindi ? "hi" : "en", {
+        onEnd: () => setPlayingAudioId(null),
+        onError: () => setPlayingAudioId(null),
       });
     }
   };
