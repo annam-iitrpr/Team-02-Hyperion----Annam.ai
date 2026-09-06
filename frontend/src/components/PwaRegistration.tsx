@@ -22,8 +22,14 @@ export function PwaRegistration() {
     const handleBeforeInstall = (e: any) => {
       e.preventDefault();
       setInstallPrompt(e);
-      // Show install banner on mobile after 3 seconds if not already installed
-      setTimeout(() => setShowPrompt(true), 3000);
+      // Only show install banner on mobile viewports (< 768px) and if never dismissed
+      if (typeof window !== "undefined") {
+        const isDismissed = localStorage.getItem("aasra_pwa_dismissed") === "true";
+        const isMobile = window.innerWidth < 768;
+        if (!isDismissed && isMobile) {
+          setTimeout(() => setShowPrompt(true), 3000);
+        }
+      }
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
@@ -37,20 +43,30 @@ export function PwaRegistration() {
     if (outcome === "accepted") {
       setShowPrompt(false);
       setInstallPrompt(null);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("aasra_pwa_dismissed", "true");
+      }
+    }
+  };
+
+  const handleDismiss = () => {
+    setShowPrompt(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("aasra_pwa_dismissed", "true");
     }
   };
 
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-6 md:right-auto md:max-w-sm z-50 bg-[#0d253d] text-white p-4 rounded-2xl shadow-2xl border border-indigo-500/30 flex items-center justify-between gap-3 animate-bounce-subtle">
+    <div className="fixed bottom-24 left-4 right-4 md:hidden z-40 bg-[#0d253d] text-white p-3.5 rounded-2xl shadow-2xl border border-indigo-500/30 flex items-center justify-between gap-3 animate-bounce-subtle">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-[#533afd] flex items-center justify-between shrink-0 p-2">
+        <div className="h-9 w-9 rounded-xl bg-[#533afd] flex items-center justify-center shrink-0 p-2">
           <Download className="h-full w-full text-white" />
         </div>
         <div>
           <h4 className="font-bold text-xs">Install AASRA Web App</h4>
-          <p className="text-[10px] text-slate-300">Quick 1-tap mobile access for farm fields</p>
+          <p className="text-[10px] text-slate-300">1-tap offline mobile access for farm fields</p>
         </div>
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
@@ -61,7 +77,7 @@ export function PwaRegistration() {
           Install
         </button>
         <button
-          onClick={() => setShowPrompt(false)}
+          onClick={handleDismiss}
           className="p-1 rounded-lg text-slate-400 hover:text-white"
         >
           <X className="h-4 w-4" />

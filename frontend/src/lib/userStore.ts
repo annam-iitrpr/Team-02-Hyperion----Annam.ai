@@ -180,7 +180,7 @@ export function findRegisteredUser(mobileOrEmail: string): FarmerProfile | null 
   
   return (
     users.find((u) => {
-      const uMobile = u.mobileNumber.replace(/\D/g, "");
+      const uMobile = (u.mobileNumber || "").replace(/\D/g, "");
       const uEmail = (u.email || "").trim().toLowerCase();
       return (
         (cleanQuery.length >= 10 && uMobile.includes(cleanQuery)) ||
@@ -188,6 +188,51 @@ export function findRegisteredUser(mobileOrEmail: string): FarmerProfile | null 
       );
     }) || null
   );
+}
+
+/**
+ * Async lookup verifying both local storage registry and server-side database (/api/farmers).
+ */
+export async function lookupFarmerInDatabase(mobileOrEmail: string): Promise<FarmerProfile | null> {
+  // 1. Fast local registry lookup
+  const localMatch = findRegisteredUser(mobileOrEmail);
+  if (localMatch) return localMatch;
+
+  // 2. Fetch server-side JSON database
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/farmers", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        const farmers: any[] = data.farmers || [];
+        const cleanQuery = mobileOrEmail.trim().toLowerCase().replace(/\D/g, "");
+
+        const serverMatch = farmers.find((f) => {
+          const fMobile = (f.mobileNumber || "").replace(/\D/g, "");
+          const fEmail = (f.email || "").trim().toLowerCase();
+          return (
+            (cleanQuery.length >= 10 && fMobile.includes(cleanQuery)) ||
+            (f.email && fEmail === mobileOrEmail.trim().toLowerCase())
+          );
+        });
+
+        if (serverMatch) {
+          const fullProfile: FarmerProfile = {
+            ...EMPTY_FARMER_PROFILE,
+            ...serverMatch,
+            fieldAreaAcres: serverMatch.fieldAreaAcres || 5.0,
+            isRegistered: true,
+          };
+          saveRegisteredUser(fullProfile);
+          return fullProfile;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to query /api/farmers database during login lookup:", e);
+    }
+  }
+
+  return null;
 }
 
 /**

@@ -79,6 +79,21 @@ def safe_int(val: Any, default: int) -> int:
     except (ValueError, TypeError):
         return int(default)
 
+LANGUAGE_NAMES = {
+    "en": "English",
+    "hi": "Hindi (हिन्दी)",
+    "mr": "Marathi (मराठी)",
+    "pa": "Punjabi (ਪੰਜਾਬੀ)",
+    "gu": "Gujarati (ગુજરાતી)",
+    "te": "Telugu (తెలుగు)",
+    "ta": "Tamil (தமிழ்)",
+    "kn": "Kannada (ಕನ್ನಡ)",
+    "ml": "Malayalam (മലയാളം)",
+    "bn": "Bengali (বাংলা)",
+    "or": "Odia (ଓଡ଼ିଆ)",
+    "as": "Assamese (অসমীয়া)",
+}
+
 def synthesize_gemini_statement(
     farmer_name: str,
     district: str,
@@ -90,6 +105,7 @@ def synthesize_gemini_statement(
     m2_readiness: Dict[str, Any],
     m3_portfolio: Dict[str, Any],
     m5_baseline: Dict[str, Any],
+    language: str = "en",
 ) -> Dict[str, Any]:
     import json
     from app.config import settings
@@ -106,40 +122,105 @@ def synthesize_gemini_statement(
     exp_yield = m5_baseline.get("expected_baseline_yield_q_ha", 25.0)
     exp_yield_acre = m5_baseline.get("expected_baseline_yield_q_acre", 10.0)
 
+    target_lang_name = LANGUAGE_NAMES.get(language, "English")
+
     safe_text_hi = "सुरक्षित स्प्रे विंडो सक्रिय है" if is_safe else "वर्तमान में स्प्रे स्थगित करें (शर्तें प्रतिकूल)"
     safe_text_en = "Safe Spray Window Active" if is_safe else "Delay Spraying — Adverse Atmospheric Window"
 
-    fallback_hi = (
-        f"किसान साथी {farmer_name}, मॉडल 1 के अनुसार आपके {district} क्षेत्र में {crop} की फसल पर "
-        f"{stress_type} (सटीकता {round(stress_conf*100)}%) का जोखिम है। "
-        f"मॉडल 2 बायोफिजिकल गेट के अनुसार {safe_text_hi} (डेल्टा-टी: {delta_t}°C)। "
-        f"मॉडल 3 द्वारा अनुशंसित जैविक उत्पाद {prod_name} की मात्रा {dosage} है। "
-        f"मॉडल 5 के अनुसार आपकी अनुमानित आधार उपज {exp_yield_acre} क्विंटल प्रति एकड़ है।"
-    )
-    fallback_en = (
-        f"Farmer {farmer_name}, Model 1 detects imminent {stress_type} ({round(stress_conf*100)}% confidence) "
-        f"for {crop} in {district}. Model 2 Action Gate reports: {safe_text_en} (Delta-T: {delta_t}°C). "
-        f"Model 3's Top-Ranked Syngenta prescription is {prod_name} ({dosage}). "
-        f"Model 5 projects a baseline harvest yield of {exp_yield_acre} Q/acre ({exp_yield} Q/ha)."
-    )
+    # 12 Regional Language Pre-Calculated Biophysical Advisory Templates
+    LOCALIZED_STATEMENTS = {
+        "hi": (
+            f"किसान साथी {farmer_name}, मॉडल 1 के अनुसार {district} में {crop} पर {stress_type} (सटीकता {round(stress_conf*100)}%) का जोखिम है। "
+            f"मॉडल 2 बायोफिजिकल गेट के अनुसार {safe_text_hi} (डेल्टा-टी: {delta_t}°C)। "
+            f"मॉडल 3 द्वारा अनुशंसित सिंजेंटा उत्पाद {prod_name} की मात्रा {dosage} है। "
+            f"मॉडल 5 के अनुसार आधार उपज {exp_yield_acre} क्विंटल प्रति एकड़ है।"
+        ),
+        "en": (
+            f"Farmer {farmer_name}, Model 1 detects {stress_type} ({round(stress_conf*100)}% confidence) for {crop} in {district}. "
+            f"Model 2 Action Gate reports: {safe_text_en} (Delta-T: {delta_t}°C). "
+            f"Model 3 recommends Syngenta {prod_name} ({dosage}). "
+            f"Model 5 projects baseline harvest yield of {exp_yield_acre} Q/acre ({exp_yield} Q/ha)."
+        ),
+        "mr": (
+            f"शेतकरी बंधू {farmer_name}, मॉडेल 1 नुसार {district} मध्ये {crop} पिकावर {stress_type} ({round(stress_conf*100)}% खात्री) चा धोका आहे. "
+            f"मॉडेल 2 नुसार {safe_text_hi} (डेल्टा-टी: {delta_t}°C). "
+            f"मॉडेल 3 शिफारस केलेले उत्पादन {prod_name} प्रमाण {dosage} आहे. "
+            f"मॉडेल 5 नुसार अपेक्षित आधार उत्पादन {exp_yield_acre} क्विंटल प्रति एकर आहे."
+        ),
+        "pa": (
+            f"ਕਿਸਾਨ ਵੀਰ {farmer_name}, ਮਾਡਲ 1 ਅਨੁਸਾਰ {district} ਵਿੱਚ {crop} ਦੀ ਫਸਲ 'ਤੇ {stress_type} ({round(stress_conf*100)}% ਸ਼ੁੱਧਤਾ) ਦਾ ਖਤਰਾ ਹੈ। "
+            f"ਮਾਡਲ 2 ਅਨੁਸਾਰ {safe_text_hi} (ਡੈਲਟਾ-ਟੀ: {delta_t}°C)। "
+            f"ਮਾਡਲ 3 ਸਿਫਾਰਿਸ਼ ਕੀਤੀ ਖੁਰਾਕ {prod_name} ({dosage}) ਹੈ। "
+            f"ਮਾਡਲ 5 ਅਨੁਸਾਰ ਝਾੜ {exp_yield_acre} ਕੁਇੰਟਲ ਪ੍ਰਤੀ ਏਕੜ ਹੈ।"
+        ),
+        "gu": (
+            f"ખેડૂત મિત્ર {farmer_name}, મોડેલ 1 મુજબ {district} માં {crop} પાક પર {stress_type} ({round(stress_conf*100)}% ચોકસાઈ) નું જોખમ છે. "
+            f"મોડેલ 2 મુજબ {safe_text_hi} (ડેલ્ટા-ટી: {delta_t}°C). "
+            f"મોડેલ 3 ભલામણ કરેલ દવા {prod_name} નો ડોઝ {dosage} છે. "
+            f"મોડેલ 5 મુજબ અંદાજિત ઉત્પાદન {exp_yield_acre} ક્વિન્ટલ પ્રતિ એકર છે."
+        ),
+        "te": (
+            f"రైతు సోదరుడు {farmer_name}, మోడల్ 1 ప్రకారం {district} లోని {crop} పంటపై {stress_type} ({round(stress_conf*100)}% ఖచ్చితత్వం) ప్రమాదం ఉంది. "
+            f"మోడల్ 2 ప్రకారం {safe_text_en} (డెల్టా-టి: {delta_t}°C). "
+            f"మోడల్ 3 సిఫార్సు చేసిన సింజెంటా {prod_name} మోతాదు {dosage}. "
+            f"మోడల్ 5 అంచనా వేసిన దిగుబడి ఎకరాకు {exp_yield_acre} క్వింటాళ్లు."
+        ),
+        "ta": (
+            f"விவசாயி {farmer_name}, மாதிரி 1 படி {district} பகுதியில் {crop} பயிரில் {stress_type} ({round(stress_conf*100)}% துல்லியம்) ஆபத்து உள்ளது. "
+            f"மாதிரி 2 படி {safe_text_en} (டெல்டா-டி: {delta_t}°C). "
+            f"மாதிரி 3 பரிந்துரைக்கும் மருந்து {prod_name} அளவு {dosage}. "
+            f"மாதிரி 5 படி எதிர்பார்க்கப்படும் மகசூல் ஏக்கருக்கு {exp_yield_acre} குவிண்டால்."
+        ),
+        "kn": (
+            f"ರೈತ ಮಿತ್ರ {farmer_name}, ಮಾದರಿ 1 ರ ಪ್ರಕಾರ {district} ನಲ್ಲಿ {crop} ಬೆಳೆಗೆ {stress_type} ({round(stress_conf*100)}% ನಿಖರತೆ) ಅಪಾಯವಿದೆ. "
+            f"ಮಾದರಿ 2 ರ ಪ್ರಕಾರ {safe_text_en} (ಡೆಲ್ಟಾ-ಟಿ: {delta_t}°C). "
+            f"ಮಾದರಿ 3 ರ ಶಿಫಾರಸು ಮಾಡಿದ {prod_name} ಪ್ರಮಾಣ {dosage}. "
+            f"ಮಾದರಿ 5 ರ ನಿರೀಕ್ಷಿತ ಇಳುವರಿ ಎಕರೆಗೆ {exp_yield_acre} ಕ್ವಿಂಟಾಲ್ ಆಗಿದೆ."
+        ),
+        "ml": (
+            f"കർഷക സുഹൃത്ത് {farmer_name}, മോഡൽ 1 പ്രകാരം {district} ൽ {crop} വിളയിൽ {stress_type} ({round(stress_conf*100)}% കൃത്യത) സാധ്യതയുണ്ട്. "
+            f"മോഡൽ 2 പ്രകാരം {safe_text_en} (ഡെൽറ്റ-ടി: {delta_t}°C). "
+            f"മോഡൽ 3 ശുപാർശ ചെയ്യുന്ന {prod_name} അളവ് {dosage}. "
+            f"മോഡൽ 5 പ്രകാരം പ്രതീക്ഷിക്കുന്ന വിളവ് ഏക്കറിന് {exp_yield_acre} ക്വിന്റൽ ആണ്."
+        ),
+        "bn": (
+            f"কৃষক বন্ধু {farmer_name}, মডেল ১ অনুযায়ী {district} এ {crop} ফসলে {stress_type} ({round(stress_conf*100)}% নির্ভুলতা) ঝুঁকি রয়েছে। "
+            f"মডেল ২ অনুযায়ী {safe_text_hi} (ডেল্টা-টি: {delta_t}°C)। "
+            f"মডেল ৩ প্রস্তাবিত সিনজেনটা পণ্য {prod_name} মাত্রা {dosage}। "
+            f"মডেল ৫ অনুযায়ী প্রত্যাশিত ফলন একরে {exp_yield_acre} কুইন্টাল।"
+        ),
+        "or": (
+            f"କୃଷକ ଭାଇ {farmer_name}, ମଡେଲ ୧ ଅନୁଯାୟୀ {district} ରେ {crop} ଫସଲରେ {stress_type} ({round(stress_conf*100)}% ସଠିକତା) ର ଆଶଙ୍କା ରହିଛି। "
+            f"ମଡେଲ ୨ ଅନୁଯାୟୀ {safe_text_hi} (ଡେଲ୍ଟା-ଟି: {delta_t}°C)। "
+            f"ମଡେଲ ୩ ସୁପାରିଶ କରାଯାଇଥିବା {prod_name} ମାତ୍ରା {dosage}। "
+            f"ମଡେଲ ୫ ଅନୁସାରେ ଆକଳନ କରାଯାଇଥିବା ଉତ୍ପାଦନ ଏକର ପିଛା {exp_yield_acre} କ୍ୱିଣ୍ଟାଲ।"
+        ),
+        "as": (
+            f"কৃষক বন্ধু {farmer_name}, মডেল ১ অনুসৰি {district} ত {crop} শস্যত {stress_type} ({round(stress_conf*100)}% সঠিকতা) আশংকা আছে। "
+            f"মডেল ২ অনুসৰি {safe_text_hi} (ডেল্টা-টি: {delta_t}°C)। "
+            f"মডেল ৩ অনুমোদন কৰা {prod_name} মাত্ৰা {dosage}। "
+            f"মডেল ৫ অনুসৰি আনুমানিক উৎপাদন একৰত {exp_yield_acre} কুইণ্টল।"
+        ),
+    }
+
+    fallback_statement = LOCALIZED_STATEMENTS.get(language, LOCALIZED_STATEMENTS["en"])
 
     fallback_payload = {
         "headline": f"{stress_type} Alert: {prod_name} Recommended" if is_safe else f"Spray Hold: High Delta-T ({delta_t}°C)",
-        "statement_hi": fallback_hi,
-        "statement_en": fallback_en,
+        "statement": fallback_statement,
+        "statement_hi": LOCALIZED_STATEMENTS["hi"],
+        "statement_en": LOCALIZED_STATEMENTS["en"],
         "spray_verdict_badge": "SAFE TO SPRAY" if is_safe else "DELAY SPRAY",
         "timing_guidance": "Early morning (5:30 AM - 8:30 AM) or Late evening after 6:00 PM" if not is_safe else "Optimal spray window open for next 4-6 hours.",
         "product_summary": f"{prod_name} at {dosage} per acre.",
         "yield_outlook": f"{exp_yield_acre} Q/acre baseline under current climate.",
+        "language_used": language,
         "generated_by": "Rule-Based Biophysical Synthesis"
     }
 
     google_keys = settings.get_google_keys()
-    if not google_keys:
-        return fallback_payload
-
     prompt = f"""You are AASRA, an elite agricultural AI decision engine deployed across Indian farms.
-Synthesize the official findings of 4 Machine Learning models into a concise, authoritative farmer advisory:
+Synthesize the official findings of 4 Machine Learning models into a concise, authoritative farmer advisory in {target_lang_name}:
 - Farmer Name: {farmer_name}
 - District: {district}
 - Crop: {crop} ({growth_stage}, {area_acres} acres)
@@ -150,33 +231,73 @@ Synthesize the official findings of 4 Machine Learning models into a concise, au
 
 Return strictly valid JSON with these keys:
 {{
-  "headline": "Short punchy bilingual header",
-  "statement_hi": "Professional, respectful Hindi statement for the farmer clearly explaining Model 1 stress, Model 2 spray safety, Model 3 dosage, and Model 5 yield",
-  "statement_en": "Clear, professional English statement explaining all 4 model outputs and actionable next steps",
+  "headline": "Short punchy header in {target_lang_name}",
+  "statement": "Professional advisory statement strictly written in {target_lang_name} addressing {farmer_name} directly, explaining Model 1, Model 2 (Delta-T), Model 3 ({prod_name} at {dosage}), and Model 5 ({exp_yield_acre} Q/acre)",
+  "statement_en": "English translation",
+  "statement_hi": "Hindi translation",
   "spray_verdict_badge": "SAFE TO SPRAY" or "DELAY SPRAY",
-  "timing_guidance": "Precise recommended time window (e.g., Early morning 6:00 - 8:30 AM)",
-  "product_summary": "Dosage and mixing instructions for knapsack sprayers",
-  "yield_outlook": "Summary of baseline yield preservation"
+  "timing_guidance": "Recommended time window in {target_lang_name}",
+  "product_summary": "Dosage in {target_lang_name}",
+  "yield_outlook": "Summary of yield in {target_lang_name}"
 }}
 """
 
-    for key in google_keys:
-        try:
-            import google.generativeai as genai
-            genai.configure(api_key=key)
-            m = genai.GenerativeModel("gemini-2.5-flash")
-            response = m.generate_content(prompt)
-            raw = response.text.strip()
-            if "```json" in raw:
-                raw = raw.split("```json")[1].split("```")[0].strip()
-            elif "```" in raw:
-                raw = raw.split("```")[1].split("```")[0].strip()
-            parsed = json.loads(raw)
-            parsed["generated_by"] = "Google Gemini 2.5 Flash"
-            return parsed
-        except Exception as e:
-            logger.warning(f"Gemini statement synthesis attempt failed with key: {e}")
-            continue
+    # 1. Try Google Gemini with key & model rotation
+    if google_keys:
+        import google.generativeai as genai
+        for model_name in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]:
+            for key in google_keys[:2]:
+                try:
+                    genai.configure(api_key=key)
+                    m = genai.GenerativeModel(model_name)
+                    response = m.generate_content(prompt, request_options={"timeout": 5.0})
+                    raw = response.text.strip()
+                    if "```json" in raw:
+                        raw = raw.split("```json")[1].split("```")[0].strip()
+                    elif "```" in raw:
+                        raw = raw.split("```")[1].split("```")[0].strip()
+                    parsed = json.loads(raw)
+                    parsed["generated_by"] = f"Google {model_name}"
+                    parsed["language_used"] = language
+                    if "statement" not in parsed or not parsed["statement"]:
+                        parsed["statement"] = fallback_statement
+                    return parsed
+                except Exception as e:
+                    logger.debug(f"Gemini {model_name} attempt failed: {e}")
+                    continue
+
+    # 2. Try Groq (Llama 3.3 70B) for ultra-fast, quota-free fallback
+    groq_keys = settings.get_groq_keys()
+    if groq_keys:
+        import urllib.request
+        for gkey in groq_keys[:2]:
+            try:
+                req_data = json.dumps({
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.3
+                }).encode("utf-8")
+                req = urllib.request.Request(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    data=req_data,
+                    headers={
+                        "Authorization": f"Bearer {gkey}",
+                        "Content-Type": "application/json"
+                    }
+                )
+                with urllib.request.urlopen(req, timeout=4.0) as resp:
+                    resp_json = json.loads(resp.read().decode("utf-8"))
+                    content = resp_json["choices"][0]["message"]["content"]
+                    parsed = json.loads(content)
+                    parsed["generated_by"] = "Groq Llama 3.3 70B"
+                    parsed["language_used"] = language
+                    if "statement" not in parsed or not parsed["statement"]:
+                        parsed["statement"] = fallback_statement
+                    return parsed
+            except Exception as ge:
+                logger.debug(f"Groq attempt failed: {ge}")
+                continue
 
     return fallback_payload
 
@@ -193,12 +314,13 @@ class AASRAPipelineOrchestrator:
         """
         start_time = time.time()
 
-        farmer_name = request_payload.get("farmer_name") or "Ramkishan Yadav"
+        farmer_name = request_payload.get("farmer_name") or "Farmer"
         farmer_id = request_payload.get("farmer_id") or "farmer-001"
         district = request_payload.get("district") or request_payload.get("region") or "Kasganj"
         crop = request_payload.get("crop") or request_payload.get("crop_type") or "potato"
         growth_stage = request_payload.get("growth_stage") or "Vegetative"
-        area_acres = safe_float(request_payload.get("area_acres"), 4.5)
+        area_acres = safe_float(request_payload.get("area_acres"), 5.0)
+        language = str(request_payload.get("language") or "en").lower().strip()
 
         # Resolve location coordinates and soil properties
         dist_key = str(district).lower().strip()

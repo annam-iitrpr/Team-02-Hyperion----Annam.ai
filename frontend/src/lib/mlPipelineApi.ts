@@ -60,6 +60,7 @@ export interface UnifiedPipelineResponse {
   };
   gemini_statement?: {
     headline: string;
+    statement: string;
     statement_hi: string;
     statement_en: string;
     spray_verdict_badge: string;
@@ -67,6 +68,7 @@ export interface UnifiedPipelineResponse {
     product_summary: string;
     yield_outlook: string;
     generated_by?: string;
+    language_used?: string;
   };
   execution_metadata: {
     models_executed: string[];
@@ -94,6 +96,7 @@ export async function runAASRAPipeline(payload: {
   crop?: string;
   growth_stage?: string;
   area_acres?: number;
+  language?: string;
   temp_max_c?: number;
   temp_min_c?: number;
   rh_avg_pct?: number;

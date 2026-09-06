@@ -10,6 +10,7 @@ import {
   saveProfile,
   getStoredProfile,
   findRegisteredUser,
+  lookupFarmerInDatabase,
   EMPTY_FARMER_PROFILE,
   INDIAN_LANGUAGES,
 } from "@/lib/userStore";
@@ -54,6 +55,7 @@ export default function LoginPage() {
   const [selectedLanguage, setSelectedLanguage] = useState(language || "hi");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [needsSignup, setNeedsSignup] = useState(false);
 
   // OTP Countdown timer
   useEffect(() => {
@@ -77,10 +79,11 @@ export default function LoginPage() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.trim());
   };
 
-  // Step 1: Request OTP
-  const handleSendOtp = (e: React.FormEvent) => {
+  // Step 1: Request OTP - Strictly verify in Database first
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setNeedsSignup(false);
 
     const cleanNum = mobileNumber.replace(/\D/g, "");
 
@@ -96,20 +99,41 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      // 1. Database Check: Farmer MUST exist in database!
+      const farmer = await lookupFarmerInDatabase(cleanNum);
+      if (!farmer) {
+        setLoading(false);
+        setErrorMessage(
+          isHindi
+            ? `खाता नहीं मिला: मोबाइल नंबर (${cleanNum}) AASRA डेटाबेस में पंजीकृत नहीं है। लॉगिन करने से पहले कृपया नया खाता बनाएं (साइन अप करें)।`
+            : `Account Not Found: Mobile number (${cleanNum}) is not registered in the AASRA database. Please Sign Up first to register your farm.`
+        );
+        setNeedsSignup(true);
+        return;
+      }
+
       // Generate a 4-digit verification code
       const code = Math.floor(1000 + Math.random() * 9000).toString();
       setGeneratedOtp(code);
       setOtpSent(true);
       setOtpTimer(45);
+    } catch (err: any) {
+      setErrorMessage(
+        isHindi
+          ? "डेटाबेस कनेक्शन त्रुटि। कृपया पुनः प्रयास करें।"
+          : "Database connection error. Please try again."
+      );
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   // Step 2: Verify OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setNeedsSignup(false);
 
     if (!otpCode || otpCode.trim().length !== 4) {
       setErrorMessage(
@@ -132,33 +156,43 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    setTimeout(() => {
+    try {
       const cleanNum = mobileNumber.replace(/\D/g, "");
-      const registeredUser = findRegisteredUser(cleanNum);
-      const existing = getStoredProfile();
+      const registeredUser = await lookupFarmerInDatabase(cleanNum);
 
-      const newProfile = {
-        ...EMPTY_FARMER_PROFILE,
-        ...existing,
-        ...(registeredUser || {}),
-        fullName: (registeredUser && registeredUser.fullName) || existing.fullName || `Kisan (${cleanNum.slice(-4)})`,
-        mobileNumber: cleanNum,
-        language: (registeredUser && registeredUser.language) || selectedLanguage,
+      if (!registeredUser) {
+        setErrorMessage(
+          isHindi
+            ? "खाता नहीं मिला: यह किसान खाता डेटाबेस में नहीं है। कृपया पहले साइन अप करें।"
+            : "Account Not Found: This profile is not registered in the database. Please sign up first."
+        );
+        setNeedsSignup(true);
+        setLoading(false);
+        return;
+      }
+
+      const activeProfile = {
+        ...registeredUser,
         isRegistered: true,
         lastLogin: new Date().toISOString(),
       };
+
       loginUser();
-      saveProfile(newProfile);
-      setLanguage(newProfile.language || selectedLanguage);
+      saveProfile(activeProfile);
+      setLanguage(activeProfile.language || selectedLanguage);
       setLoading(false);
-      router.push("/dashboard");
-    }, 500);
+      router.push("/pipeline");
+    } catch (err) {
+      setErrorMessage("Login failed. Please try again.");
+      setLoading(false);
+    }
   };
 
-  // Password / Email Login Handler with Strict Validation
+  // Password / Email Login Handler with Strict Database Validation
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setNeedsSignup(false);
 
     if (!isValidEmail(email)) {
       setErrorMessage(
@@ -190,28 +224,34 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const registeredUser = findRegisteredUser(email);
-      const displayName = email.split("@")[0] || "Farmer";
-      const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-      const existing = getStoredProfile();
+    try {
+      const registeredUser = await lookupFarmerInDatabase(email.trim());
+      if (!registeredUser) {
+        setErrorMessage(
+          isHindi
+            ? `खाता नहीं मिला: ईमेल (${email.trim()}) AASRA डेटाबेस में पंजीकृत नहीं है। लॉगिन करने के लिए कृपया पहले नया खाता बनाएं (साइन अप करें)।`
+            : `Account Not Found: Email (${email.trim()}) is not registered in the database. Please Sign Up first to create your farm profile.`
+        );
+        setNeedsSignup(true);
+        setLoading(false);
+        return;
+      }
 
-      const newProfile = {
-        ...EMPTY_FARMER_PROFILE,
-        ...existing,
-        ...(registeredUser || {}),
-        fullName: (registeredUser && registeredUser.fullName) || existing.fullName || formattedName,
-        email: email.trim(),
-        language: (registeredUser && registeredUser.language) || selectedLanguage,
+      const activeProfile = {
+        ...registeredUser,
         isRegistered: true,
         lastLogin: new Date().toISOString(),
       };
+
       loginUser();
-      saveProfile(newProfile);
-      setLanguage(newProfile.language || selectedLanguage);
+      saveProfile(activeProfile);
+      setLanguage(activeProfile.language || selectedLanguage);
       setLoading(false);
-      router.push("/dashboard");
-    }, 600);
+      router.push("/pipeline");
+    } catch (err) {
+      setErrorMessage("Database verification failed. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -359,15 +399,33 @@ export default function LoginPage() {
                     initial={{ opacity: 0, y: -8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8 }}
-                    className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-2.5"
+                    className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-2.5 shadow-sm"
                   >
-                    <AlertCircle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
-                    <div className="space-y-0.5">
-                      <span className="font-bold block">
-                        {isHindi ? "सत्यापन त्रुटि (Authentication Failed):" : "Authentication Error:"}
-                      </span>
-                      <p className="text-[11px] text-rose-800 leading-relaxed">{errorMessage}</p>
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5 flex-1">
+                        <span className="font-bold block text-rose-900">
+                          {isHindi ? "सत्यापन सूचना (Authentication Notice):" : "Authentication Notice:"}
+                        </span>
+                        <p className="text-[11px] text-rose-800 leading-relaxed font-medium">{errorMessage}</p>
+                      </div>
                     </div>
+
+                    {needsSignup && (
+                      <div className="pt-1 border-t border-rose-200/80 flex items-center justify-between gap-2">
+                        <span className="text-[11px] text-rose-700">
+                          {isHindi ? "नया किसान खाता पंजीकरण आवश्यक है:" : "Farmer profile registration required:"}
+                        </span>
+                        <Link
+                          href="/signup"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#533afd] hover:bg-[#432dd8] text-white font-bold text-xs shadow transition-all cursor-pointer"
+                        >
+                          <UserPlus className="h-3.5 w-3.5" />
+                          <span>{isHindi ? "साइन अप करें" : "Sign Up Now"}</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
