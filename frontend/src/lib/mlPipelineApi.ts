@@ -5,10 +5,12 @@
  */
 
 export interface UnifiedPipelineResponse {
+  farmer_name?: string;
   farmer_id: string;
   district: string;
   crop: string;
   growth_stage: string;
+  area_acres?: number;
   telemetry_summary: {
     temp_max_c: number;
     temp_min_c: number;
@@ -56,9 +58,20 @@ export interface UnifiedPipelineResponse {
     historical_district_average_q_ha: number;
     yield_impact_pct: number;
   };
+  gemini_statement?: {
+    headline: string;
+    statement_hi: string;
+    statement_en: string;
+    spray_verdict_badge: string;
+    timing_guidance: string;
+    product_summary: string;
+    yield_outlook: string;
+    generated_by?: string;
+  };
   execution_metadata: {
     models_executed: string[];
     serving_mode: string;
+    ai_synthesis_engine?: string;
     latency_ms: number;
     timestamp: string;
   };
@@ -75,9 +88,12 @@ export async function fetchPipelineModels() {
 }
 
 export async function runAASRAPipeline(payload: {
+  farmer_name?: string;
+  farmer_id?: string;
   district?: string;
   crop?: string;
   growth_stage?: string;
+  area_acres?: number;
   temp_max_c?: number;
   temp_min_c?: number;
   rh_avg_pct?: number;

@@ -79,6 +79,108 @@ def safe_int(val: Any, default: int) -> int:
     except (ValueError, TypeError):
         return int(default)
 
+def synthesize_gemini_statement(
+    farmer_name: str,
+    district: str,
+    crop: str,
+    growth_stage: str,
+    area_acres: float,
+    telemetry: Dict[str, Any],
+    m1_risk: Dict[str, Any],
+    m2_readiness: Dict[str, Any],
+    m3_portfolio: Dict[str, Any],
+    m5_baseline: Dict[str, Any],
+) -> Dict[str, Any]:
+    import json
+    from app.config import settings
+
+    top_prod = m3_portfolio.get("primary_recommendation") or {}
+    prod_name = top_prod.get("name", "Syngenta Biological")
+    dosage = top_prod.get("recommended_dosage", "2.0 ml/L")
+    stress_type = m1_risk.get("stress_type", "Optimal")
+    stress_conf = m1_risk.get("confidence", 0.8)
+    is_safe = m2_readiness.get("spray_window_safe", False)
+    readiness_score = m2_readiness.get("readiness_score", 0.5)
+    delta_t = m2_readiness.get("delta_t", 4.5)
+    reasons = m2_readiness.get("safety_reasons", [])
+    exp_yield = m5_baseline.get("expected_baseline_yield_q_ha", 25.0)
+    exp_yield_acre = m5_baseline.get("expected_baseline_yield_q_acre", 10.0)
+
+    safe_text_hi = "सुरक्षित स्प्रे विंडो सक्रिय है" if is_safe else "वर्तमान में स्प्रे स्थगित करें (शर्तें प्रतिकूल)"
+    safe_text_en = "Safe Spray Window Active" if is_safe else "Delay Spraying — Adverse Atmospheric Window"
+
+    fallback_hi = (
+        f"किसान साथी {farmer_name}, मॉडल 1 के अनुसार आपके {district} क्षेत्र में {crop} की फसल पर "
+        f"{stress_type} (सटीकता {round(stress_conf*100)}%) का जोखिम है। "
+        f"मॉडल 2 बायोफिजिकल गेट के अनुसार {safe_text_hi} (डेल्टा-टी: {delta_t}°C)। "
+        f"मॉडल 3 द्वारा अनुशंसित जैविक उत्पाद {prod_name} की मात्रा {dosage} है। "
+        f"मॉडल 5 के अनुसार आपकी अनुमानित आधार उपज {exp_yield_acre} क्विंटल प्रति एकड़ है।"
+    )
+    fallback_en = (
+        f"Farmer {farmer_name}, Model 1 detects imminent {stress_type} ({round(stress_conf*100)}% confidence) "
+        f"for {crop} in {district}. Model 2 Action Gate reports: {safe_text_en} (Delta-T: {delta_t}°C). "
+        f"Model 3's Top-Ranked Syngenta prescription is {prod_name} ({dosage}). "
+        f"Model 5 projects a baseline harvest yield of {exp_yield_acre} Q/acre ({exp_yield} Q/ha)."
+    )
+
+    fallback_payload = {
+        "headline": f"{stress_type} Alert: {prod_name} Recommended" if is_safe else f"Spray Hold: High Delta-T ({delta_t}°C)",
+        "statement_hi": fallback_hi,
+        "statement_en": fallback_en,
+        "spray_verdict_badge": "SAFE TO SPRAY" if is_safe else "DELAY SPRAY",
+        "timing_guidance": "Early morning (5:30 AM - 8:30 AM) or Late evening after 6:00 PM" if not is_safe else "Optimal spray window open for next 4-6 hours.",
+        "product_summary": f"{prod_name} at {dosage} per acre.",
+        "yield_outlook": f"{exp_yield_acre} Q/acre baseline under current climate.",
+        "generated_by": "Rule-Based Biophysical Synthesis"
+    }
+
+    google_keys = settings.get_google_keys()
+    if not google_keys:
+        return fallback_payload
+
+    prompt = f"""You are AASRA, an elite agricultural AI decision engine deployed across Indian farms.
+Synthesize the official findings of 4 Machine Learning models into a concise, authoritative farmer advisory:
+- Farmer Name: {farmer_name}
+- District: {district}
+- Crop: {crop} ({growth_stage}, {area_acres} acres)
+- Model 1 (PS-02 Stress Risk): Stress = {stress_type}, Confidence = {stress_conf:.2f}
+- Model 2 (PS-02 Biological Action Gate): Safe Window = {is_safe}, Readiness Score = {readiness_score:.4f}, Delta-T = {delta_t}°C, Reasons = {reasons}
+- Model 3 (PS-03 Syngenta Product Ranker): Champion = {prod_name}, Dosage = {dosage}, Active Ingredient = {top_prod.get('active_ingredient', '')}, Timing = {top_prod.get('application_timing', '')}
+- Model 5 (PS-07 Yield Baseline): Expected Baseline Yield = {exp_yield} Q/ha ({exp_yield_acre} Q/acre)
+
+Return strictly valid JSON with these keys:
+{{
+  "headline": "Short punchy bilingual header",
+  "statement_hi": "Professional, respectful Hindi statement for the farmer clearly explaining Model 1 stress, Model 2 spray safety, Model 3 dosage, and Model 5 yield",
+  "statement_en": "Clear, professional English statement explaining all 4 model outputs and actionable next steps",
+  "spray_verdict_badge": "SAFE TO SPRAY" or "DELAY SPRAY",
+  "timing_guidance": "Precise recommended time window (e.g., Early morning 6:00 - 8:30 AM)",
+  "product_summary": "Dosage and mixing instructions for knapsack sprayers",
+  "yield_outlook": "Summary of baseline yield preservation"
+}}
+"""
+
+    for key in google_keys:
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=key)
+            m = genai.GenerativeModel("gemini-2.5-flash")
+            response = m.generate_content(prompt)
+            raw = response.text.strip()
+            if "```json" in raw:
+                raw = raw.split("```json")[1].split("```")[0].strip()
+            elif "```" in raw:
+                raw = raw.split("```")[1].split("```")[0].strip()
+            parsed = json.loads(raw)
+            parsed["generated_by"] = "Google Gemini 2.5 Flash"
+            return parsed
+        except Exception as e:
+            logger.warning(f"Gemini statement synthesis attempt failed with key: {e}")
+            continue
+
+    return fallback_payload
+
+
 class AASRAPipelineOrchestrator:
     def __init__(self, client: Optional[VertexMLInferenceClient] = None):
         self.client = client or VertexMLInferenceClient()
@@ -86,14 +188,17 @@ class AASRAPipelineOrchestrator:
     def run_pipeline(self, request_payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Executes the full 4-model pipeline:
-        Model 1 (Stress Risk) + Model 2 (Biological Readiness) -> Model 3 (Product Portfolio) + Model 5 (Yield Baseline).
+        Model 1 (Stress Risk) + Model 2 (Biological Readiness) -> Model 3 (Product Portfolio) + Model 5 (Yield Baseline)
+        + Gemini 2.5 Flash Statement Synthesis.
         """
         start_time = time.time()
 
+        farmer_name = request_payload.get("farmer_name") or "Ramkishan Yadav"
         farmer_id = request_payload.get("farmer_id") or "farmer-001"
         district = request_payload.get("district") or request_payload.get("region") or "Kasganj"
         crop = request_payload.get("crop") or request_payload.get("crop_type") or "potato"
         growth_stage = request_payload.get("growth_stage") or "Vegetative"
+        area_acres = safe_float(request_payload.get("area_acres"), 4.5)
 
         # Resolve location coordinates and soil properties
         dist_key = str(district).lower().strip()
@@ -133,9 +238,7 @@ class AASRAPipelineOrchestrator:
         else:
             stage_sensitivity = 0.30
 
-        # ----------------------------------------------------
-        # Layer 2: Model 1 (Stress Risk) & Model 2 (Readiness)
-        # ----------------------------------------------------
+        # Layer 2: Model 1 & Model 2
         m1_features = {
             "temp_max_forecast_7d": temp_max,
             "temp_night_min_7d": temp_min,
@@ -160,9 +263,7 @@ class AASRAPipelineOrchestrator:
         }
         m2_result = self.client.predict_model2(m2_features)
 
-        # ----------------------------------------------------
-        # Layer 3: Model 3 (Syngenta Product Portfolio Ranker)
-        # ----------------------------------------------------
+        # Layer 3: Model 3 Product Portfolio Ranker
         farm_context = {
             "crop": crop,
             "growth_stage": growth_stage,
@@ -177,9 +278,7 @@ class AASRAPipelineOrchestrator:
         }
         m3_ranked = self.client.predict_model3(farm_context, m1_result, m2_result, top_k=3)
 
-        # ----------------------------------------------------
-        # Layer 4: Model 5 (Field Yield Baseline Regressor)
-        # ----------------------------------------------------
+        # Layer 4: Model 5 Field Yield Baseline Regressor
         m5_context = {
             "crop": crop,
             "district_historical_mean_yield": hist_yield,
@@ -191,53 +290,81 @@ class AASRAPipelineOrchestrator:
         }
         m5_result = self.client.predict_model5(m5_context)
 
+        telemetry_summary = {
+            "temp_max_c": temp_max,
+            "temp_min_c": temp_min,
+            "rh_avg_pct": rh_avg,
+            "vpd_kpa": round(vpd, 2),
+            "delta_t_c": round(delta_t, 2),
+            "wind_speed_kmh": wind_speed,
+            "rain_prob_next_48h": rain_prob,
+            "soil_moisture_pct": soil_moisture
+        }
+
+        m1_risk_obj = {
+            "stress_type": m1_result["stress_type"],
+            "stress_class": m1_result["stress_class"],
+            "confidence": m1_result["confidence"],
+            "days_to_impact": 4 if m1_result["stress_class"] != 0 else 0,
+            "probabilities": m1_result["probabilities"]
+        }
+
+        m2_readiness_obj = {
+            "spray_window_safe": m2_result["spray_window_safe"],
+            "readiness_score": m2_result["readiness_score"],
+            "delta_t": m2_result["delta_t"],
+            "safety_reasons": m2_result["reasons"]
+        }
+
+        m3_portfolio_obj = {
+            "top_recommendations": m3_ranked,
+            "primary_recommendation": m3_ranked[0] if m3_ranked else None
+        }
+
+        m5_baseline_obj = {
+            "expected_baseline_yield_q_ha": m5_result["expected_baseline_yield_q_ha"],
+            "expected_baseline_yield_q_acre": m5_result["expected_baseline_yield_q_acre"],
+            "historical_district_average_q_ha": m5_result["historical_district_average_q_ha"],
+            "yield_impact_pct": m5_result["yield_impact_pct"]
+        }
+
+        # Synthesize Gemini statement
+        gemini_statement = synthesize_gemini_statement(
+            farmer_name=farmer_name,
+            district=district,
+            crop=crop,
+            growth_stage=growth_stage,
+            area_acres=area_acres,
+            telemetry=telemetry_summary,
+            m1_risk=m1_risk_obj,
+            m2_readiness=m2_readiness_obj,
+            m3_portfolio=m3_portfolio_obj,
+            m5_baseline=m5_baseline_obj
+        )
+
         latency_ms = round((time.time() - start_time) * 1000, 2)
 
-        # Build Standardized Unified JSON Payload Contract (Page 11 AASRA Master Guide)
         unified_payload = {
+            "farmer_name": farmer_name,
             "farmer_id": farmer_id,
             "district": district,
             "crop": crop,
             "growth_stage": growth_stage,
-            "telemetry_summary": {
-                "temp_max_c": temp_max,
-                "temp_min_c": temp_min,
-                "rh_avg_pct": rh_avg,
-                "vpd_kpa": round(vpd, 2),
-                "delta_t_c": round(delta_t, 2),
-                "wind_speed_kmh": wind_speed,
-                "rain_prob_next_48h": rain_prob,
-                "soil_moisture_pct": soil_moisture
-            },
-            "model1_risk": {
-                "stress_type": m1_result["stress_type"],
-                "stress_class": m1_result["stress_class"],
-                "confidence": m1_result["confidence"],
-                "days_to_impact": 4 if m1_result["stress_class"] != 0 else 0,
-                "probabilities": m1_result["probabilities"]
-            },
-            "model2_readiness": {
-                "spray_window_safe": m2_result["spray_window_safe"],
-                "readiness_score": m2_result["readiness_score"],
-                "delta_t": m2_result["delta_t"],
-                "safety_reasons": m2_result["reasons"]
-            },
-            "model3_portfolio": {
-                "top_recommendations": m3_ranked,
-                "primary_recommendation": m3_ranked[0] if m3_ranked else None
-            },
-            "model5_baseline": {
-                "expected_baseline_yield_q_ha": m5_result["expected_baseline_yield_q_ha"],
-                "expected_baseline_yield_q_acre": m5_result["expected_baseline_yield_q_acre"],
-                "historical_district_average_q_ha": m5_result["historical_district_average_q_ha"],
-                "yield_impact_pct": m5_result["yield_impact_pct"]
-            },
+            "area_acres": area_acres,
+            "telemetry_summary": telemetry_summary,
+            "model1_risk": m1_risk_obj,
+            "model2_readiness": m2_readiness_obj,
+            "model3_portfolio": m3_portfolio_obj,
+            "model5_baseline": m5_baseline_obj,
+            "gemini_statement": gemini_statement,
             "execution_metadata": {
                 "models_executed": ["Model 1 (PS-02)", "Model 2 (PS-02)", "Model 3 (PS-03)", "Model 5 (PS-07)"],
                 "serving_mode": m1_result.get("serving_mode", "local_optimized_runtime"),
+                "ai_synthesis_engine": gemini_statement.get("generated_by", "Google Gemini"),
                 "latency_ms": latency_ms,
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
             }
         }
 
         return sanitize_for_json(unified_payload)
+

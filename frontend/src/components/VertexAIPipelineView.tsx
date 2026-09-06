@@ -21,9 +21,18 @@ import {
   ArrowUpRight,
   Gauge,
   Flame,
-  CloudRain
+  Clock,
+  TrendingUp,
+  Volume2,
+  VolumeX,
+  Languages,
+  User,
+  MapPin,
+  Check
 } from "lucide-react";
 import { runAASRAPipeline, UnifiedPipelineResponse, fetchPipelineModels } from "@/lib/mlPipelineApi";
+import { useFarm } from "@/context/FarmContext";
+import { getStoredProfile } from "@/lib/userStore";
 
 const CROPS = ["potato", "soybean", "wheat", "rice", "maize", "groundnut", "cotton_bt"];
 const DISTRICTS = [
@@ -38,9 +47,12 @@ const DISTRICTS = [
 const STAGES = ["Vegetative", "Flowering / Bloom", "Tuber / Pod Initiation", "Grain Filling", "Maturity"];
 
 export function VertexAIPipelineView() {
-  const [district, setDistrict] = useState("Kasganj");
-  const [crop, setCrop] = useState("potato");
-  const [growthStage, setGrowthStage] = useState("Tuber / Pod Initiation");
+  const { activeFarm } = useFarm();
+  const profile = getStoredProfile();
+
+  const [district, setDistrict] = useState(activeFarm?.district || "Kasganj");
+  const [crop, setCrop] = useState((activeFarm?.primaryCrop || "potato").toLowerCase());
+  const [growthStage, setGrowthStage] = useState(activeFarm?.growthStage || "Tuber / Pod Initiation");
   
   // Microclimate Sliders
   const [tempMax, setTempMax] = useState<number>(38.5);
@@ -49,6 +61,8 @@ export function VertexAIPipelineView() {
   const [soilMoisture, setSoilMoisture] = useState<number>(28);
   const [rainProb, setRainProb] = useState<number>(10);
 
+  const [selectedLang, setSelectedLang] = useState<"hi" | "en">("hi");
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<UnifiedPipelineResponse | null>(null);
   const [modelsMeta, setModelsMeta] = useState<any>(null);
@@ -58,13 +72,16 @@ export function VertexAIPipelineView() {
     executePipeline();
   }, []);
 
-  const executePipeline = async () => {
+  const executePipeline = async (customOverrides?: { district?: string; crop?: string; growth_stage?: string }) => {
     setLoading(true);
     try {
       const res = await runAASRAPipeline({
-        district,
-        crop,
-        growth_stage: growthStage,
+        farmer_name: profile?.fullName || activeFarm.name || "Ramkishan Yadav",
+        farmer_id: profile?.mobileNumber || activeFarm.id || "farmer-001",
+        district: customOverrides?.district || district,
+        crop: customOverrides?.crop || crop,
+        growth_stage: customOverrides?.growth_stage || growthStage,
+        area_acres: activeFarm?.areaAcres || 5.0,
         temp_max_c: tempMax,
         rh_avg_pct: humidity,
         wind_speed_kmh: windSpeed,
@@ -77,6 +94,33 @@ export function VertexAIPipelineView() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const syncActiveFarm = () => {
+    const d = activeFarm.district || "Kasganj";
+    const c = (activeFarm.primaryCrop || "potato").toLowerCase();
+    const g = activeFarm.growthStage || "Tuber / Pod Initiation";
+    setDistrict(d);
+    setCrop(c);
+    setGrowthStage(g);
+    executePipeline({ district: d, crop: c, growth_stage: g });
+  };
+
+  const toggleSpeech = (text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const cleanText = text.replace(/[*#]/g, "");
+      const utter = new SpeechSynthesisUtterance(cleanText);
+      utter.lang = selectedLang === "hi" ? "hi-IN" : "en-IN";
+      utter.rate = 0.92;
+      utter.onend = () => setIsSpeaking(false);
+      utter.onerror = () => setIsSpeaking(false);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(utter);
     }
   };
 
@@ -156,6 +200,15 @@ export function VertexAIPipelineView() {
             className="px-2.5 py-1 text-xs rounded-lg bg-[#18191a] hover:bg-[#23252a] text-[#f7f8f8] border border-[#23252a] transition-all flex items-center gap-1"
           >
             <Wind className="w-3 h-3 text-cyan-400" /> High Drift
+          </button>
+          <div className="h-4 w-px bg-[#23252a] hidden sm:block" />
+          <button
+            onClick={syncActiveFarm}
+            className="px-2.5 py-1 text-xs rounded-lg bg-[#5e6ad2]/20 hover:bg-[#5e6ad2]/30 text-[#828fff] border border-[#5e6ad2]/40 transition-all flex items-center gap-1.5 font-medium"
+            title="Load your registered farm from the AASRA database"
+          >
+            <Database className="w-3 h-3 text-[#828fff]" />
+            <span>Sync Farm Database ({activeFarm.primaryCrop || "Potato"})</span>
           </button>
         </div>
       </div>
@@ -324,6 +377,148 @@ export function VertexAIPipelineView() {
       {/* Main 4-Layer Dashboard Grid */}
       {data && (
         <div className="space-y-6">
+          {/* Gemini 2.5 Flash Advisory Statement Card */}
+          {data.gemini_statement && (
+            <div className="bg-gradient-to-br from-[#12132b]/90 via-[#0f1013] to-[#0a0a10] rounded-2xl border border-[#5e6ad2]/40 p-6 relative overflow-hidden shadow-2xl shadow-[#5e6ad2]/10">
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#5e6ad2]/15 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Header with Title, AI Engine Tag & Language Switcher */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-[#23252a]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[#5e6ad2]/20 text-[#828fff] flex items-center justify-center border border-[#5e6ad2]/40">
+                    <Sparkles className="w-4 h-4 text-[#828fff]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-[#f7f8f8]">
+                        Gemini 2.5 Agro-Intelligence Advisory Statement
+                      </span>
+                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#5e6ad2]/20 text-[#828fff] border border-[#5e6ad2]/40 font-semibold">
+                        Grounded on Models 1, 2, 3, 5
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#8a8f98] mt-0.5">
+                      <User className="w-3 h-3 text-[#5e6ad2]" />
+                      <span>Farmer: <strong className="text-[#f7f8f8]">{data.farmer_name || "Ramkishan Yadav"}</strong></span>
+                      <span>•</span>
+                      <MapPin className="w-3 h-3 text-[#5e6ad2]" />
+                      <span>{data.district}</span>
+                      <span>•</span>
+                      <span>{data.crop} ({data.growth_stage})</span>
+                      <span>•</span>
+                      <span>{data.area_acres || 5.0} Acres</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-center">
+                  {/* Language Selector */}
+                  <div className="flex items-center bg-[#141518] p-1 rounded-lg border border-[#23252a] text-xs">
+                    <button
+                      onClick={() => setSelectedLang("hi")}
+                      className={`px-2.5 py-1 rounded-md transition-all ${
+                        selectedLang === "hi"
+                          ? "bg-[#5e6ad2] text-white font-medium shadow"
+                          : "text-[#8a8f98] hover:text-[#f7f8f8]"
+                      }`}
+                    >
+                      हिन्दी
+                    </button>
+                    <button
+                      onClick={() => setSelectedLang("en")}
+                      className={`px-2.5 py-1 rounded-md transition-all ${
+                        selectedLang === "en"
+                          ? "bg-[#5e6ad2] text-white font-medium shadow"
+                          : "text-[#8a8f98] hover:text-[#f7f8f8]"
+                      }`}
+                    >
+                      English
+                    </button>
+                  </div>
+
+                  {/* Text-to-Speech Audio Button */}
+                  <button
+                    onClick={() =>
+                      toggleSpeech(
+                        selectedLang === "hi"
+                          ? data.gemini_statement?.statement_hi || ""
+                          : data.gemini_statement?.statement_en || ""
+                      )
+                    }
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      isSpeaking
+                        ? "bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse"
+                        : "bg-[#18191c] hover:bg-[#23252a] text-[#f7f8f8] border-[#23252a]"
+                    }`}
+                  >
+                    {isSpeaking ? (
+                      <>
+                        <VolumeX className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Stop Voice</span>
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="w-3.5 h-3.5 text-[#5e6ad2]" />
+                        <span>Listen Voice</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Headline & Statement Body */}
+              <div className="mt-4">
+                <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                  <span
+                    className={`text-xs font-mono font-bold px-2.5 py-1 rounded-md border ${
+                      data.gemini_statement.spray_verdict_badge === "SAFE TO SPRAY"
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                        : "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                    }`}
+                  >
+                    {data.gemini_statement.spray_verdict_badge}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-[#f7f8f8]">
+                    {data.gemini_statement.headline}
+                  </h3>
+                </div>
+
+                <div className="text-xs sm:text-sm text-[#d0d3d8] leading-relaxed bg-[#111216]/60 p-4 rounded-xl border border-[#23252a] font-normal">
+                  {selectedLang === "hi"
+                    ? data.gemini_statement.statement_hi
+                    : data.gemini_statement.statement_en}
+                </div>
+              </div>
+
+              {/* 4 Multi-Model Key Takeaway Pills */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-[#23252a]/80 text-xs">
+                <div className="bg-[#141518]/90 p-3 rounded-lg border border-[#23252a]">
+                  <div className="text-[#8a8f98] text-[11px] mb-0.5">Application Window (Model 2)</div>
+                  <div className="text-[#f7f8f8] font-medium flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="truncate">{data.gemini_statement.timing_guidance}</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#141518]/90 p-3 rounded-lg border border-[#23252a]">
+                  <div className="text-[#8a8f98] text-[11px] mb-0.5">Syngenta Prescription (Model 3)</div>
+                  <div className="text-[#f7f8f8] font-medium flex items-center gap-1.5">
+                    <Droplets className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="truncate">{data.gemini_statement.product_summary}</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#141518]/90 p-3 rounded-lg border border-[#23252a]">
+                  <div className="text-[#8a8f98] text-[11px] mb-0.5">Harvest Outlook (Model 5)</div>
+                  <div className="text-[#f7f8f8] font-medium flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="truncate">{data.gemini_statement.yield_outlook}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Top Row: Layer 1 (Model 1 Risk) & Layer 2 (Model 2 Readiness) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Model 1 Card */}
