@@ -105,6 +105,7 @@ def synthesize_gemini_statement(
     m2_readiness: Dict[str, Any],
     m3_portfolio: Dict[str, Any],
     m5_baseline: Dict[str, Any],
+    m6_causal_robi: Optional[Dict[str, Any]] = None,
     language: str = "en",
 ) -> Dict[str, Any]:
     import json
@@ -122,6 +123,11 @@ def synthesize_gemini_statement(
     exp_yield = m5_baseline.get("expected_baseline_yield_q_ha", 25.0)
     exp_yield_acre = m5_baseline.get("expected_baseline_yield_q_acre", 10.0)
 
+    m6 = m6_causal_robi or {}
+    causal_gain_q = m6.get("causal_gain_tau_q_acre", 0.0)
+    robi_mult = m6.get("robi_multiplier", "N/A")
+    rev_saved = m6.get("revenue_saved_inr", 0)
+
     target_lang_name = LANGUAGE_NAMES.get(language, "English")
 
     safe_text_hi = "सुरक्षित स्प्रे विंडो सक्रिय है" if is_safe else "वर्तमान में स्प्रे स्थगित करें (शर्तें प्रतिकूल)"
@@ -133,19 +139,22 @@ def synthesize_gemini_statement(
             f"किसान साथी {farmer_name}, मॉडल 1 के अनुसार {district} में {crop} पर {stress_type} (सटीकता {round(stress_conf*100)}%) का जोखिम है। "
             f"मॉडल 2 बायोफिजिकल गेट के अनुसार {safe_text_hi} (डेल्टा-टी: {delta_t}°C)। "
             f"मॉडल 3 द्वारा अनुशंसित सिंजेंटा उत्पाद {prod_name} की मात्रा {dosage} है। "
-            f"मॉडल 5 के अनुसार आधार उपज {exp_yield_acre} क्विंटल प्रति एकड़ है।"
+            f"मॉडल 5 के अनुसार आधार उपज {exp_yield_acre} क्विंटल प्रति एकड़ है। "
+            f"मॉडल 6 (डबल एमएल) के अनुसार जैविक उपचार से +{causal_gain_q} क्विंटल/एकड़ उपज सुरक्षा और {robi_mult} ROBI अनुमानित है।"
         ),
         "en": (
             f"Farmer {farmer_name}, Model 1 detects {stress_type} ({round(stress_conf*100)}% confidence) for {crop} in {district}. "
             f"Model 2 Action Gate reports: {safe_text_en} (Delta-T: {delta_t}°C). "
             f"Model 3 recommends Syngenta {prod_name} ({dosage}). "
-            f"Model 5 projects baseline harvest yield of {exp_yield_acre} Q/acre ({exp_yield} Q/ha)."
+            f"Model 5 projects baseline harvest yield of {exp_yield_acre} Q/acre ({exp_yield} Q/ha). "
+            f"Model 6 (Double ML) estimates causal protection of +{causal_gain_q} Q/acre delivering {robi_mult} ROBI (₹{rev_saved:,} saved)."
         ),
         "mr": (
             f"शेतकरी बंधू {farmer_name}, मॉडेल 1 नुसार {district} मध्ये {crop} पिकावर {stress_type} ({round(stress_conf*100)}% खात्री) चा धोका आहे. "
             f"मॉडेल 2 नुसार {safe_text_hi} (डेल्टा-टी: {delta_t}°C). "
             f"मॉडेल 3 शिफारस केलेले उत्पादन {prod_name} प्रमाण {dosage} आहे. "
-            f"मॉडेल 5 नुसार अपेक्षित आधार उत्पादन {exp_yield_acre} क्विंटल प्रति एकर आहे."
+            f"मॉडेल 5 नुसार अपेक्षित आधार उत्पादन {exp_yield_acre} क्विंटल प्रति एकर आहे. "
+            f"मॉडेल 6 (डबल एमएल) द्वारे +{causal_gain_q} क्विंटल/एकर उत्पादन वाढ आणि {robi_mult} ROBI सिद्ध होते."
         ),
         "pa": (
             f"ਕਿਸਾਨ ਵੀਰ {farmer_name}, ਮਾਡਲ 1 ਅਨੁਸਾਰ {district} ਵਿੱਚ {crop} ਦੀ ਫਸਲ 'ਤੇ {stress_type} ({round(stress_conf*100)}% ਸ਼ੁੱਧਤਾ) ਦਾ ਖਤਰਾ ਹੈ। "
@@ -213,14 +222,14 @@ def synthesize_gemini_statement(
         "spray_verdict_badge": "SAFE TO SPRAY" if is_safe else "DELAY SPRAY",
         "timing_guidance": "Adverse weather window — hold spray until atmospheric conditions stabilize" if not is_safe else "Optimal 48h spray window open (early morning / late afternoon).",
         "product_summary": f"{prod_name} at {dosage}.",
-        "yield_outlook": f"{exp_yield_acre} Q/acre baseline vs District Historical Baseline.",
+        "yield_outlook": f"{exp_yield_acre} Q/acre baseline. Model 6 Causal Uplift: +{causal_gain_q} Q/acre ({robi_mult} ROBI).",
         "language_used": language,
         "generated_by": "Rule-Based Biophysical Synthesis"
     }
 
     google_keys = settings.get_google_keys()
     prompt = f"""You are AASRA, an elite agricultural AI decision engine deployed across Indian farms.
-Synthesize the official findings of 4 Machine Learning models into a concise, authoritative farmer advisory in {target_lang_name}:
+Synthesize the official findings of 5 Machine Learning models into a concise, authoritative farmer advisory in {target_lang_name}:
 - Farmer Name: {farmer_name}
 - District: {district}
 - Crop: {crop} ({growth_stage}, {area_acres} acres)
@@ -229,12 +238,13 @@ Synthesize the official findings of 4 Machine Learning models into a concise, au
 - Model 2 (PS-02 Biological Action Gate): Safe Window = {is_safe} ({'48h Spray Window Open' if is_safe else 'Spray Prohibited / Closed due to weather gating'}), Readiness Score = {readiness_score:.4f}, Delta-T = {delta_t}°C, Reasons = {reasons}
 - Model 3 (PS-03 Syngenta Product Ranker): Champion = {prod_name} ({top_prod.get('category', 'Agri Solution')}), Dosage = {dosage}, Active Ingredient = {top_prod.get('active_ingredient', '')}, Timing = {top_prod.get('application_timing', '')}
 - Model 5 (PS-07 Yield Baseline): Expected Baseline Yield = {exp_yield} Q/ha ({exp_yield_acre} Q/acre) vs District Historical Baseline
+- Model 6 (PS-07 Causal Double ML & ROBI Attribution): True Causal Yield Protection tau = +{causal_gain_q} Q/acre, Net Causal ROBI Multiplier = {robi_mult}, Total Farm Revenue Saved = ₹{rev_saved}
 Strict Rule: Do not hallucinate unapproved chemical recommendations. Honor the official approved product name, dosage, and 48h spray safety verdict exactly.
 
 Return strictly valid JSON with these keys:
 {{
   "headline": "Short punchy header in {target_lang_name}",
-  "statement": "Professional advisory statement strictly written in {target_lang_name} addressing {farmer_name} directly, explaining Model 1 ({stress_type}), Model 2 (Delta-T {delta_t}°C and whether spray window is open or delayed), Model 3 ({prod_name} at {dosage}), and Model 5 ({exp_yield_acre} Q/acre vs District Historical Baseline)",
+  "statement": "Professional advisory statement strictly written in {target_lang_name} addressing {farmer_name} directly, explaining Model 1 ({stress_type}), Model 2 (Delta-T {delta_t}°C and spray window), Model 3 ({prod_name} at {dosage}), Model 5 ({exp_yield_acre} Q/acre baseline), and Model 6 (+{causal_gain_q} Q/acre causal gain with {robi_mult} ROBI)",
   "statement_en": "English translation",
   "statement_hi": "Hindi translation",
   "spray_verdict_badge": "SAFE TO SPRAY" or "DELAY SPRAY",
@@ -414,6 +424,29 @@ class AASRAPipelineOrchestrator:
         }
         m5_result = self.client.predict_model5(m5_context)
 
+        # Layer 4 (Continued): Model 6 Causal Double ML & ROBI Attribution (PS-07)
+        treatment_applied = safe_int(request_payload.get("treatment_applied"), 1)
+        mandi_price = safe_float(request_payload.get("mandi_price_inr_q"), 2800.0)
+        product_cost_acre = safe_float(request_payload.get("product_cost_inr_acre"), 400.0)
+        top_product_name = m3_ranked[0]["name"] if m3_ranked else "Syngenta Quantis"
+
+        m6_result = self.client.predict_model6(
+            farm_context={
+                "crop": crop,
+                "growth_stage": growth_stage,
+                "temp_max_c": temp_max,
+                "extreme_heat_days_count": consecutive_hot,
+                "soil_clay_pct": soil_clay,
+            },
+            m1_result=m1_result,
+            m5_result=m5_result,
+            treatment_applied=treatment_applied,
+            mandi_price_inr_q=mandi_price,
+            product_cost_inr_acre=product_cost_acre,
+            area_acres=area_acres,
+            product_name=top_product_name
+        )
+
         now_time = time.strftime("%Y-%m-%d %H:%M:%S IST", time.localtime())
         weather_time_input = request_payload.get("weather_timestamp") or now_time
 
@@ -456,6 +489,25 @@ class AASRAPipelineOrchestrator:
             "yield_impact_pct": m5_result["yield_impact_pct"]
         }
 
+        m6_causal_obj = {
+            "causal_gain_tau_q_acre": m6_result["causal_gain_tau_q_acre"],
+            "confidence_interval_95": m6_result["confidence_interval_95"],
+            "revenue_saved_inr": m6_result["revenue_saved_inr"],
+            "revenue_saved_per_acre": m6_result["revenue_saved_per_acre"],
+            "total_treatment_cost_inr": m6_result["total_treatment_cost_inr"],
+            "net_farmer_profit_inr": m6_result["net_farmer_profit_inr"],
+            "robi_multiplier": m6_result["robi_multiplier"],
+            "robi_ratio": m6_result["robi_ratio"],
+            "counterfactual_baseline_q_acre": m6_result["counterfactual_baseline_q_acre"],
+            "predicted_yield_q_acre": m6_result["predicted_yield_q_acre"],
+            "treatment_applied": m6_result["treatment_applied"],
+            "product_name": m6_result["product_name"],
+            "product_cost_inr_acre": m6_result["product_cost_inr_acre"],
+            "mandi_price_inr_q": m6_result["mandi_price_inr_q"],
+            "confounders_controlled": m6_result["confounders_controlled"],
+            "methodology": m6_result["methodology"]
+        }
+
         # Synthesize Gemini statement
         gemini_statement = synthesize_gemini_statement(
             farmer_name=farmer_name,
@@ -467,7 +519,9 @@ class AASRAPipelineOrchestrator:
             m1_risk=m1_risk_obj,
             m2_readiness=m2_readiness_obj,
             m3_portfolio=m3_portfolio_obj,
-            m5_baseline=m5_baseline_obj
+            m5_baseline=m5_baseline_obj,
+            m6_causal_robi=m6_causal_obj,
+            language=language
         )
 
         latency_ms = round((time.time() - start_time) * 1000, 2)
@@ -484,9 +538,16 @@ class AASRAPipelineOrchestrator:
             "model2_readiness": m2_readiness_obj,
             "model3_portfolio": m3_portfolio_obj,
             "model5_baseline": m5_baseline_obj,
+            "model6_causal_robi": m6_causal_obj,
             "gemini_statement": gemini_statement,
             "execution_metadata": {
-                "models_executed": ["Model 1 (PS-02)", "Model 2 (PS-02)", "Model 3 (PS-03)", "Model 5 (PS-07)"],
+                "models_executed": [
+                    "Model 1 (PS-02 Stress Risk)",
+                    "Model 2 (PS-02 Biological Action Gate)",
+                    "Model 3 (PS-03 Product Portfolio)",
+                    "Model 5 (PS-07 Field Yield Baseline)",
+                    "Model 6 (PS-07 Causal Double ML & ROBI Attribution)"
+                ],
                 "serving_mode": m1_result.get("serving_mode", "local_optimized_runtime"),
                 "ai_synthesis_engine": gemini_statement.get("generated_by", "Google Gemini"),
                 "latency_ms": latency_ms,
@@ -495,4 +556,5 @@ class AASRAPipelineOrchestrator:
         }
 
         return sanitize_for_json(unified_payload)
+
 

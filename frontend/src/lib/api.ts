@@ -45,7 +45,17 @@ export async function sendChatMessage(
     field_id?: string;
     field_name?: string;
     farmer_id?: string;
-  }
+  },
+  user_fields?: Array<{
+    name: string;
+    crop: string;
+    cropVariety?: string;
+    areaAcres: number;
+    soilType?: string;
+    district?: string;
+    growthStage?: string;
+    sowingDate?: string;
+  }>
 ) {
   try {
     const res = await fetch(`${API_BASE}/chat`, {
@@ -77,6 +87,7 @@ export async function sendChatMessage(
         audioMimeType,
         conversation_history,
         last_resolved_location,
+        user_fields: user_fields && user_fields.length > 0 ? user_fields : undefined,
       }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

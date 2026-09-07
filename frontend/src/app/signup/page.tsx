@@ -1042,8 +1042,10 @@ export default function SignupPage() {
                 initialPoints={drawnPolygon.length >= 3 ? drawnPolygon : undefined}
                 onCenterChange={(newC) => setMapCenter({ lat: newC[0], lon: newC[1] })}
                 onBoundaryChange={(pts, calculatedAcres) => {
-                  setDrawnPolygon(pts);
-                  setAcres(calculatedAcres);
+                  setTimeout(() => {
+                    setDrawnPolygon(pts);
+                    setAcres(calculatedAcres);
+                  }, 0);
                   try {
                     localStorage.setItem(
                       "aasra_signup_field_boundary",
@@ -1610,7 +1612,7 @@ export default function SignupPage() {
               </div>
 
               <div className="pt-2 flex items-center justify-between text-[9px] font-mono text-slate-400 border-t border-white/10">
-                <span>Vault ID: AASRA-{mobileNumber.slice(-4)}-{Date.now().toString().slice(-4)}</span>
+                <span suppressHydrationWarning>Vault ID: AASRA-{mobileNumber ? mobileNumber.slice(-4) : "FARM"}-2026</span>
                 <span className="text-emerald-400">AES-256 SECURED</span>
               </div>
             </div>
@@ -1619,7 +1621,14 @@ export default function SignupPage() {
             <div className="pt-4">
               <button
                 type="button"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => {
+                  let target = "/dashboard";
+                  if (typeof window !== "undefined") {
+                    const params = new URLSearchParams(window.location.search);
+                    target = params.get("redirect") || "/dashboard";
+                  }
+                  router.push(target);
+                }}
                 className="w-full py-4 rounded-2xl text-white font-bold text-sm shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 style={{
                   background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",

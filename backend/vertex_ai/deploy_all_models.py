@@ -52,6 +52,13 @@ MODEL_REGISTRY_SPECS = {
         "local_dir": os.path.join(BASE_DIR, "model5_yield_regressor"),
         "gcs_subfolder": "model5",
         "serving_container_image_uri": "us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest",
+    },
+    "model6": {
+        "display_name": "aasra-model6-causal-robi",
+        "description": "PS-07 Double Machine Learning Causal Attribution & ROBI Estimator (Microsoft EconML LinearDML)",
+        "local_dir": os.path.join(BASE_DIR, "model6_causal_robi"),
+        "gcs_subfolder": "model6",
+        "serving_container_image_uri": "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-3:latest",
     }
 }
 
@@ -131,6 +138,7 @@ MODELS = [
     ("aasra-model2-biological-readiness", f"{BUCKET}/model2/", "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-0:latest"),
     ("aasra-model3-product-ranker", f"{BUCKET}/model3/", "us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest"),
     ("aasra-model5-yield-baseline", f"{BUCKET}/model5/", "us-docker.pkg.dev/vertex-ai/prediction/xgboost-cpu.1-6:latest"),
+    ("aasra-model6-causal-robi", f"{BUCKET}/model6/", "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-3:latest"),
 ]
 
 for name, uri, container in MODELS:

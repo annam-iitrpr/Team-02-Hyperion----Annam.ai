@@ -245,7 +245,14 @@ export function isUserLoggedIn(): boolean {
     const raw = localStorage.getItem("aasra_farmer_profile");
     if (isLoggedIn && raw) {
       const parsed = JSON.parse(raw);
-      return !!(parsed && parsed.fullName && parsed.fullName.trim().length > 0);
+      return !!(
+        parsed &&
+        parsed.isRegistered === true &&
+        parsed.fullName &&
+        parsed.fullName.trim().length > 0 &&
+        parsed.mobileNumber &&
+        parsed.mobileNumber.trim().length >= 10
+      );
     }
     return false;
   } catch (e) {
@@ -274,6 +281,7 @@ export function saveProfile(profile: FarmerProfile): void {
   try {
     localStorage.setItem("aasra_farmer_profile", JSON.stringify(profile));
     localStorage.setItem("aasra_is_logged_in", "true");
+    window.dispatchEvent(new CustomEvent("aasra-profile-updated", { detail: profile }));
   } catch (e) {
     console.error("Failed to save farmer profile", e);
   }

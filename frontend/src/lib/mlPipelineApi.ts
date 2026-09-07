@@ -59,6 +59,24 @@ export interface UnifiedPipelineResponse {
     historical_district_average_q_ha: number;
     yield_impact_pct: number;
   };
+  model6_causal_robi: {
+    causal_gain_tau_q_acre: number;
+    confidence_interval_95: [number, number];
+    revenue_saved_inr: number;
+    revenue_saved_per_acre: number;
+    total_treatment_cost_inr: number;
+    net_farmer_profit_inr: number;
+    robi_multiplier: string;
+    robi_ratio: number;
+    counterfactual_baseline_q_acre: number;
+    predicted_yield_q_acre: number;
+    treatment_applied: number;
+    product_name?: string;
+    product_cost_inr_acre?: number;
+    mandi_price_inr_q?: number;
+    confounders_controlled: string[];
+    methodology: string;
+  };
   gemini_statement?: {
     headline: string;
     statement: string;
@@ -105,6 +123,9 @@ export async function runAASRAPipeline(payload: {
   rain_prob_pct?: number;
   soil_moisture_pct?: number;
   consecutive_hot_days?: number;
+  treatment_applied?: number;
+  mandi_price_inr_q?: number;
+  product_cost_inr_acre?: number;
 }): Promise<UnifiedPipelineResponse | null> {
   try {
     const res = await fetch("/api/pipeline/run", {
@@ -136,3 +157,29 @@ export async function runAASRAPipeline(payload: {
 
   return null;
 }
+
+export async function calculateCausalROBI(payload: {
+  crop?: string;
+  growth_stage?: string;
+  stress_intensity?: number;
+  temp_max_c?: number;
+  treatment_applied?: number;
+  mandi_price_inr_q?: number;
+  product_cost_inr_acre?: number;
+  baseline_yield_q_acre?: number;
+  area_acres?: number;
+  product_name?: string;
+}) {
+  try {
+    const res = await fetch("/api/pipeline/causal-robi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn("Call to /api/pipeline/causal-robi failed:", err);
+  }
+  return null;
+}
+

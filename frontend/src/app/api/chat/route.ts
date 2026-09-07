@@ -129,6 +129,7 @@ export async function POST(req: NextRequest) {
       last_resolved_location = null,
       audioBase64 = null,
       audioMimeType = "audio/webm",
+      user_fields = null,
     } = body;
 
     reqLang = language || "hi";
@@ -327,13 +328,30 @@ export async function POST(req: NextRequest) {
         recentTurns.map((t: any) => `${t.sender === "user" ? "Farmer" : "AASRA"}: "${t.text}"`).join("\n");
     }
 
-    // Format database dossier for Gemini 2.5 Flash
-    const registeredPlotsSummary = dbFields.map((f, idx) => 
+    // Build registered plots summary — prefer user-supplied fields (from localStorage/FarmContext),
+    // fall back to DB fields only if the client didn't send any.
+    const effectiveFields = (Array.isArray(user_fields) && user_fields.length > 0)
+      ? user_fields.map((f: any, idx: number) => ({
+          id: `user-field-${idx + 1}`,
+          name: f.name || `Field ${idx + 1}`,
+          lat: defaultLat,
+          lon: defaultLon,
+          area_acres: f.areaAcres || f.area_acres || 1,
+          crop: f.crop || "—",
+          variety: f.cropVariety || f.variety || "",
+          soil_type: f.soilType || f.soil_type || "Black Cotton Soil",
+        }))
+      : dbFields;
+
+    const registeredPlotsSummary = effectiveFields.map((f, idx) =>
       `  Plot #${idx + 1}: "${f.name}"
-     - Area: ${f.area_acres} acres | Soil: ${f.soil_type || "Deep Black Clay Soil"} | GPS: (${f.lat.toFixed(4)}, ${f.lon.toFixed(4)})
+     - Area: ${f.area_acres} acres | Soil: ${f.soil_type || "Deep Black Clay Soil"} | GPS: (${f.lat.toFixed ? f.lat.toFixed(4) : f.lat}, ${f.lon.toFixed ? f.lon.toFixed(4) : f.lon})
      - Current Crop: ${f.crop}${f.variety ? ` (Variety: ${f.variety})` : ""}
      - Field ID: ${f.id}`
     ).join("\n");
+
+    const totalRegisteredAcres = effectiveFields.reduce((sum, f) => sum + (f.area_acres || 0), 0).toFixed(1);
+    const totalRegisteredPlots = effectiveFields.length;
 
     const recentJournalSummary = dbJournal.slice(0, 4).map((j) =>
       `  - [${j.date}] ${j.title} (${j.badge}): ${j.notes}`
@@ -353,7 +371,7 @@ FARMER PROFILE & VERIFIED DATABASE DOSSIER (AASRA DB GROUND TRUTH):
 - Registered Farmer: ${cleanFarmerName} (ID: ${activeDbFarmer?.id || "farmer-001"})
 - Farmer Home: ${defaultVillage}, ${activeDistrict}, ${activeState}
 - KCC Status: ${activeDbFarmer?.hasKisanCreditCard ? "Active Kisan Credit Card" : "Not Linked"} | PM-Kisan: ${activeDbFarmer?.pmKisanBeneficiary ? "Active Beneficiary" : "Not Linked"}
-- Total Registered Holdings: ${dbFields.reduce((sum, f) => sum + f.area_acres, 0).toFixed(1)} acres across ${dbFields.length} registered geo-tagged plots:
+- Total Registered Holdings: ${totalRegisteredAcres} acres across ${totalRegisteredPlots} registered geo-tagged plot${totalRegisteredPlots !== 1 ? "s" : ""}:
 ${registeredPlotsSummary}
 
 ACTIVE TARGET FIELD FOR THIS CONSULTATION:

@@ -87,6 +87,14 @@ export function RealBoundaryMap({
   const onCenterChangeRef = useRef(onCenterChange);
   onCenterChangeRef.current = onCenterChange;
 
+  // Safe boundary notifier that always defers to next tick, preventing React cross-component setState-in-render warnings
+  const notifyBoundaryChange = (newPts: Array<[number, number]>, calculatedAcres?: number) => {
+    const acres = calculatedAcres !== undefined ? calculatedAcres : calculatePolygonAreaAcres(newPts);
+    setTimeout(() => {
+      onBoundaryChangeRef.current?.(newPts, acres);
+    }, 0);
+  };
+
   // Sync when initialPoints changes from outside
   useEffect(() => {
     if (initialPoints && initialPoints.length >= 3) {
@@ -100,8 +108,7 @@ export function RealBoundaryMap({
 
       if (!isIdentical) {
         setPoints(initialPoints);
-        const acres = calculatePolygonAreaAcres(initialPoints);
-        onBoundaryChangeRef.current(initialPoints, acres);
+        notifyBoundaryChange(initialPoints);
 
         const map = mapInstanceRef.current;
         if (map) {
@@ -116,11 +123,10 @@ export function RealBoundaryMap({
     }
   }, [initialPoints]);
 
-  // 1. Initial Mount: Trigger area sync immediately
+  // 1. Initial Mount: Trigger area sync safely on next tick
   useEffect(() => {
     const activePts = initialPoints && initialPoints.length >= 3 ? initialPoints : points;
-    const acres = calculatePolygonAreaAcres(activePts);
-    onBoundaryChangeRef.current(activePts, acres);
+    notifyBoundaryChange(activePts);
   }, []);
 
   // 2. Initialize Leaflet Map
@@ -168,8 +174,7 @@ export function RealBoundaryMap({
         } else {
           updated = [...prev, newPt];
         }
-        const acres = calculatePolygonAreaAcres(updated);
-        onBoundaryChangeRef.current(updated, acres);
+        notifyBoundaryChange(updated);
         return updated;
       });
     });
@@ -244,8 +249,7 @@ export function RealBoundaryMap({
   const handleRemovePoint = (indexToRemove: number) => {
     setPoints((prev) => {
       const next = prev.filter((_, i) => i !== indexToRemove);
-      const acres = calculatePolygonAreaAcres(next);
-      onBoundaryChangeRef.current(next, acres);
+      notifyBoundaryChange(next);
       return next;
     });
   };
@@ -254,8 +258,7 @@ export function RealBoundaryMap({
     setPoints((prev) => {
       if (prev.length === 0) return prev;
       const next = prev.slice(0, prev.length - 1);
-      const acres = calculatePolygonAreaAcres(next);
-      onBoundaryChangeRef.current(next, acres);
+      notifyBoundaryChange(next);
       return next;
     });
   };
@@ -329,8 +332,7 @@ export function RealBoundaryMap({
         setPoints((prev) => {
           const next = [...prev];
           next[idx] = [newPos.lat, newPos.lng];
-          const acres = calculatePolygonAreaAcres(next);
-          onBoundaryChangeRef.current(next, acres);
+          notifyBoundaryChange(next);
           return next;
         });
       });
@@ -406,13 +408,12 @@ export function RealBoundaryMap({
       [c.lat - 0.0014, c.lng - 0.0012],
     ];
     setPoints(newPts);
-    const acres = calculatePolygonAreaAcres(newPts);
-    onBoundaryChange(newPts, acres);
+    notifyBoundaryChange(newPts);
   };
 
   const handleClearPoints = () => {
     setPoints([]);
-    onBoundaryChange([], 0);
+    notifyBoundaryChange([]);
   };
 
   return (

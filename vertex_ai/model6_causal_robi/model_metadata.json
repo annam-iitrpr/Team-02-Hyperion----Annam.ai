@@ -1,0 +1,60 @@
+{
+  "model_name": "aasra_model6_causal_robi",
+  "version": "1.0.0",
+  "problem_statement": "PS-07: Causal Biological Impact & Return on Biological Investment (ROBI)",
+  "team": "AASRA (Team 02) / Annam AI",
+  "hackathon": "Syngenta Biologicals Hackathon 2026",
+  "author": "Ritvik (Causal ML Lead)",
+  "framework": "Microsoft EconML (Double Machine Learning) + Scikit-Learn",
+  "algorithm": "Chernozhukov et al. (2018) Orthogonalized Residual Cross-Fitting (LinearDML)",
+  "feature_schema": {
+    "heterogeneity_features_X": [
+      "crop_groundnut",
+      "crop_maize",
+      "crop_potato",
+      "crop_rice",
+      "crop_soybean",
+      "crop_sugarcane",
+      "crop_wheat",
+      "stage_podFormation",
+      "stage_vegetative",
+      "stress_intensity",
+      "temp_max_c",
+      "extreme_heat_days_count",
+      "soil_clay_pct"
+    ],
+    "confounder_features_W": [
+      "rainfall_total_mm",
+      "soil_moisture_pct",
+      "irrigation_type",
+      "farm_size_acres"
+    ],
+    "treatment_feature_T": "treatment_applied (0=Untreated Control, 1=Syngenta Biological Applied)",
+    "target_outcome_Y": "observed_yield_q_acre"
+  },
+  "supported_crops": [
+    "cotton",
+    "groundnut",
+    "maize",
+    "potato",
+    "rice",
+    "soybean",
+    "sugarcane",
+    "wheat"
+  ],
+  "supported_stages": [
+    "flowering",
+    "podFormation",
+    "vegetative"
+  ],
+  "causal_benchmarks": {
+    "mean_causal_effect_tau_q_acre": -0.0062034768152586526,
+    "selection_bias_eliminated_q_acre": 9.219722492409744,
+    "evaluation_dataset_size": 50000
+  },
+  "citations": {
+    "yield_census": "Directorate of Economics & Statistics (DES), Ministry of Agriculture & Farmers Welfare, Govt of India",
+    "weather_data": "India Meteorological Department (IMD) Official 1901-2015 Historical Gridded Rainfall",
+    "soil_data": "ICAR-NBSS&LUP Regional Soil Taxonomy"
+  }
+}

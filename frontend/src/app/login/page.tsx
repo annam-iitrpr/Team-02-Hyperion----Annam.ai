@@ -181,7 +181,12 @@ export default function LoginPage() {
       saveProfile(activeProfile);
       setLanguage(activeProfile.language || selectedLanguage);
       setLoading(false);
-      router.push("/pipeline");
+      let target = "/dashboard";
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        target = params.get("redirect") || "/dashboard";
+      }
+      router.push(target);
     } catch (err) {
       setErrorMessage("Login failed. Please try again.");
       setLoading(false);
@@ -247,7 +252,12 @@ export default function LoginPage() {
       saveProfile(activeProfile);
       setLanguage(activeProfile.language || selectedLanguage);
       setLoading(false);
-      router.push("/pipeline");
+      let target = "/dashboard";
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        target = params.get("redirect") || "/dashboard";
+      }
+      router.push(target);
     } catch (err) {
       setErrorMessage("Database verification failed. Please try again.");
       setLoading(false);

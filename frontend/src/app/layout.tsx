@@ -3,6 +3,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { WeatherProvider } from "@/context/WeatherContext";
 import { FarmProvider } from "@/context/FarmContext";
 import { PwaRegistration } from "@/components/PwaRegistration";
+import { AuthGatekeeper } from "@/components/AuthGatekeeper";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -41,7 +42,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LanguageProvider>
           <WeatherProvider>
             <FarmProvider>
-              {children}
+              <AuthGatekeeper>
+                {children}
+              </AuthGatekeeper>
               <PwaRegistration />
             </FarmProvider>
           </WeatherProvider>
@@ -50,3 +53,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

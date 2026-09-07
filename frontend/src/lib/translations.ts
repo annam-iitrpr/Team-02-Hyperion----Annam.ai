@@ -250,6 +250,38 @@ export interface TranslationDict {
   fourteenDayStressForecast: string;
   stressProb: string;
 
+  // Detailed Telemetry & Science Keys
+  weatherTelemetryTitle: string;
+  maxTemp: string;
+  nightMin: string;
+  vpdAirPull: string;
+  ndviIndex: string;
+  ndwiCanopyMoisture: string;
+  hydricIndex: string;
+  vegetationCondition: string;
+  healthyCanopy: string;
+  adequateMoistureRetention: string;
+  thermalLoadLabel: string;
+  vpdMoistureDeficit: string;
+  phenologyVulnerability: string;
+  fieldVulnerabilityTitle: string;
+  rootZoneSoilTitle: string;
+
+  // Syngenta Mandi Offers
+  mandiOffersTitle: string;
+  mandiOffersSubtitle: string;
+  verifiedLocalDeals: string;
+  heatStressRebateTitle: string;
+  heatStressRebateDiscount: string;
+  heatStressRebateDesc: string;
+  comboDiscountTitle: string;
+  comboDiscountAmount: string;
+  comboDiscountDesc: string;
+  validAtMandi: string;
+  popularInArea: string;
+  seasonSpecial: string;
+  activeCropStage: string;
+
   // Login & Signup
   portalSignIn: string;
   signInToFarm: string;
@@ -542,6 +574,36 @@ const EN_DICT: TranslationDict = {
   fourteenDayStressForecast: "14-Day Dynamic Plant Stress Forecast",
   stressProb: "Stress Prob",
 
+  weatherTelemetryTitle: "Weather Telemetry",
+  maxTemp: "Max Temp",
+  nightMin: "Night Min",
+  vpdAirPull: "VPD Air Pull",
+  ndviIndex: "NDVI Index",
+  ndwiCanopyMoisture: "NDWI Canopy Moisture",
+  hydricIndex: "Hydric Index",
+  vegetationCondition: "Vegetation Condition",
+  healthyCanopy: "Healthy Canopy",
+  adequateMoistureRetention: "Adequate Moisture Retention",
+  thermalLoadLabel: "Thermal Load (TMax/TNight):",
+  vpdMoistureDeficit: "VPD & Moisture Deficit:",
+  phenologyVulnerability: "Phenology Vulnerability:",
+  fieldVulnerabilityTitle: "Field Vulnerability & Stress Factors",
+  rootZoneSoilTitle: "Root-Zone Soil Telemetry",
+
+  mandiOffersTitle: "Active Syngenta Mandi Offers",
+  mandiOffersSubtitle: "Special discounts and packages available at your nearest Krishi Seva Kendra in",
+  verifiedLocalDeals: "VERIFIED LOCAL OFFERS",
+  heatStressRebateTitle: "Crop Heat Shield Pack (Quantis®)",
+  heatStressRebateDiscount: "Save ₹150 per Acre on 2L+ Packs",
+  heatStressRebateDesc: "Protects crops from sudden heat waves and prevents flower dropping.",
+  comboDiscountTitle: "Growth & Flowering Booster (Isabion®)",
+  comboDiscountAmount: "10% Instant Discount + Free Measuring Cup",
+  comboDiscountDesc: "Helps plants produce more flowers and improves grain filling.",
+  validAtMandi: "Valid at",
+  popularInArea: "HOT WEATHER CARE",
+  seasonSpecial: "Season Special (Valid this month)",
+  activeCropStage: "Recommended for current crop stage",
+
   portalSignIn: "PORTAL SIGN-IN",
   signInToFarm: "Sign in to your farm",
   signInDesc: "Enter your mobile number to access live weather & crop overwatch.",
@@ -830,6 +892,36 @@ const HI_DICT: Partial<TranslationDict> = {
   shapExplainability: "SHAP AI व्याख्यात्मकता",
   fourteenDayStressForecast: "14-दिवसीय डायनामिक पौधा तनाव पूर्वानुमान",
   stressProb: "तनाव संभावना",
+
+  weatherTelemetryTitle: "मौसम टेलीमेट्री",
+  maxTemp: "अधिकतम तापमान",
+  nightMin: "न्यूनतम रात",
+  vpdAirPull: "VPD हवा खिंचाव",
+  ndviIndex: "NDVI सूचकांक",
+  ndwiCanopyMoisture: "NDWI छत्र नमी",
+  hydricIndex: "हाइड्रिक सूचकांक",
+  vegetationCondition: "वनस्पति स्थिति",
+  healthyCanopy: "स्वस्थ छत्र (Healthy Canopy)",
+  adequateMoistureRetention: "पर्याप्त नमी प्रतिधारण",
+  thermalLoadLabel: "तापीय भार (TMax/TNight):",
+  vpdMoistureDeficit: "VPD व नमी घाटा:",
+  phenologyVulnerability: "फेनोलॉजी संवेदनशीलता:",
+  fieldVulnerabilityTitle: "खेत तनाव व संवेदनशीलता कारक",
+  rootZoneSoilTitle: "जड़-क्षेत्र मिट्टी टेलीमेट्री",
+
+  mandiOffersTitle: "सक्रिय सिंजेंटा मंडी ऑफर",
+  mandiOffersSubtitle: "नजदीकी कृषि सेवा केंद्र व अधिकृत दुकानों पर किसानों के लिए विशेष बचत पैक:",
+  verifiedLocalDeals: "सत्यापित स्थानीय ऑफर",
+  heatStressRebateTitle: "फसल ताप व धूप सुरक्षा (क्वांटिस)",
+  heatStressRebateDiscount: "2L+ पैक पर ₹150 प्रति एकड़ बचत",
+  heatStressRebateDesc: "तेज धूप और गर्मी में फूलों को झड़ने से रोकता है और फसल को हरा-भरा रखता है।",
+  comboDiscountTitle: "पौधा वृद्धि व अधिक फूल पैक (इसाबियन)",
+  comboDiscountAmount: "10% तत्काल बचत + मुफ्त माप कप",
+  comboDiscountDesc: "फूलों की संख्या बढ़ाता है, शाखाओं को मजबूत करता है और दानों का वजन बढ़ाता है।",
+  validAtMandi: "मान्य मंडी:",
+  popularInArea: "भीषण गर्मी व धूप सुरक्षा",
+  seasonSpecial: "सीजन विशेष (इस महीने मान्य)",
+  activeCropStage: "फसल की वर्तमान अवस्था हेतु अनुशंसित",
 
   portalSignIn: "पोर्टल साइन-इन",
   signInToFarm: "अपने खेत में साइन इन करें",

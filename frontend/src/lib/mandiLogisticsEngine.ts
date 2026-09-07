@@ -47,30 +47,39 @@ export interface MandiArbitrageResult {
 // Regional Mandi Clusters across India with benchmarks
 const CLUSTER_MANDIS: Record<string, Array<{ name: string; nameHi: string; district: string; state: string; distanceKm: number; speedKmh: number; priceOffset: number }>> = {
   sehore: [
-    { name: "Sehore APMC Krishi Upaj Mandi", nameHi: "सीहोर कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 8, speedKmh: 25, priceOffset: 0 },
     { name: "Bhopal (Karond) APMC Mandi", nameHi: "भोपाल (करौंद) कृषि उपज मंडी", district: "Bhopal", state: "Madhya Pradesh", distanceKm: 34, speedKmh: 35, priceOffset: 140 },
-    { name: "Ashta APMC Krishi Upaj Mandi", nameHi: "आष्टा कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 42, speedKmh: 32, priceOffset: 80 },
     { name: "Dewas APMC Mandi", nameHi: "देवास कृषि उपज मंडी", district: "Dewas", state: "Madhya Pradesh", distanceKm: 78, speedKmh: 40, priceOffset: 190 },
+    { name: "Sehore APMC Krishi Upaj Mandi", nameHi: "सीहोर कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 8, speedKmh: 25, priceOffset: 0 },
+    { name: "Ashta APMC Krishi Upaj Mandi", nameHi: "आष्टा कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 42, speedKmh: 32, priceOffset: 80 },
+    { name: "Vidisha APMC Krishi Upaj Mandi", nameHi: "विदिशा कृषि उपज मंडी", district: "Vidisha", state: "Madhya Pradesh", distanceKm: 88, speedKmh: 42, priceOffset: 230 },
   ],
   bhopal: [
-    { name: "Bhopal (Karond) APMC Mandi", nameHi: "भोपाल (करौंद) कृषि उपज मंडी", district: "Bhopal", state: "Madhya Pradesh", distanceKm: 10, speedKmh: 25, priceOffset: 0 },
-    { name: "Sehore APMC Mandi", nameHi: "सीहोर कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 36, speedKmh: 35, priceOffset: -40 },
-    { name: "Vidisha APMC Mandi", nameHi: "विदिशा कृषि उपज मंडी", district: "Vidisha", state: "Madhya Pradesh", distanceKm: 54, speedKmh: 35, priceOffset: 95 },
+    { name: "Bhopal (Karond) APMC Mandi", nameHi: "भोपाल (करौंद) कृषि उपज मंडी", district: "Bhopal", state: "Madhya Pradesh", distanceKm: 12, speedKmh: 25, priceOffset: 140 },
+    { name: "Dewas APMC Mandi", nameHi: "देवास कृषि उपज मंडी", district: "Dewas", state: "Madhya Pradesh", distanceKm: 78, speedKmh: 40, priceOffset: 190 },
+    { name: "Vidisha APMC Krishi Upaj Mandi", nameHi: "विदिशा कृषि उपज मंडी", district: "Vidisha", state: "Madhya Pradesh", distanceKm: 54, speedKmh: 38, priceOffset: 260 },
+    { name: "Sehore APMC Krishi Upaj Mandi", nameHi: "सीहोर कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 36, speedKmh: 35, priceOffset: 0 },
+    { name: "Ashta APMC Krishi Upaj Mandi", nameHi: "आष्टा कृषि उपज मंडी", district: "Sehore", state: "Madhya Pradesh", distanceKm: 68, speedKmh: 36, priceOffset: 80 },
   ],
   indore: [
     { name: "Indore (Laxmibai Nagar) APMC", nameHi: "इंदौर (लक्ष्मीबाई नगर) कृषि मंडी", district: "Indore", state: "Madhya Pradesh", distanceKm: 12, speedKmh: 25, priceOffset: 0 },
     { name: "Ujjain (Chimanganj) Mandi", nameHi: "उज्जैन (चिमनगंज) कृषि मंडी", district: "Ujjain", state: "Madhya Pradesh", distanceKm: 55, speedKmh: 40, priceOffset: 110 },
-    { name: "Dewas APMC Mandi", nameHi: "देवास कृषि उपज मंडी", district: "Dewas", state: "Madhya Pradesh", distanceKm: 38, speedKmh: 35, priceOffset: -30 },
+    { name: "Dewas APMC Mandi", nameHi: "देवास कृषि उपज मंडी", district: "Dewas", state: "Madhya Pradesh", distanceKm: 38, speedKmh: 35, priceOffset: 70 },
+    { name: "Dhar APMC Mandi", nameHi: "धार कृषि उपज मंडी", district: "Dhar", state: "Madhya Pradesh", distanceKm: 64, speedKmh: 38, priceOffset: 40 },
+    { name: "Khargone APMC Mandi", nameHi: "खरगोन कृषि उपज मंडी", district: "Khargone", state: "Madhya Pradesh", distanceKm: 85, speedKmh: 42, priceOffset: 125 },
   ],
   nashik: [
     { name: "Nashik (Panchavati) APMC", nameHi: "नाशिक कृषी उत्पन्न बाजार समिती", district: "Nashik", state: "Maharashtra", distanceKm: 9, speedKmh: 25, priceOffset: 0 },
     { name: "Lasalgaon APMC (Asia's Largest)", nameHi: "लासलगाव कृषी बाजार समिती", district: "Nashik", state: "Maharashtra", distanceKm: 58, speedKmh: 35, priceOffset: 220 },
     { name: "Pimpalgaon Baswant APMC", nameHi: "पिंपळगाव बसवंत कृषी बाजार", district: "Nashik", state: "Maharashtra", distanceKm: 32, speedKmh: 30, priceOffset: 130 },
+    { name: "Yeola APMC Mandi", nameHi: "येवला कृषी बाजार समिती", district: "Nashik", state: "Maharashtra", distanceKm: 76, speedKmh: 38, priceOffset: 170 },
+    { name: "Sinnar APMC Mandi", nameHi: "सिन्नर कृषी बाजार समिती", district: "Nashik", state: "Maharashtra", distanceKm: 28, speedKmh: 32, priceOffset: 45 },
   ],
   ludhiana: [
     { name: "Ludhiana APMC Grain Market", nameHi: "लुधियाना दाना मंडी", district: "Ludhiana", state: "Punjab", distanceKm: 8, speedKmh: 25, priceOffset: 0 },
     { name: "Khanna APMC (Asia's Largest Grain)", nameHi: "खन्ना दाना मंडी (एशिया की सबसे बड़ी)", district: "Ludhiana", state: "Punjab", distanceKm: 42, speedKmh: 40, priceOffset: 160 },
     { name: "Jagraon APMC Grain Market", nameHi: "जgraon दाना मंडी", district: "Ludhiana", state: "Punjab", distanceKm: 38, speedKmh: 35, priceOffset: 45 },
+    { name: "Mandi Gobindgarh APMC", nameHi: "मंडी गोबिंदगढ़ दाना मंडी", district: "Fatehgarh Sahib", state: "Punjab", distanceKm: 55, speedKmh: 42, priceOffset: 110 },
+    { name: "Samrala APMC Grain Market", nameHi: "समराला दाना मंडी", district: "Ludhiana", state: "Punjab", distanceKm: 34, speedKmh: 36, priceOffset: 30 },
   ],
 };
 
@@ -82,7 +91,13 @@ export function optimizeMandiLogistics(
   baseModalPrice: number = 4850
 ): MandiArbitrageResult {
   const normDist = district.toLowerCase().replace(/[^a-z]/g, "");
-  const cluster = CLUSTER_MANDIS[normDist] || CLUSTER_MANDIS["sehore"];
+  const cluster = CLUSTER_MANDIS[normDist] || [
+    { name: `${district} APMC Krishi Upaj Mandi`, nameHi: `${district} कृषि उपज मंडी`, district: district, state: state, distanceKm: 8, speedKmh: 25, priceOffset: 0 },
+    { name: `Nearby ${district} Rural Sub-Yard`, nameHi: `उप कृषि मंडी ${district}`, district: district, state: state, distanceKm: 28, speedKmh: 30, priceOffset: 45 },
+    { name: `Central District Mega APMC`, nameHi: `केंद्रीय संभागीय कृषि मंडी`, district: district, state: state, distanceKm: 48, speedKmh: 36, priceOffset: 120 },
+    { name: `Inter-District Commercial APMC`, nameHi: `अंतर-जिला वाणिज्यिक मंडी`, district: district, state: state, distanceKm: 65, speedKmh: 38, priceOffset: 175 },
+    { name: `State Terminal Grain Market`, nameHi: `राज्य मुख्य टर्मिनल दाना मंडी`, district: district, state: state, distanceKm: 84, speedKmh: 42, priceOffset: 240 },
+  ];
   const harvestQtl = Math.max(1.0, totalHarvestQtl || 45.0);
 
   // Transportation Cost Rates:

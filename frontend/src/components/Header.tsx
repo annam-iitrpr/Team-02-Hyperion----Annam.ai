@@ -9,7 +9,6 @@ import {
   Sprout,
   Layers,
   Mic,
-  Sliders,
   TrendingUp,
   BookOpen,
   FileText,
@@ -45,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
     { href: "/plant-intelligence", label: "Plant AI", icon: Sprout },
     { href: "/fields", label: "Fields", icon: Layers },
     { href: "/assistant", label: "Ask AI", icon: Mic },
-    { href: "/what-if", label: "What-If", icon: Sliders },
+    { href: "/impact", label: "Impact", icon: TrendingUp },
   ];
 
   return (

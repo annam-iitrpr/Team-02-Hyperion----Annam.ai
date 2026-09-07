@@ -1,426 +1,556 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { AppShell } from "@/components/AppShell";
-import { AdvisoryChat } from "@/components/AdvisoryChat";
-import { PageHelpModal } from "@/components/PageHelpModal";
 import { useLanguage } from "@/context/LanguageContext";
 import { useWeather } from "@/context/WeatherContext";
 import { useFarm } from "@/context/FarmContext";
-import { resolveCropThresholds } from "@/lib/cropRegistry";
-import { getCropAdvisoryProfile } from "@/lib/agriculture/cropAdvisoryMatrix";
-import { findCropMandiRate } from "@/lib/mandiEngine";
+import { getStoredProfile } from "@/lib/userStore";
+import { sendChatMessage, analyzeCropLeafImage } from "@/lib/api";
+import { playGoogleNeuralSpeech, stopGoogleSpeech } from "@/lib/googleVoiceEngine";
+import { VoiceRecognitionService, VoiceState } from "@/lib/voiceRecognitionService";
+import { FormattedAgriResponse } from "@/components/FormattedAgriResponse";
 import {
-  Thermometer,
-  RefreshCw,
-  AlertTriangle,
+  Mic,
+  MicOff,
+  Send,
+  Loader2,
+  Volume2,
+  VolumeX,
+  Camera,
   Sparkles,
-  Droplets,
-  Wind,
-  ShieldCheck,
+  User,
   Sprout,
-  Compass,
-  Cpu,
-  Layers,
-  Activity,
-  TrendingUp,
+  MapPin,
+  Thermometer,
+  Wind,
+  X,
 } from "lucide-react";
 
-export default function AssistantPage() {
-  const { language, setLanguage, t } = useLanguage();
-  const { weather, refetch } = useWeather();
-  const { activeFarm, activeField } = useFarm();
-  const [selectedQuestion, setSelectedQuestion] = useState<string>("");
-  const [activeCropId, setActiveCropId] = useState<string>(
-    (activeField?.crop || activeFarm?.primaryCrop || "wheat").toLowerCase()
-  );
+// ─── Types ───────────────────────────────────────────────────────────────────
+interface Message {
+  id: string;
+  sender: "user" | "bot";
+  text: string;
+  time: string;
+  imageUrl?: string;
+  followUpQuestions?: string[];
+  whyRecommendation?: string;
+  confidenceScore?: number;
+  provider?: string;
+}
 
-  const cropInfo = resolveCropThresholds(activeCropId);
-  const cropProfile = getCropAdvisoryProfile(activeCropId);
+// Lightweight field shape sent to the API (no polygons / heavy data)
+interface UserFieldSummary {
+  name: string;
+  crop: string;
+  cropVariety?: string;
+  areaAcres: number;
+  soilType?: string;
+  district?: string;
+  growthStage?: string;
+  sowingDate?: string;
+}
+
+// ─── Pure Chat Page ───────────────────────────────────────────────────────────
+export default function AssistantPage() {
+  const { language, setLanguage } = useLanguage();
+  const { weather } = useWeather();
+  const { farms, activeFarm } = useFarm();
+  const isHindi = language === "hi";
+
+  // ── State ───────────────────────────────────────────────────────────────
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [voiceState, setVoiceState] = useState<VoiceState>("IDLE");
+  const [liveTranscript, setLiveTranscript] = useState("");
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [micError, setMicError] = useState(false);
+
+  const chatRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const voiceRef = useRef<VoiceRecognitionService | null>(null);
+
+  // ── User / farm data ─────────────────────────────────────────────────────
+  const profile = typeof window !== "undefined" ? (getStoredProfile() as any) : {};
+  const farmerName = (profile?.fullName || activeFarm?.name || "Farmer Friend") as string;
+  const district = (activeFarm?.district || profile?.district || weather?.district || "Bhopal") as string;
+  const state = (activeFarm?.state || profile?.state || weather?.state || "Madhya Pradesh") as string;
+  const activeCrop = ((activeFarm?.primaryCrop || profile?.primaryCrop || "Soybean") as string).toLowerCase();
+  const activeAcres = Number(activeFarm?.areaAcres || profile?.fieldAreaAcres || 5.0);
+
+  // ── Build user-specific fields for API — ONLY the logged-in user's farms ──
+  // We pass these to the backend so the AI never sees other users' fields.
+  const userFields: UserFieldSummary[] = farms && (farms as any[]).length > 0
+    ? (farms as any[]).map((f: any) => ({
+        name: f.name,
+        crop: f.primaryCrop || f.crop || "Unknown",
+        cropVariety: f.cropVariety || f.variety || "",
+        areaAcres: Number(f.areaAcres || 1),
+        soilType: f.soilType || "Black Cotton Soil",
+        district: f.district || district,
+        growthStage: f.growthStage || "",
+        sowingDate: f.sowingDate || "",
+      }))
+    : activeFarm
+    ? [{
+        name: activeFarm.name,
+        crop: activeFarm.primaryCrop,
+        cropVariety: (activeFarm as any).cropVariety || "",
+        areaAcres: activeFarm.areaAcres,
+        soilType: activeFarm.soilType || "Black Cotton Soil",
+        district: activeFarm.district || district,
+        growthStage: (activeFarm as any).growthStage || "",
+        sowingDate: (activeFarm as any).sowingDate || "",
+      }]
+    : [];
+
+  // Human-readable summary for the welcome message (uses real user data)
+  const fieldCount = userFields.length;
+  const fieldListDisplay = userFields.length > 0
+    ? userFields.map((f) => `${f.name} (${f.crop}, ${f.areaAcres} ${isHindi ? "एकड़" : "ac"})`).join(", ")
+    : activeFarm?.name || "Main Farm";
+
+  // ── Welcome message ──────────────────────────────────────────────────────
+  const buildWelcome = useCallback((): Message => {
+    const hi = language === "hi";
+
+    return {
+      id: "welcome",
+      sender: "bot",
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      provider: "Google Gemini 2.5 Flash",
+      confidenceScore: 99,
+      followUpQuestions: hi
+        ? [
+            `${activeFarm?.primaryCrop || "फसल"} का आज मंडी भाव क्या है?`,
+            `मेरे खेत में स्प्रे करना सुरक्षित है?`,
+            `AASRA मॉडल की भविष्यवाणी क्या है?`,
+            `सभी पंजीकृत खेतों का सारांश दें`,
+          ]
+        : [
+            `What is today's ${activeFarm?.primaryCrop || "crop"} mandi rate?`,
+            `Is weather safe to spray on my field today?`,
+            `What does the AASRA model predict for my field?`,
+            `Show summary of all my registered fields`,
+          ],
+      text: hi
+        ? `नमस्ते ${farmerName} जी! मैं आपका AASRA AI फार्म सहायक हूँ।\n\nआपके ${fieldCount} पंजीकृत खेत — ${fieldListDisplay}\n\nमौसम: ${weather?.temperature || "—"}°C · हवा: ${weather?.windSpeed || "—"} km/h · ${district}\n\nआप कुछ भी पूछें — स्प्रे खुराक, मंडी भाव, मौसम सलाह, AASRA मॉडल आउटपुट, या पत्ती की बीमारी।`
+        : `Namaste ${farmerName}! I am your AASRA AI Farm Companion.\n\nYour ${fieldCount} registered field${fieldCount !== 1 ? "s" : ""} — ${fieldListDisplay}\n\nLive weather: ${weather?.temperature || "—"}°C · Wind: ${weather?.windSpeed || "—"} km/h · ${district}\n\nAsk me anything — spray dosage, mandi price, weather advice, AASRA model predictions, or disease diagnosis.`,
+    };
+  }, [language, activeFarm, farmerName, district, weather, fieldCount, fieldListDisplay]);
+
+  useEffect(() => {
+    setMessages([buildWelcome()]);
+  }, [buildWelcome]);
+
+  // ── Send message ─────────────────────────────────────────────────────────
+  const sendMessage = useCallback(async (text?: string, audioBase64?: string, audioMime?: string) => {
+    const q = (text || "").trim();
+    if (!q && !selectedImage && !audioBase64) return;
+
+    voiceRef.current?.cancelListening();
+    const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    const userMsg: Message = {
+      id: `u-${Date.now()}`,
+      sender: "user",
+      text: q || (audioBase64 ? "🎙️ Voice Query…" : "📷 Leaf Photo Diagnostics"),
+      time: timeStr,
+      imageUrl: imagePreview || undefined,
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
+    setLiveTranscript("");
+    const img = selectedImage;
+    setSelectedImage(null);
+    setImagePreview(null);
+    setVoiceState("PROCESSING");
+
+    let reply = "";
+    let why = "";
+    let conf = 98;
+    let followUps: string[] = [];
+    let provider = "Google Gemini 2.5 Flash";
+
+    try {
+      if (img) {
+        const res = await analyzeCropLeafImage(img, activeCrop, language, q, district);
+        reply = res?.diagnosis || "Leaf analysis complete.";
+        why = res?.why_recommendation || "";
+        conf = res?.confidence_score || 95;
+        followUps = res?.follow_up_questions || [];
+        provider = res?.provider || "Google Gemini 2.5 Flash Vision";
+      } else {
+        const fullContext = [
+          `[FARMER PROFILE] Name: ${farmerName}, District: ${district}, State: ${state}`,
+          `[ACTIVE FIELD] Crop: ${activeCrop}, Acres: ${activeAcres}, Growth Stage: ${(activeFarm as any)?.growthStage || "Flowering"}`,
+          `[LIVE WEATHER] Temp: ${weather?.temperature}°C, Night: ${weather?.nightTemperature}°C, Wind: ${weather?.windSpeed} km/h, Humidity: ${weather?.humidity}%, Soil Moisture: ${weather?.soilMoistureEst}%, Spray Safe: ${(weather?.windSpeed || 0) < 15 && (weather?.temperature || 0) < 33 ? "YES" : "NO"}`,
+        ].filter(Boolean).join("\n");
+
+        const res = await sendChatMessage(
+          `${fullContext}\n\n[USER QUESTION] ${q}`,
+          weather?.lat,
+          weather?.lon,
+          activeCrop,
+          language,
+          `${district}, ${state}`,
+          weather?.nightTemperature || weather?.temperature,
+          farmerName,
+          activeAcres,
+          (activeFarm as any)?.cropVariety || "",
+          (activeFarm as any)?.soilType || "Black Cotton Soil",
+          district,
+          (activeFarm as any)?.village || "",
+          audioBase64,
+          audioMime,
+          messages.map((m) => ({ sender: m.sender, text: m.text })),
+          `${district}, ${state}`,
+          {
+            temperature: weather?.temperature,
+            humidity: weather?.humidity ?? 68,
+            wind_speed: weather?.windSpeed,
+            soil_moisture: weather?.soilMoistureEst,
+            state,
+            field_name: (activeFarm as any)?.name || "Main Farm",
+          },
+          // ✅ Pass only the logged-in user's fields — ensures personalized AI responses
+          userFields,
+        );
+
+        if (res && (res.reply || res.response)) {
+          reply = res.reply || res.response;
+          why = res.why_recommendation || `Verified for ${district}`;
+          conf = res.confidence_score || 98;
+          followUps = res.follow_up_questions || [];
+          provider = res.model_used ? `Google ${res.model_used}` : "Google Gemini 2.5 Flash";
+        }
+      }
+    } catch {
+      reply = isHindi
+        ? "तकनीकी समस्या। कृपया पुनः प्रयास करें।"
+        : "Could not connect to advisory engine. Please try again.";
+    } finally {
+      setVoiceState("IDLE");
+    }
+
+    const botMsg: Message = {
+      id: `b-${Date.now()}`,
+      sender: "bot",
+      text: reply,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      provider,
+      whyRecommendation: why,
+      confidenceScore: conf,
+      followUpQuestions: followUps,
+    };
+    setMessages((prev) => [...prev, botMsg]);
+    if (audioBase64) speakMsg(botMsg.id, reply);
+  }, [selectedImage, imagePreview, activeCrop, language, district, state, farmerName, activeAcres, activeFarm, userFields, weather, messages, isHindi]);
+
+  useEffect(() => {
+    const svc = new VoiceRecognitionService({
+      languageKey: language,
+      endpointingSilenceMs: 3200,
+      maxRecordingDurationMs: 45000,
+      onStateChange: setVoiceState,
+      onInterimTranscript: (t) => { setLiveTranscript(t); setInput(t); },
+      onFinalSpeechPayload: (p) => { setLiveTranscript(""); sendMessage(p.transcript, p.audioBase64, p.audioMimeType); },
+      onFinalTranscript: (t) => { setLiveTranscript(""); sendMessage(t); },
+      onAudioLevelChange: () => {},
+      onError: (type) => { if (type === "permission_denied" || type === "not_allowed") setMicError(true); },
+    });
+    voiceRef.current = svc;
+    return () => svc.cancelListening();
+  }, [language]);
+
+  // ── Scroll to bottom ─────────────────────────────────────────────────────
+  useEffect(() => {
+    chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, voiceState, liveTranscript]);
+
+  const speakMsg = (id: string, text: string) => {
+    if (speakingId === id) { stopGoogleSpeech(); setSpeakingId(null); return; }
+    stopGoogleSpeech();
+    setSpeakingId(id);
+    setVoiceState("RESPONDING");
+    playGoogleNeuralSpeech(text, language, {
+      onEnd: () => { setSpeakingId(null); setVoiceState("IDLE"); },
+      onError: () => { setSpeakingId(null); setVoiceState("IDLE"); },
+    });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) { setSelectedImage(f); setImagePreview(URL.createObjectURL(f)); }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(input); }
+  };
+
+  // ── Languages ────────────────────────────────────────────────────────────
+  const LANGS = [
+    { code: "hi", label: "हिंदी", name: "Hindi" },
+    { code: "mr", label: "मराठी", name: "Marathi" },
+    { code: "pa", label: "ਪੰਜਾਬੀ", name: "Punjabi" },
+    { code: "gu", label: "ગુજરાતી", name: "Gujarati" },
+    { code: "te", label: "తెలుగు", name: "Telugu" },
+    { code: "ta", label: "தமிழ்", name: "Tamil" },
+    { code: "kn", label: "ಕನ್ನಡ", name: "Kannada" },
+    { code: "ml", label: "മലയാളം", name: "Malayalam" },
+    { code: "bn", label: "বাংলা", name: "Bengali" },
+    { code: "en", label: "English", name: "English" },
+  ];
+  const currentLang = LANGS.find((l) => l.code === language) || LANGS[LANGS.length - 1];
 
   return (
     <AppShell>
-      <div className="max-w-[1280px] w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 font-sans">
-        
-        {/* ─────────────────────────────────────────────────────────────
-            1. HEADER SECTION (STRIPE-INSPIRED REFINED HERO)
-           ───────────────────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e8ee] pb-5 sm:pb-6">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap mb-2">
-              <span className="text-xs font-mono font-bold text-[#533afd] bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 flex items-center gap-1.5 shadow-2xs">
-                <span className="h-2 w-2 rounded-full bg-[#533afd] animate-ping" />
-                PS-04 · PRECISION MULTI-CROP AGRI-STACK
+      <div className="flex flex-col h-[calc(100dvh-64px)] max-w-[880px] mx-auto w-full px-3 sm:px-5 py-3 font-sans">
+
+        {/* ── Top Bar ───────────────────────────────────────────────── */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-3 shrink-0">
+          {/* Single AI logo — only one Sparkles icon on the whole page header */}
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-md shrink-0">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm sm:text-base font-extrabold text-[#0d253d] leading-tight truncate">
+              {isHindi ? "AASRA AI फार्म सहायक" : "AASRA AI Farm Assistant"}
+            </h1>
+            {/* Status chips — wrap gracefully on small screens */}
+            <div className="flex items-center gap-1 flex-wrap mt-0.5">
+              <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
+                <Sprout className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                {activeFarm?.primaryCrop || "—"} · {activeFarm?.areaAcres || "—"} ac
               </span>
-              <span className="text-xs font-mono font-bold text-slate-700 bg-[#f6f9fc] px-2.5 py-0.5 rounded-full border border-[#e3e8ee]">
-                50+ CROPS
+              <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
+                <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{district}
               </span>
-              <span className="text-xs font-mono font-bold text-slate-700 bg-[#f6f9fc] px-2.5 py-0.5 rounded-full border border-[#e3e8ee]">
-                GEMINI 2.5 FLASH
+              <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold bg-blue-50 text-blue-800 border border-blue-200 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
+                <Thermometer className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{weather?.temperature || "—"}°C
               </span>
-              <span className="text-xs font-mono font-bold text-slate-700 bg-[#f6f9fc] px-2.5 py-0.5 rounded-full border border-[#e3e8ee]">
-                GOOGLE CHIRP 3 HD
+              <span className="hidden xs:flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
+                <Wind className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{weather?.windSpeed || "—"} km/h
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-[#0d253d] tracking-tight">
-              {t.askAasraTitle}
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-3xl mt-1">
-              Hyper-local, zero-hallucination agricultural intelligence grounded in live Open-Meteo telemetry & APMC Agmarknet prices.
-            </p>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+
+        </div>
+
+        {/* ── Chat Messages ───────────────────────────────────────────── */}
+        <div
+          ref={chatRef}
+          className="flex-1 overflow-y-auto space-y-4 sm:space-y-5 pr-0.5 sm:pr-1 pb-2"
+          style={{ scrollbarWidth: "thin", scrollbarColor: "#e2e8f0 transparent" }}
+        >
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex gap-2 sm:gap-3 ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"}`}>
+              {/* Avatar */}
+              <div className={`h-7 w-7 sm:h-8 sm:w-8 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${
+                msg.sender === "bot"
+                  ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                  : "bg-[#0d253d] text-white"
+              }`}>
+                {/* Bot uses a plain icon (no extra logo) — User icon for user messages */}
+                {msg.sender === "bot" ? <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+              </div>
+
+              {/* Bubble group */}
+              <div className={`max-w-[85%] sm:max-w-[78%] space-y-2 flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
+                {msg.imageUrl && (
+                  <img src={msg.imageUrl} alt="leaf" className="rounded-2xl max-w-[180px] sm:max-w-[220px] border border-slate-200 shadow-sm" />
+                )}
+
+                <div className={`rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm leading-relaxed shadow-xs ${
+                  msg.sender === "user"
+                    ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-tr-sm"
+                    : "bg-white border border-[#e3e8ee] text-[#0d253d] rounded-tl-sm"
+                }`}>
+                  {msg.sender === "bot"
+                    ? <FormattedAgriResponse id={msg.id} text={msg.text} language={currentLang.code} />
+                    : <span className="whitespace-pre-wrap">{msg.text}</span>
+                  }
+                </div>
+
+                {/* Bot footer */}
+                {msg.sender === "bot" && (
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap px-1">
+                    <span className="text-[10px] text-slate-400 font-mono">{msg.time}</span>
+                    {msg.provider && (
+                      <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded-md">
+                        {msg.provider}
+                      </span>
+                    )}
+                    {msg.confidenceScore && msg.confidenceScore > 0 && (
+                      <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md">
+                        {msg.confidenceScore}% confidence
+                      </span>
+                    )}
+                    <button type="button" onClick={() => speakMsg(msg.id, msg.text)} className="p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" title="Listen">
+                      {speakingId === msg.id
+                        ? <VolumeX className="h-3.5 w-3.5 text-rose-500" />
+                        : <Volume2 className="h-3.5 w-3.5 text-slate-400 hover:text-indigo-600" />
+                      }
+                    </button>
+                  </div>
+                )}
+
+                {msg.sender === "user" && (
+                  <span className="text-[10px] text-slate-400 font-mono px-1">{msg.time}</span>
+                )}
+
+                {/* Follow-up chips */}
+                {msg.sender === "bot" && msg.followUpQuestions && msg.followUpQuestions.length > 0 && (
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 pt-1">
+                    {msg.followUpQuestions.map((q, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => sendMessage(q)}
+                        className="text-[10px] sm:text-[11px] font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 hover:border-indigo-400 transition-all cursor-pointer shadow-2xs"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* Live transcript */}
+          {voiceState === "LISTENING" && liveTranscript && (
+            <div className="flex gap-2 sm:gap-3 flex-row-reverse">
+              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl bg-[#0d253d] flex items-center justify-center shrink-0 mt-1">
+                <Mic className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white animate-pulse" />
+              </div>
+              <div className="max-w-[85%] sm:max-w-[78%] bg-indigo-600/10 border border-indigo-200 rounded-2xl rounded-tr-sm px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-indigo-800 italic">
+                {liveTranscript}
+              </div>
+            </div>
+          )}
+
+          {/* Thinking */}
+          {voiceState === "PROCESSING" && (
+            <div className="flex gap-2 sm:gap-3">
+              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shrink-0 mt-1">
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white animate-spin" />
+              </div>
+              <div className="bg-white border border-[#e3e8ee] rounded-2xl rounded-tl-sm px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2 shadow-xs">
+                <Loader2 className="h-4 w-4 text-indigo-600 animate-spin" />
+                <span className="text-sm text-slate-500">{isHindi ? "AASRA सोच रहा है…" : "AASRA is thinking…"}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── Image preview strip ─────────────────────────────────────── */}
+        {imagePreview && (
+          <div className="flex items-center gap-2 py-2 px-1 shrink-0">
+            <div className="relative inline-block">
+              <img src={imagePreview} alt="preview" className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl object-cover border border-slate-200" />
+              <button
+                type="button"
+                onClick={() => { setSelectedImage(null); setImagePreview(null); }}
+                className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-rose-500 text-white flex items-center justify-center cursor-pointer shadow-sm"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+            <span className="text-xs text-slate-500 font-medium">
+              {isHindi ? "पत्ती फोटो संलग्न — प्रश्न लिखें या भेजें" : "Leaf photo attached — type a question or send"}
+            </span>
+          </div>
+        )}
+
+        {/* ── Input Bar ──────────────────────────────────────────────── */}
+        <div className="shrink-0 mt-2">
+          <div className={`flex items-end gap-1.5 sm:gap-2 bg-white border-2 rounded-2xl px-2.5 sm:px-3 py-2 sm:py-2.5 shadow-sm transition-all ${
+            voiceState === "LISTENING"
+              ? "border-rose-400 ring-2 ring-rose-200"
+              : voiceState === "PROCESSING"
+              ? "border-indigo-400"
+              : "border-[#e3e8ee] focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100"
+          }`}>
+            {/* Camera */}
             <button
               type="button"
-              onClick={() => refetch(true)}
-              className="px-4 py-2 rounded-xl border border-[#e3e8ee] bg-white hover:bg-[#f6f9fc] text-[#0d253d] text-xs font-bold flex items-center gap-1.5 shadow-xs hover:border-indigo-300 transition-all cursor-pointer"
+              onClick={() => fileRef.current?.click()}
+              className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all cursor-pointer shrink-0"
+              title={isHindi ? "पत्ती फोटो जोड़ें" : "Attach leaf photo"}
             >
-              <RefreshCw className="h-3.5 w-3.5 text-[#533afd]" />
-              <span>Sync Live Sensors</span>
+              <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
 
-            <PageHelpModal
-              pageKey="assistant"
-              title="How to Use AASRA Multi-Crop AI Assistant"
-              subtitle="AASRA's Multilingual Assistant pairs Google Gemini 2.5 Flash reasoning with Open-Meteo micro-climatic telemetry, 50+ crop knowledge base, and APMC Mandi prices."
-              steps={[
-                { number: "01", title: "Select Preferred Language & Crop", desc: "Choose any of 12 Indian languages and switch between 50+ crops using the top bar to tailor agronomic advice." },
-                { number: "02", title: "Speak or Type Your Query", desc: "Speak directly in your regional dialect or type questions about disease diagnosis, chemical dosages, spray timing, or mandi rates." },
-                { number: "03", title: "Instant Leaf Photo Inspection", desc: "Click the camera icon to upload or snap a leaf photo for instant multimodal thermal damage, rust, and chlorosis diagnosis." },
-              ]}
+            {/* Text area */}
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={
+                voiceState === "LISTENING"
+                  ? (isHindi ? "🎙️ सुन रहा है…" : "🎙️ Listening…")
+                  : isHindi
+                  ? "कुछ भी पूछें — स्प्रे खुराक, मंडी भाव, मौसम सलाह…"
+                  : "Ask anything — spray dosage, mandi price, weather, AASRA model…"
+              }
+              rows={1}
+              className="flex-1 resize-none bg-transparent text-sm text-[#0d253d] placeholder-slate-400 focus:outline-none leading-relaxed min-h-[22px] sm:min-h-[24px] max-h-28 sm:max-h-32"
+              style={{ overflowY: "auto" }}
+              disabled={voiceState === "PROCESSING"}
             />
-          </div>
-        </div>
 
-        {/* ─────────────────────────────────────────────────────────────
-            2. 12 INDIAN LANGUAGES SELECTOR RIBBON
-           ───────────────────────────────────────────────────────────── */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-slate-600 notranslate" translate="no">
-              {t.quickLanguageLabel} (12 Regional Languages)
-            </span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar notranslate" translate="no">
-            {[
-              { code: "hi", label: "हिंदी",    name: "Hindi"    },
-              { code: "mr", label: "मराठी",   name: "Marathi"  },
-              { code: "pa", label: "ਪੰਜਾਬੀ",  name: "Punjabi"  },
-              { code: "gu", label: "ગુજરાતી", name: "Gujarati" },
-              { code: "te", label: "తెలుగు",  name: "Telugu"   },
-              { code: "ta", label: "தமிழ்",  name: "Tamil"    },
-              { code: "kn", label: "ಕನ್ನಡ",   name: "Kannada"  },
-              { code: "ml", label: "മലയാളം", name: "Malayalam"},
-              { code: "bn", label: "বাংলা",   name: "Bengali"  },
-              { code: "or", label: "ଓଡ଼ିଆ",   name: "Odia"     },
-              { code: "as", label: "অসমীয়া",  name: "Assamese" },
-              { code: "en", label: "English",  name: "English"  },
-            ].map(({ code, label, name }) => (
+            {/* Mic */}
+            {voiceState === "LISTENING" ? (
+              <button type="button" onClick={() => voiceRef.current?.stopListening()} className="p-1.5 sm:p-2 rounded-xl bg-rose-500 text-white shadow-sm animate-pulse cursor-pointer shrink-0">
+                <MicOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </button>
+            ) : (
               <button
-                key={code}
                 type="button"
-                onClick={() => setLanguage(code)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border cursor-pointer transition-all select-none whitespace-nowrap notranslate shrink-0 ${
-                  language === code
-                    ? "bg-gradient-to-r from-[#533afd] to-[#4434d4] text-white border-[#4434d4] shadow-sm ring-2 ring-[#533afd]/20"
-                    : "bg-white border-[#e3e8ee] text-[#0d253d] hover:border-indigo-300 hover:bg-indigo-50/50 shadow-2xs"
+                onClick={async () => {
+                  setMicError(false);
+                  stopGoogleSpeech();
+                  setSpeakingId(null);
+                  setInput("");
+                  setLiveTranscript("");
+                  if (voiceRef.current) await voiceRef.current.startListening();
+                }}
+                className={`p-1.5 sm:p-2 rounded-xl transition-all cursor-pointer shrink-0 ${
+                  micError ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700"
                 }`}
-                translate="no"
+                disabled={voiceState === "PROCESSING" || micError}
+                title={micError ? "Microphone permission denied" : (isHindi ? "बोलकर पूछें" : "Ask by voice")}
               >
-                <span className="notranslate font-bold" translate="no">{label}</span>{" "}
-                <span className={`text-[10px] notranslate ${language === code ? "text-indigo-100" : "text-slate-400"}`} translate="no">
-                  {name}
-                </span>
+                <Mic className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
-            ))}
+            )}
+
+            {/* Send */}
+            <button
+              type="button"
+              onClick={() => sendMessage(input)}
+              disabled={voiceState === "PROCESSING" || (!input.trim() && !selectedImage)}
+              className="p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            >
+              {voiceState === "PROCESSING" ? <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" /> : <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+            </button>
           </div>
+
+          {/* Hint */}
+          <p className="text-center text-[10px] text-slate-400 font-mono mt-1.5 sm:mt-2">
+            {isHindi
+              ? `AASRA · ${fieldCount} पंजीकृत खेत · Gemini 2.5 Flash · Enter भेजें`
+              : `AASRA · ${fieldCount} registered field${fieldCount !== 1 ? "s" : ""} · Gemini 2.5 Flash · Enter to send`
+            }
+          </p>
         </div>
-
-        {/* ─────────────────────────────────────────────────────────────
-            3. SUGGESTED CROP-AWARE & TELEMETRY-AWARE QUESTION CHIPS
-           ───────────────────────────────────────────────────────────── */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-slate-500">{t.tryAskingLabel}</span>
-            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-bold flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-              Live {weather.temperature}°C Grounded
-            </span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            {[
-              language === "hi"
-                ? `🌡️ ${weather.temperature}°C में क्या ${cropInfo.nameHi} पर स्ट्रेस बस्टर स्प्रे करना चाहिए?`
-                : `🌡️ At ${weather.temperature}°C: Should I spray stress buster on ${cropInfo.name}?`,
-              language === "hi"
-                ? `🏛️ ${weather.district || "भोपाल"} APMC में आज ${cropInfo.nameHi} का ताजा मंडी भाव क्या है?`
-                : `🏛️ What is today's ${cropInfo.name} mandi price in ${weather.district || "Bhopal"} APMC?`,
-              language === "hi"
-                ? `💨 हवा ${weather.windSpeed} km/h: क्या आज कीटनाशक/टॉनिक छिड़काव के लिए सुरक्षित मौसम है?`
-                : `💨 Wind at ${weather.windSpeed} km/h: Is current weather safe for spraying?`,
-              language === "hi"
-                ? `💧 मिट्टी में ${weather.soilMoistureEst}% नमी: क्या सिंचाई तुरंत करनी चाहिए?`
-                : `💧 Soil moisture index at ${weather.soilMoistureEst}%: Is immediate irrigation required?`,
-              language === "hi"
-                ? `🛡️ सिंजेंटा क्वांटिस®: मेरे 5 एकड़ खेत के लिए सही खुराक व पानी की मात्रा बताएं`
-                : `🛡️ Syngenta Quantis®: Exact dosage and water dilution for 5 acres`,
-            ].map((q, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setSelectedQuestion(q)}
-                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-indigo-50/80 border border-[#e3e8ee] hover:border-indigo-300 text-[#0d253d] hover:text-[#533afd] cursor-pointer transition-all whitespace-nowrap shrink-0 shadow-2xs text-left flex items-center gap-1.5 hover:scale-[1.01]"
-              >
-                <span>💡</span>
-                <span>{q}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ─────────────────────────────────────────────────────────────
-            4. MAIN GRID LAYOUT (AI ADVISORY + TELEMETRY SIDEBAR)
-           ───────────────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
-          
-          {/* Main Multilingual AI Voice Chat & Leaf Scanner (2 Cols) */}
-          <div className="lg:col-span-2">
-            <AdvisoryChat
-              currentField={activeField?.name || "Field 1"}
-              crop={activeCropId}
-              onCropChange={(cId) => setActiveCropId(cId)}
-              externalQuery={selectedQuestion}
-              onClearExternalQuery={() => setSelectedQuestion("")}
-            />
-          </div>
-
-          {/* Live Telemetry, Crop Biology & Safety Sidebar (1 Col) */}
-          <div className="space-y-6">
-            
-            {/* Live Telemetry Card */}
-            <div className="bg-white border border-[#e3e8ee] rounded-3xl p-6 space-y-4 shadow-sm">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 className="font-bold text-sm text-[#0d253d] font-display flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <Thermometer className="h-4 w-4 text-[#533afd]" />
-                  <span>{t.liveFieldTelemetry}</span>
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => refetch(true)}
-                  className="p-1.5 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
-                  title="Refresh Telemetry"
-                >
-                  <RefreshCw className="h-3.5 w-3.5 text-slate-400" />
-                </button>
-              </div>
-
-              <div className="space-y-2.5 font-mono text-xs">
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Active Crop:</span>
-                  <span className="font-bold text-[#0d253d] flex items-center gap-1.5">
-                    <Sprout className="h-3.5 w-3.5 text-emerald-600" />
-                    <span>{language === "hi" ? cropInfo.nameHi : cropInfo.name}</span>
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Air Temperature:</span>
-                  <span className="font-bold text-[#533afd] text-sm">{weather.temperature}°C</span>
-                </div>
-
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Soil Moisture:</span>
-                  <span className="font-bold text-emerald-600 text-sm">{weather.soilMoistureEst}% Index</span>
-                </div>
-
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Wind Speed:</span>
-                  <span className="font-bold text-[#0d253d]">{weather.windSpeed} km/h</span>
-                </div>
-
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Night Temperature:</span>
-                  <span className="font-bold text-[#0d253d]">
-                    {weather.nightTemperature ? `${weather.nightTemperature}°C` : "21.0°C"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Interactive Crop Thermal Range Indicator with Live Gauge Needle */}
-              <div className="bg-[#f6f9fc] p-4 rounded-2xl border border-[#e3e8ee] space-y-3 text-xs shadow-2xs">
-                <div className="flex justify-between text-[#0d253d] font-bold font-mono">
-                  <span className="flex items-center gap-1.5">
-                    <Activity className="h-3.5 w-3.5 text-[#533afd]" />
-                    <span>Live Thermal Gauge</span>
-                  </span>
-                  <span className="text-[#533afd] font-extrabold">{cropInfo.t_opt_day}°C – {cropInfo.t_limit_day}°C Opt</span>
-                </div>
-                
-                {/* Visual Gauge Bar with Dynamic Pointer */}
-                <div className="relative pt-4 pb-1">
-                  {/* Gauge Needle */}
-                  <div 
-                    className="absolute -top-1 transition-all duration-700 ease-out flex flex-col items-center -translate-x-1/2 z-10"
-                    style={{
-                      left: `${Math.min(94, Math.max(6, ((weather.temperature - 15) / (45 - 15)) * 100))}%`
-                    }}
-                  >
-                    <span className="px-1.5 py-0.5 rounded-md bg-[#0d253d] text-white text-[9px] font-mono font-bold shadow-xs whitespace-nowrap">
-                      {weather.temperature}°C
-                    </span>
-                    <div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-[#0d253d]" />
-                  </div>
-
-                  <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden flex shadow-inner">
-                    <div className="bg-gradient-to-r from-blue-400 to-emerald-500 h-full" style={{ width: "55%" }} title="Safe Range"></div>
-                    <div className="bg-amber-400 h-full" style={{ width: "25%" }} title="Thermal Caution"></div>
-                    <div className="bg-rose-500 h-full" style={{ width: "20%" }} title="Critical Respiration Loss"></div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-[10px] font-mono text-slate-500 pt-0.5">
-                  <span className="text-emerald-700 font-bold flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-                    Optimal
-                  </span>
-                  <span className="text-amber-700 font-bold">Caution (32°C+)</span>
-                  <span className="text-rose-700 font-bold">Critical Stress (38°C+)</span>
-                </div>
-              </div>
-
-              {/* Heat Stress Alert if active */}
-              {weather.isNightHeatStress && (
-                <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-rose-900 text-xs font-mono space-y-1.5 animate-pulse">
-                  <div className="flex items-center gap-1.5 font-bold text-rose-700">
-                    <AlertTriangle className="h-4 w-4 shrink-0" />
-                    <span>Thermal Stress Risk: {weather.heatStressPercent}%</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 font-sans leading-relaxed">
-                    Night temp exceeds {cropInfo.t_opt_night}°C threshold causing respiration carbohydrate loss. Syngenta Quantis® biostimulant recommended.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Live APMC Mandi Benchmark Card */}
-            <div className="bg-white border border-[#e3e8ee] rounded-3xl p-6 space-y-3.5 shadow-sm">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 className="font-bold text-sm text-[#0d253d] font-display flex items-center gap-2">
-                  <span className="text-base">🏛️</span>
-                  <span>APMC Mandi Benchmark</span>
-                </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
-                  AGMARKNET
-                </span>
-              </div>
-
-              <div className="space-y-2 text-xs font-mono">
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Market Yard:</span>
-                  <span className="font-bold text-[#0d253d]">{weather.district || "Bhopal"} APMC</span>
-                </div>
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">Modal Price:</span>
-                  <span className="font-black text-[#533afd] text-sm">
-                    ₹{(findCropMandiRate(activeCropId, weather.district || "Bhopal", weather.state || "Madhya Pradesh")?.modalPrice || 4850).toLocaleString("en-IN")}/quintal
-                  </span>
-                </div>
-                <div className="flex justify-between items-center bg-[#f6f9fc] p-3 rounded-xl border border-[#e3e8ee]">
-                  <span className="text-slate-500 font-sans font-medium">5-Acre Harvest Est:</span>
-                  <span className="font-bold text-emerald-700">
-                    ~₹{((findCropMandiRate(activeCropId, weather.district || "Bhopal", weather.state || "Madhya Pradesh")?.modalPrice || 4850) * 45).toLocaleString("en-IN")}
-                  </span>
-                </div>
-              </div>
-
-              {/* Spray Window Safety Meter */}
-              <div className={`p-3.5 rounded-2xl border text-xs font-mono space-y-1.5 ${
-                weather.windSpeed < 15 && weather.temperature < 33
-                  ? "bg-emerald-50 border-emerald-200 text-emerald-950"
-                  : "bg-amber-50 border-amber-200 text-amber-950"
-              }`}>
-                <div className="flex items-center gap-1.5 font-bold">
-                  <Wind className="h-4 w-4 shrink-0" />
-                  <span>
-                    {weather.windSpeed < 15 && weather.temperature < 33
-                      ? "Safe Spray Window Active"
-                      : "Spray Drift Caution"}
-                  </span>
-                </div>
-                <p className="text-[11px] font-sans opacity-85 leading-relaxed">
-                  {weather.windSpeed < 15 && weather.temperature < 33
-                    ? `Wind is ${weather.windSpeed} km/h (threshold < 15 km/h) & Temp ${weather.temperature}°C. Minimal chemical drift risk.`
-                    : `Wind speed is ${weather.windSpeed} km/h or temp is high (${weather.temperature}°C). Spray in the evening after 5:00 PM.`}
-                </p>
-              </div>
-            </div>
-
-            {/* Architecture Card - Stripe Enterprise Dark Accent with Interactive Glow */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#0d253d] via-[#141d38] to-[#1c1e54] text-white border border-[#273951] rounded-3xl p-6 space-y-4 shadow-xl">
-              <div className="absolute -top-12 -right-12 w-44 h-44 bg-[#533afd]/25 rounded-full blur-3xl pointer-events-none animate-float-gentle" />
-              <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-purple-600/15 rounded-full blur-2xl pointer-events-none" />
-              
-              <div className="flex items-center justify-between border-b border-indigo-900/50 pb-3">
-                <div className="flex items-center gap-2.5 font-bold text-sm text-white">
-                  <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-[#533afd] to-indigo-400 text-white flex items-center justify-center shadow-md animate-pulse-ring">
-                    <Cpu className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-mono text-indigo-300 font-bold uppercase tracking-wider">AASRA Core</div>
-                    <span className="text-white font-extrabold text-sm">5-Stage Precision Engine</span>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  LIVE
-                </span>
-              </div>
-
-              <ul className="text-xs text-slate-300 space-y-3 leading-relaxed">
-                <li className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white/5 transition-colors">
-                  <span className="h-6 w-6 rounded-lg bg-[#533afd]/40 text-[#b9b9f9] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-[#533afd]/60 shadow-xs">1</span>
-                  <div>
-                    <strong className="text-white block">Multi-Crop Registry</strong>
-                    <span className="text-slate-400 text-[11px]">50+ crops with thermal, GDD & pest phenology limits</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white/5 transition-colors">
-                  <span className="h-6 w-6 rounded-lg bg-[#533afd]/40 text-[#b9b9f9] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-[#533afd]/60 shadow-xs">2</span>
-                  <div>
-                    <strong className="text-white block">Hyper-Local Grounding</strong>
-                    <span className="text-slate-400 text-[11px]">Live Open-Meteo microclimate per GPS field polygon</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white/5 transition-colors">
-                  <span className="h-6 w-6 rounded-lg bg-[#533afd]/40 text-[#b9b9f9] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-[#533afd]/60 shadow-xs">3</span>
-                  <div>
-                    <strong className="text-white block">APMC Mandi Intelligence</strong>
-                    <span className="text-slate-400 text-[11px]">700+ verified government market yards with real modal rates</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white/5 transition-colors">
-                  <span className="h-6 w-6 rounded-lg bg-[#533afd]/40 text-[#b9b9f9] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-[#533afd]/60 shadow-xs">4</span>
-                  <div>
-                    <strong className="text-white block">Agronomic Safety Guard</strong>
-                    <span className="text-slate-400 text-[11px]">Real-time chemical drift & per-acre dilution calculator</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white/5 transition-colors">
-                  <span className="h-6 w-6 rounded-lg bg-[#533afd]/40 text-[#b9b9f9] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-[#533afd]/60 shadow-xs">5</span>
-                  <div>
-                    <strong className="text-white block">Multilingual Chirp 3 HD</strong>
-                    <span className="text-slate-400 text-[11px]">12 Indian regional languages with natural acoustic speech</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
     </AppShell>
   );

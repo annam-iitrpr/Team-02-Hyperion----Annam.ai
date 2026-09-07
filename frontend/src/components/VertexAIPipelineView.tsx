@@ -34,6 +34,9 @@ import {
   ExternalLink,
   ArrowRight,
   Lock,
+  Scale,
+  DollarSign,
+  Percent,
 } from "lucide-react";
 import Link from "next/link";
 import { runAASRAPipeline, UnifiedPipelineResponse, fetchPipelineModels } from "@/lib/mlPipelineApi";
@@ -73,6 +76,11 @@ export function VertexAIPipelineView() {
   const [windSpeed, setWindSpeed] = useState<number>(9.5);
   const [soilMoisture, setSoilMoisture] = useState<number>(30);
   const [rainProb, setRainProb] = useState<number>(10);
+
+  // Model 6 Causal Economic Controls
+  const [treatmentApplied, setTreatmentApplied] = useState<number>(1);
+  const [mandiPrice, setMandiPrice] = useState<number>(2800);
+  const [productCost, setProductCost] = useState<number>(400);
 
   // Live Telemetry Metadata from .env Weather API
   const [isLiveWeather, setIsLiveWeather] = useState<boolean>(true);
@@ -188,24 +196,53 @@ export function VertexAIPipelineView() {
         historical_district_average_q_ha: 15.2,
         yield_impact_pct: -22.5,
       },
+      model6_causal_robi: {
+        causal_gain_tau_q_acre: 1.85,
+        confidence_interval_95: [0.95, 2.75],
+        revenue_saved_inr: 25900,
+        revenue_saved_per_acre: 5180,
+        total_treatment_cost_inr: 2000,
+        net_farmer_profit_inr: 23900,
+        robi_multiplier: "12.9x",
+        robi_ratio: 12.9,
+        counterfactual_baseline_q_acre: 6.8,
+        predicted_yield_q_acre: 8.65,
+        treatment_applied: 1,
+        product_name: "Quantis® Osmoprotectant",
+        product_cost_inr_acre: 400,
+        mandi_price_inr_q: 2800,
+        confounders_controlled: [
+          "Rainfall totals (IMD gridded)",
+          "Soil moisture volume (satellite)",
+          "Borewell drip vs. rainfed bias",
+          "Farm landholding wealth bias"
+        ],
+        methodology: "Microsoft EconML LinearDML (Chernozhukov et al. 2018)"
+      },
       gemini_statement: {
         headline: isHindi
           ? "वर्टेक्स AI मॉडल सोयाबीन में अत्यधिक गर्मी तनाव (84% जोखिम) का संकेत देते हैं"
           : "Vertex AI Sequential Models Detect Elevated Thermal Stress (84% Probability) in Soybean",
         statement: isHindi
-          ? "नमूना बेंचमार्क सलाह (फ़ीचर टूर): वर्टेक्स AI मॉडल सोयाबीन में अत्यधिक गर्मी तनाव (84% जोखिम) का संकेत देते हैं। सुबह 06:00 से 09:30 बजे के बीच सुरक्षित स्प्रे विंडो में Quantis® (400 मिली/एकड़) का उपयोग करें जिससे अनुमानित ₹4,250 प्रति एकड़ की उपज सुरक्षित होगी। अपने खेत के लिए सटीक लाइव मॉडल चलाने के लिए कृपया लॉग इन या साइन अप करें।"
-          : "SAMPLE BENCHMARK ADVISORY (Feature Tour Mode): Real-time Vertex AI models detect elevated thermal stress (84% probability) in flowering soybean. Atmospheric Delta-T is 7.4°C permitting morning spray. Quantis® (400 ml/acre) is recommended to prevent flower drop, securing an estimated ₹4,250/acre yield protection. Log in or sign up to run live models on your verified field coordinates.",
-        statement_hi: "नमूना बेंचमार्क सलाह (फ़ीचर टूर): वर्टेक्स AI मॉडल सोयाबीन में अत्यधिक गर्मी तनाव (84% जोखिम) का संकेत देते हैं। सुबह 06:00 से 09:30 बजे के बीच सुरक्षित स्प्रे विंडो में Quantis® (400 मिली/एकड़) का उपयोग करें जिससे अनुमानित ₹4,250 प्रति एकड़ की उपज सुरक्षित होगी।",
-        statement_en: "SAMPLE BENCHMARK ADVISORY (Feature Tour Mode): Real-time Vertex AI models detect elevated thermal stress (84% probability) in flowering soybean. Atmospheric Delta-T is 7.4°C permitting morning spray. Quantis® (400 ml/acre) is recommended to prevent flower drop, securing an estimated ₹4,250/acre yield protection.",
+          ? "नमूना बेंचमार्क सलाह (फ़ीचर टूर): वर्टेक्स AI मॉडल सोयाबीन में अत्यधिक गर्मी तनाव (84% जोखिम) का संकेत देते हैं। सुबह 06:00 से 09:30 बजे के बीच सुरक्षित स्प्रे विंडो में Quantis® (400 मिली/एकड़) का उपयोग करें। मॉडल 6 डबल एमएल विश्लेषण प्रमाणित करता है कि जैविक सुरक्षा से +1.85 क्विंटल/एकड़ वास्तविक उपज वृद्धि और 12.9x ROBI (₹23,900 शुद्ध लाभ) प्राप्त होता है।"
+          : "SAMPLE BENCHMARK ADVISORY (Feature Tour Mode): Real-time Vertex AI models detect elevated thermal stress (84% probability) in flowering soybean. Atmospheric Delta-T is 7.4°C permitting morning spray. Quantis® (400 ml/acre) is recommended to prevent flower drop. Model 6 Double ML causal attribution isolates +1.85 Q/acre true biological protection with a 12.9x ROBI multiplier (₹23,900 net profit).",
+        statement_hi: "नमूना बेंचमार्क सलाह (फ़ीचर टूर): वर्टेक्स AI मॉडल सोयाबीन में अत्यधिक गर्मी तनाव (84% जोखिम) का संकेत देते हैं। सुबह 06:00 से 09:30 बजे के बीच सुरक्षित स्प्रे विंडो में Quantis® (400 मिली/एकड़) का उपयोग करें। मॉडल 6 डबल एमएल के अनुसार +1.85 क्विंटल/एकड़ शुद्ध लाभ और 12.9x ROBI प्राप्त होगा।",
+        statement_en: "SAMPLE BENCHMARK ADVISORY (Feature Tour Mode): Real-time Vertex AI models detect elevated thermal stress (84% probability) in flowering soybean. Atmospheric Delta-T is 7.4°C permitting morning spray. Quantis® (400 ml/acre) is recommended. Model 6 Double ML isolates +1.85 Q/acre causal gain with 12.9x ROBI.",
         spray_verdict_badge: "SAFE TO SPRAY",
         timing_guidance: isHindi ? "सुबह 06:00 से 09:30 बजे के बीच तापमान 35°C से नीचे रहने पर स्प्रे करें" : "Spray between 06:00 - 09:30 AM before ambient temperatures exceed 35°C",
         product_summary: "Quantis® Osmoprotectant (400 ml/acre)",
-        yield_outlook: isHindi ? "बायोस्टिमुलेंट सुरक्षा के साथ 7.45 क्विंटल/एकड़ अनुमानित पैदावार" : "7.45 Q/acre projected with timely biostimulant shielding",
+        yield_outlook: isHindi ? "बायोस्टिमुलेंट सुरक्षा के साथ 8.65 क्विंटल/एकड़ (12.9x ROBI)" : "8.65 Q/acre protected (+1.85 Q/ac causal gain, 12.9x ROBI)",
         generated_by: "Gemini 2.5 Agro-Intelligence Engine",
         language_used: activeLang,
       },
       execution_metadata: {
-        models_executed: ["Model 1 (Risk)", "Model 2 (Readiness)", "Model 3 (Portfolio)", "Model 5 (Yield)"],
+        models_executed: [
+          "Model 1 (Risk)",
+          "Model 2 (Readiness)",
+          "Model 3 (Portfolio)",
+          "Model 5 (Yield Baseline)",
+          "Model 6 (Causal ROBI)"
+        ],
         serving_mode: "Educational Tour Preview (Benchmark Dataset)",
         ai_synthesis_engine: "Gemini 2.5 Flash Ag-Grounding",
         latency_ms: 115,
@@ -344,6 +381,9 @@ export function VertexAIPipelineView() {
         soil_moisture_pct: sMoist,
         rain_prob_pct: rProb,
         consecutive_hot_days: tMax > 35 ? 4 : 1,
+        treatment_applied: treatmentApplied,
+        mandi_price_inr_q: mandiPrice,
+        product_cost_inr_acre: productCost,
       });
 
       if (res) {
@@ -433,10 +473,10 @@ export function VertexAIPipelineView() {
               <span className="text-[11px] text-[#64748d] font-mono">• Read-Only Demo</span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-[#0d253d]">
-              AASRA 4-Model Vertex AI Biological Engine
+              AASRA 5-Model Vertex AI Biological Engine
             </h3>
             <p className="text-xs text-[#64748d] max-w-2xl">
-              Explore how our 4 sequential ML models (Stress Risk, Spray Readiness, Biological Ranker, and Yield Baseline) collaborate with satellite telemetry and Gemini 2.5. To run live model predictions on your own field, log in or sign up.
+              Explore how our 5 sequential ML models (Stress Risk, Spray Readiness, Biological Ranker, Yield Baseline, and Causal ROBI Double ML) collaborate with satellite telemetry and Gemini 2.5. To run live model predictions on your own field, log in or sign up.
             </p>
           </div>
           <div className="flex items-center gap-2.5 shrink-0">
@@ -465,7 +505,7 @@ export function VertexAIPipelineView() {
               <Cpu className="w-3.5 h-3.5 text-[#5e6ad2]" /> Vertex AI Model Registry
             </span>
             <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#f6f9fc] text-[#64748d] border border-[#e3e8ee]">
-              4-Model Sequential Pipeline
+              5-Model Sequential Pipeline
             </span>
           </div>
 
@@ -473,7 +513,7 @@ export function VertexAIPipelineView() {
             AASRA Core ML Intelligence Engine
           </h2>
           <p className="text-xs text-[#64748d] mt-0.5 max-w-2xl">
-            Decoupled biological intelligence: Models 1 (Risk), 2 (Readiness), 3 (Product Ranker), and 5 (Yield Baseline) synthesized with Google Gemini.
+            Decoupled biological intelligence: Models 1 (Risk), 2 (Readiness), 3 (Product Ranker), 5 (Yield Baseline), and 6 (Causal ROBI Double ML) synthesized with Google Gemini.
           </p>
         </div>
 
@@ -549,7 +589,7 @@ export function VertexAIPipelineView() {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
           {/* Step 1 */}
           <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
             <div>
@@ -611,6 +651,18 @@ export function VertexAIPipelineView() {
           </div>
 
           {/* Step 6 */}
+          <div className="bg-white p-2.5 rounded-lg border border-[#e3e8ee] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
+                <span className="font-bold text-purple-600">MODEL 6</span>
+                <Scale className="w-3 h-3 text-purple-600" />
+              </div>
+              <div className="font-bold text-[#0d253d] text-[11px]">Causal ROBI</div>
+              <p className="text-[10px] text-[#64748d] mt-0.5">Double ML unbiased attribution</p>
+            </div>
+          </div>
+
+          {/* Step 7 */}
           <div className="bg-white p-2.5 rounded-lg border border-[#5e6ad2]/50 flex flex-col justify-between shadow-sm">
             <div>
               <div className="flex items-center justify-between text-[10px] text-[#64748d] mb-1">
@@ -1012,8 +1064,8 @@ export function VertexAIPipelineView() {
                 </div>
               </div>
 
-              {/* 3 Model Key Takeaway Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-[#e3e8ee]/80 text-xs">
+              {/* 4 Model Key Takeaway Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-3 border-t border-[#e3e8ee]/80 text-xs">
                 <div className="bg-white p-3 rounded-lg border border-[#e3e8ee]">
                   <div className="text-[#64748d] text-[11px] mb-0.5">Spray Timing Window (Model 2)</div>
                   <div className="text-[#0d253d] font-medium flex items-center gap-1.5">
@@ -1035,6 +1087,16 @@ export function VertexAIPipelineView() {
                   <div className="text-[#0d253d] font-medium flex items-center gap-1.5">
                     <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span className="truncate">{data.gemini_statement.yield_outlook}</span>
+                  </div>
+                </div>
+
+                <div className="bg-white p-3 rounded-lg border border-[#e3e8ee]">
+                  <div className="text-[#64748d] text-[11px] mb-0.5">Causal ROBI (Model 6 EconML)</div>
+                  <div className="text-[#0d253d] font-medium flex items-center gap-1.5">
+                    <Scale className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                    <span className="truncate">
+                      +{data.model6_causal_robi ? data.model6_causal_robi.causal_gain_tau_q_acre : 1.85} Q/Ac • {data.model6_causal_robi ? data.model6_causal_robi.robi_multiplier : "12.5x"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1196,84 +1258,84 @@ export function VertexAIPipelineView() {
             </div>
           </div>
 
-          {/* Model 3 & Model 5 Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Model 3 Card (2 cols) */}
-            <div className="lg:col-span-2 bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold border border-indigo-500/30">
-                    M3
-                  </span>
-                  <div>
-                    <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d] block">
-                      PS-03 Product Recommendation
-                    </span>
-                    <span className="text-sm font-bold text-[#0d253d]">
-                      Top 3 Syngenta Crop-Approved Prescriptions (Ranked from 50 Products)
-                    </span>
-                  </div>
-                </div>
-                <span className="text-[11px] font-mono text-[#64748d] bg-[#f6f9fc] px-2 py-0.5 rounded border border-[#e3e8ee]">
-                  LambdaMART Ranker
+          {/* Model 3 Card (Full Width) */}
+          <div className="bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold border border-indigo-500/30">
+                  M3
                 </span>
+                <div>
+                  <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d] block">
+                    PS-03 Product Recommendation
+                  </span>
+                  <span className="text-sm font-bold text-[#0d253d]">
+                    Top 3 Syngenta Crop-Approved Prescriptions (Ranked from 50 Products)
+                  </span>
+                </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {data.model3_portfolio.top_recommendations.map((prod) => (
-                  <div
-                    key={prod.product_key}
-                    className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all ${
-                      prod.rank === 1
-                        ? "bg-[#f6f9fc] border-[#5e6ad2]/50 shadow-lg shadow-[#5e6ad2]/5"
-                        : "bg-white border-[#e3e8ee]"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          prod.rank === 1
-                            ? "bg-[#5e6ad2] text-white"
-                            : "bg-[#23252a] text-[#64748d]"
-                        }`}>
-                          #{prod.rank} RANK
-                        </span>
-                        <span className="text-xs font-mono font-semibold text-emerald-400">
-                          {prod.efficacy_score_pct}% Fit
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <h4 className="font-bold text-sm text-[#0d253d]">{prod.name}</h4>
-                        {prod.category && (
-                          <span className="text-[9px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
-                            {prod.category}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-[#64748d] mt-0.5 line-clamp-2">
-                        {prod.active_ingredient}
-                      </p>
-
-                      <div className="mt-2.5 space-y-1 text-[11px]">
-                        <div className="text-[#64748d]">
-                          <span className="text-[#64748d]">Dosage:</span> {prod.recommended_dosage}
-                        </div>
-                        <div className="text-[#64748d]">
-                          <span className="text-[#64748d]">CIB&RC:</span> {prod.registration}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 pt-2 border-t border-[#e3e8ee] text-[10px] text-[#64748d]">
-                      {prod.application_timing}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <span className="text-[11px] font-mono text-[#64748d] bg-[#f6f9fc] px-2 py-0.5 rounded border border-[#e3e8ee]">
+                LambdaMART Ranker
+              </span>
             </div>
 
-            {/* Model 5 Card (1 col) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {data.model3_portfolio.top_recommendations.map((prod) => (
+                <div
+                  key={prod.product_key}
+                  className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all ${
+                    prod.rank === 1
+                      ? "bg-[#f6f9fc] border-[#5e6ad2]/50 shadow-lg shadow-[#5e6ad2]/5"
+                      : "bg-white border-[#e3e8ee]"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        prod.rank === 1
+                          ? "bg-[#5e6ad2] text-white"
+                          : "bg-[#23252a] text-[#64748d]"
+                      }`}>
+                        #{prod.rank} RANK
+                      </span>
+                      <span className="text-xs font-mono font-semibold text-emerald-400">
+                        {prod.efficacy_score_pct}% Fit
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <h4 className="font-bold text-sm text-[#0d253d]">{prod.name}</h4>
+                      {prod.category && (
+                        <span className="text-[9px] font-medium tracking-tight px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+                          {prod.category}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[#64748d] mt-0.5 line-clamp-2">
+                      {prod.active_ingredient}
+                    </p>
+
+                    <div className="mt-2.5 space-y-1 text-[11px]">
+                      <div className="text-[#64748d]">
+                        <span className="text-[#64748d]">Dosage:</span> {prod.recommended_dosage}
+                      </div>
+                      <div className="text-[#64748d]">
+                        <span className="text-[#64748d]">CIB&RC:</span> {prod.registration}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t border-[#e3e8ee] text-[10px] text-[#64748d]">
+                    {prod.application_timing}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Layer 4 Economic Audit: Model 5 & Model 6 in 2-Column Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Model 5 Card */}
             <div className="bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -1300,7 +1362,7 @@ export function VertexAIPipelineView() {
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 rounded-lg bg-[#f6f9fc] border border-[#e3e8ee] space-y-2">
+                <div className="mt-4 p-3 rounded-lg bg-white border border-[#e3e8ee] space-y-2">
                   <div className="flex justify-between text-xs">
                     <span className="text-[#64748d]">District 10y Average:</span>
                     <span className="font-mono text-[#0d253d]">
@@ -1310,7 +1372,7 @@ export function VertexAIPipelineView() {
                   <div className="flex justify-between text-xs">
                     <span className="text-[#64748d]">vs District Historical Baseline:</span>
                     <span className={`font-mono font-semibold ${
-                      data.model5_baseline.yield_impact_pct >= 0 ? "text-emerald-400" : "text-rose-400"
+                      data.model5_baseline.yield_impact_pct >= 0 ? "text-emerald-500" : "text-rose-500"
                     }`}>
                       {data.model5_baseline.yield_impact_pct >= 0 ? "+" : ""}{data.model5_baseline.yield_impact_pct}%
                     </span>
@@ -1320,6 +1382,100 @@ export function VertexAIPipelineView() {
 
               <div className="mt-4 pt-3 border-t border-[#e3e8ee] text-[11px] text-[#64748d]">
                 Benchmarking baseline yield without intervention under current season conditions.
+              </div>
+            </div>
+
+            {/* Model 6 Card: Causal Biological Impact & ROBI Attribution */}
+            <div className="bg-[#f6f9fc] rounded-xl border border-[#e3e8ee] p-5 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-600 flex items-center justify-center text-xs font-bold border border-purple-500/30">
+                      M6
+                    </span>
+                    <span className="text-xs uppercase tracking-wider font-semibold text-[#64748d]">
+                      PS-07 Causal Attribution &amp; ROBI
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                    Microsoft EconML LinearDML
+                  </span>
+                </div>
+
+                {/* Primary Causal Impact Metric */}
+                <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2">
+                  <div>
+                    <span className="text-xs text-[#64748d]">Causal Treatment Effect (&tau;):</span>
+                    <div className="text-2xl font-bold font-mono text-[#0d253d] mt-0.5 flex items-center gap-2">
+                      <span>+{data.model6_causal_robi ? data.model6_causal_robi.causal_gain_tau_q_acre : 1.85}</span>
+                      <span className="text-sm font-normal text-[#64748d]">Q/acre saved</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs text-[#64748d]">Return on Biological Investment:</span>
+                    <div className="mt-0.5">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        {data.model6_causal_robi ? data.model6_causal_robi.robi_multiplier : "12.5x"} Causal ROBI
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 95% Confidence Interval */}
+                {data.model6_causal_robi?.confidence_interval_95 && (
+                  <div className="mt-2 text-[11px] text-[#64748d] flex items-center gap-1.5 font-mono">
+                    <span className="font-semibold text-[#0d253d]">95% CI:</span>
+                    <span>
+                      [{data.model6_causal_robi.confidence_interval_95[0]} to {data.model6_causal_robi.confidence_interval_95[1]}] Q/acre
+                    </span>
+                  </div>
+                )}
+
+                {/* Financial Ledger Breakdown */}
+                <div className="mt-3 p-3 rounded-lg bg-white border border-[#e3e8ee] space-y-1.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-[#64748d]">Mandi Market Price:</span>
+                    <span className="font-mono text-[#0d253d]">
+                      ₹{(data.model6_causal_robi?.mandi_price_inr_q || 2800).toLocaleString()}/Q
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#64748d]">Gross Value Saved / Acre:</span>
+                    <span className="font-mono font-semibold text-emerald-600">
+                      ₹{(data.model6_causal_robi?.revenue_saved_per_acre || 5180).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#64748d]">Syngenta Product Cost / Acre:</span>
+                    <span className="font-mono text-[#0d253d]">
+                      ₹{data.model6_causal_robi?.product_cost_inr_acre || 400}
+                    </span>
+                  </div>
+                  <div className="pt-1.5 border-t border-[#e3e8ee] flex justify-between font-bold">
+                    <span className="text-[#0d253d]">Total Farm Net Profit ({acres} Ac):</span>
+                    <span className="font-mono text-emerald-700">
+                      +₹{(data.model6_causal_robi?.net_farmer_profit_inr || 23900).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Confounders Controlled Badges */}
+                <div className="mt-3">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#64748d] block mb-1">
+                    Confounders Partialled Out (Chernozhukov DML):
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {["Rainfall", "Soil Moisture", "Irrigation Type", "Farm Wealth"].map((c) => (
+                      <span key={c} className="text-[10px] px-2 py-0.5 rounded-md bg-[#eef2f6] text-[#475569] font-medium">
+                        ✓ {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-[#e3e8ee] text-[11px] text-[#64748d]">
+                Double ML isolates pure biological causality from irrigation and wealth correlation.
               </div>
             </div>
           </div>

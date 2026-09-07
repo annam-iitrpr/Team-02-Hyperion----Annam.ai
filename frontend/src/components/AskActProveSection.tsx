@@ -73,7 +73,7 @@ export const AskActProveSection: React.FC = () => {
       desc: "Disentangles background environmental noise (weather, soil) from true biostimulant treatment gains using biophysical thermal sensitivity decay curves.",
       icon: Zap,
       color: "purple",
-      link: "/what-if",
+      link: "/plant-intelligence",
       tag: "SHAP ATTRIBUTION",
     },
     {

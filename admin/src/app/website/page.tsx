@@ -419,7 +419,7 @@ export default function WebsiteControlsPage() {
             { label: "Main Farmer Home", url: MAIN_SITE_URL },
             { label: "Farmer Dashboard", url: `${MAIN_SITE_URL}/dashboard` },
             { label: "Voice AI Advisory", url: `${MAIN_SITE_URL}/assistant` },
-            { label: "What-If Simulator", url: `${MAIN_SITE_URL}/what-if` },
+            { label: "Mandi Market Rates", url: `${MAIN_SITE_URL}/mandi` },
             { label: "ROBI Causal Impact", url: `${MAIN_SITE_URL}/impact` },
             { label: "Live System Settings API", url: `${MAIN_SITE_URL}/api/settings` },
           ].map((link) => (

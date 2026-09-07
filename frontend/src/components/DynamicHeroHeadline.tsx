@@ -18,64 +18,224 @@ import {
   Activity,
   UserPlus,
   ShieldCheck,
+  ChevronRight,
+  Cpu,
+  Layers,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { isUserLoggedIn } from "@/lib/userStore";
 import { useFarm } from "@/context/FarmContext";
 import { PhoneMockup } from "@/components/PhoneMockup";
+import { FeatureDetailModal, FeatureDetailData } from "@/components/FeatureDetailModal";
 
-const featureChips = [
+const featureChips: FeatureDetailData[] = [
   {
+    id: "weather",
+    badge: "Open-Meteo & Meteoblue Live",
+    badgeBg: "bg-indigo-100/90",
+    badgeText: "text-indigo-800",
+    accentColor: "#533afd",
     icon: <CloudRain className="h-4 w-4 text-[#533afd]" />,
-    label: "रियल-टाइम मौसम टेलीमेट्री",
-    sublabel: "14-दिन सटीक सूक्ष्म पूर्वानुमान",
-    labelEn: "Micro-Weather Radar",
-    sublabelEn: "14-Day Hyperlocal Forecast",
+    iconBg: "bg-indigo-100/80",
     bg: "bg-indigo-50/70 hover:bg-indigo-50",
     border: "border-indigo-100 hover:border-indigo-300",
     text: "text-indigo-950",
     subtext: "text-indigo-700/80",
-    iconBg: "bg-indigo-100/80",
     delay: "300ms",
+    label: "सूक्ष्म-मौसम रडार",
+    sublabel: "14-दिन का सटीक खेत पूर्वानुमान",
+    labelEn: "Micro-Weather Radar",
+    sublabelEn: "14-Day Hyperlocal Forecast",
+    title: "Micro-Weather Radar & Safe Spray Window",
+    titleHi: "खेत स्तरीय मौसम रडार व सुरक्षित स्प्रे समय",
+    subtitle: "14-day agrometeorological forecast, wind drift alerts, and root-zone moisture tracking directly over your farm.",
+    subtitleHi: "ठीक आपके खेत के ऊपर 14-दिन का मौसम, हवा की गति और सुरक्षित छिड़काव का समय।",
+    simpleExplanation: "General weather apps only predict conditions for an entire district. AASRA tracks rain, temperature, and wind directly over your field coordinates—telling you the exact hour it is safe to spray fertilizer or pesticide so your money is never blown away or washed off.",
+    simpleExplanationHi: "पूरे जिले का मौसम देखकर खेत के सही फैसले नहीं लिए जा सकते। AASRA ठीक आपके खेत के ऊपर 14-दिन की बारिश, धूप और हवा की गति मापता है ताकि आपकी महंगी दवा या खाद हवा में न उड़े और सही समय पर पूरा फायदा दे।",
+    benefits: [
+      {
+        title: "Prevents Spray Waste & Drift",
+        titleHi: "दवा के व्यर्थ बहने व उड़ने से बचाव",
+        desc: "Warns if wind speed or Delta-T drying rate is too high, keeping your chemical budget completely protected.",
+        descHi: "तेज हवा या अधिक गर्मी होने पर रोकता है ताकि स्प्रे हवा में उड़कर बर्बाद न हो।",
+      },
+      {
+        title: "14-Day Rain & Soil Moisture Tracking",
+        titleHi: "14-दिन की बारिश व मिट्टी की नमी",
+        desc: "Tracks 0-10cm root-zone soil moisture to alert you days before plants enter severe drought stress.",
+        descHi: "जड़ों में नमी की निगरानी करता है ताकि फसल सूखने से पहले ही समय पर सिंचाई की जा सके।",
+      },
+      {
+        title: "Night Heat Wave Alarms",
+        titleHi: "रात के तापमान (नाइट हीट) का अलर्ट",
+        desc: "Flags hot nights during flowering so you can take protective measures against flower shedding.",
+        descHi: "फूल आने के समय रात का तापमान बढ़ने पर तुरंत चेतावनी देता है ताकि फूल झड़ने से बचाए जा सकें।",
+      },
+    ],
+    techSpecs: [
+      { label: "Data Providers", value: "Open-Meteo & Meteoblue" },
+      { label: "Biophysical Gate", value: "Delta-T & Stull Wet-Bulb" },
+      { label: "Forecast Range", value: "14-Day Hourly GPS" },
+    ],
+    actionLabel: "Explore Live Farm Weather",
+    actionLabelHi: "खेत का लाइव मौसम देखें",
+    actionHref: "/weather",
   },
   {
+    id: "mandi",
+    badge: "140+ Govt APMC Mandis",
+    badgeBg: "bg-emerald-100/90",
+    badgeText: "text-emerald-800",
+    accentColor: "#10b981",
     icon: <Store className="h-4 w-4 text-emerald-600" />,
-    label: "सत्यापित मंडी भाव",
-    sublabel: "140+ लाइव APMC सरकारी मंडियां",
-    labelEn: "APMC Mandi Network",
-    sublabelEn: "140+ Verified Live Markets",
+    iconBg: "bg-emerald-100/80",
     bg: "bg-emerald-50/70 hover:bg-emerald-50",
     border: "border-emerald-100 hover:border-emerald-300",
     text: "text-emerald-950",
     subtext: "text-emerald-700/80",
-    iconBg: "bg-emerald-100/80",
     delay: "400ms",
+    label: "APMC मंडी भाव नेटवर्क",
+    sublabel: "140+ सत्यापित लाइव मंडियां",
+    labelEn: "APMC Mandi Network",
+    sublabelEn: "140+ Verified Live Markets",
+    title: "140+ Certified APMC Mandi Price Network",
+    titleHi: "140+ सत्यापित APMC सरकारी मंडी नेटवर्क",
+    subtitle: "Daily real-time modal prices, Minimum Support Price (MSP) benchmarks, and top nearby selling options.",
+    subtitleHi: "लाइव सरकारी मंडी भाव, न्यूनतम समर्थन मूल्य (MSP) तुलना और सबसे ज्यादा मुनाफा देने वाली मंडी का सुझाव।",
+    simpleExplanation: "Local middlemen often misquote crop prices to buy cheap. AASRA connects directly to 140+ government-regulated mandis every morning, showing daily auction rates, price trends, and which nearby market will fetch you the highest rate per quintal.",
+    simpleExplanationHi: "बिचौलिए अक्सर किसानों को मंडी के सही भाव नहीं बताते। AASRA मध्य प्रदेश, यूपी, पंजाब, गुजरात और महाराष्ट्र की 140+ सरकारी मंडियों से सीधे जुड़ा है। यह आपको आज का सही भाव और सबसे ज्यादा मुनाफा देने वाली मंडी का सुझाव देता है।",
+    benefits: [
+      {
+        title: "Official MSP Comparison",
+        titleHi: "सरकारी एमएसपी (MSP) से तुलना",
+        desc: "Compares current bids against Government Minimum Support Price (e.g. Soybean MSP ₹4,892/Q) to prevent distress selling.",
+        descHi: "सरकारी एमएसपी के साथ लाइव भाव की तुलना करता है ताकि आपको अपनी उपज का पूरा और उचित मूल्य मिले।",
+      },
+      {
+        title: "Nearby Mandi Profit Discovery",
+        titleHi: "आस-पास की सबसे फायदेमंद मंडी",
+        desc: "Finds neighboring mandis paying ₹150–₹350/Q higher within easy transport distance.",
+        descHi: "आस-पास की उन मंडियों की पहचान करता है जहां ₹150 से ₹350 प्रति क्विंटल तक ज्यादा दाम मिल रहे हों।",
+      },
+      {
+        title: "Real Cash Profit Calculation",
+        titleHi: "संरक्षित उपज का नकद मूल्य",
+        desc: "Multiplies your yield saved by biological protection by today's live rate to show net cash profit in rupees.",
+        descHi: "जैविक उपचार से बची फसल को लाइव मंडी भाव से जोड़कर आपके खेत का शुद्ध मुनाफा (रुपयों में) दिखाता है।",
+      },
+    ],
+    techSpecs: [
+      { label: "Live Mandis", value: "140+ APMC Centers" },
+      { label: "Official Source", value: "Agmarknet & e-NAM" },
+      { label: "Updates", value: "Daily Real-time Feed" },
+    ],
+    actionLabel: "View Verified Mandi Prices",
+    actionLabelHi: "सत्यापित मंडी भाव देखें",
+    actionHref: "/dashboard",
   },
   {
-    icon: <Leaf className="h-4 w-4 text-amber-600" />,
-    label: "बहु-फसली AI सलाहकार",
-    sublabel: "60+ फसलों का वैज्ञानिक मार्गदर्शन",
-    labelEn: "Multi-Crop AI Advisory",
-    sublabelEn: "60+ Certified Crop Protocols",
+    id: "models",
+    badge: "Vertex AI & EconML Engine",
+    badgeBg: "bg-amber-100/90",
+    badgeText: "text-amber-800",
+    accentColor: "#f59e0b",
+    icon: <Cpu className="h-4 w-4 text-amber-600" />,
+    iconBg: "bg-amber-100/80",
     bg: "bg-amber-50/70 hover:bg-amber-50",
     border: "border-amber-100 hover:border-amber-300",
     text: "text-amber-950",
     subtext: "text-amber-700/80",
-    iconBg: "bg-amber-100/80",
     delay: "500ms",
+    label: "मल्टी-क्रॉप AI सलाहकार",
+    sublabel: "6-मॉडल वर्टेक्स AI • 60+ फसलें",
+    labelEn: "Multi-Crop AI Advisory",
+    sublabelEn: "6-Model Engine • 60+ Crops",
+    title: "Multi-Crop 6-Model AI Decision Engine",
+    titleHi: "6 विशेषीकृत AI मॉडल व फसल सलाहकार प्रणाली",
+    subtitle: "Specialized machine learning models for early stress warning, spray safety gating, certified biological ranking, and net ROI proof.",
+    subtitleHi: "मौसम तनाव पूर्वानुमान, सुरक्षित स्प्रे समय, प्रमाणित सिंजेंटा उत्पाद रैंकिंग और शुद्ध लाभ का पक्का गणित।",
+    simpleExplanation: "A generic chatbot makes guesses about chemical doses that can scorch plants. AASRA decouples agricultural intelligence into 6 dedicated models: Model 1 detects heat/drought stress 7 days early, Model 2 confirms leaf spray safety, Model 3 ranks top biologicals, and Model 6 proves your net profit in rupees.",
+    simpleExplanationHi: "साधारण चैटबॉट गलत दवाएं बताकर फसल को नुकसान पहुंचा सकते हैं। AASRA ने 6 अलग-अलग विशेषीकृत मॉडल बनाए हैं: मॉडल 1 मौसम का तनाव भांपता है, मॉडल 2 स्प्रे का सुरक्षित समय बताता है, मॉडल 3 सही दवा चुनता है, और मॉडल 6 साबित करता है कि आपको कितना शुद्ध मुनाफा हुआ।",
+    benefits: [
+      {
+        title: "3 to 7 Days Early Stress Forecast",
+        titleHi: "3 से 7 दिन पहले तनाव की चेतावनी",
+        desc: "Alerts you before heat or moisture deficit causes irreversible damage to flowering and pod formation.",
+        descHi: "ताप और सूखे का 3 से 7 दिन पहले पूर्वानुमान लगाकर फसल को नुकसान से बचाता है।",
+      },
+      {
+        title: "Syngenta Biologicals Ranking",
+        titleHi: "शीर्ष प्रमाणित दवाओं का चयन",
+        desc: "Ranks top crop-safe biological solutions (Quantis, Isabion) with exact dose recommendations per acre.",
+        descHi: "आपकी फसल के लिए सबसे उपयुक्त शीर्ष जैविक दवा और उसकी प्रति एकड़ सटीक मात्रा बताता है।",
+      },
+      {
+        title: "Net Farmer Profit Guarantee",
+        titleHi: "शुद्ध अतिरिक्त मुनाफे का पक्का हिसाब",
+        desc: "Calculates the true additional quintals harvested and net cash profit in farmer pockets.",
+        descHi: "प्रमाणित करता है कि दवा डालने के बाद सभी खर्चे काटकर किसान को कितना अतिरिक्त शुद्ध नकद फायदा हुआ।",
+      },
+    ],
+    techSpecs: [
+      { label: "AI Engine", value: "Vertex AI & EconML" },
+      { label: "Crops Supported", value: "60+ Certified Crops" },
+      { label: "Languages", value: "12 Indian Dialects" },
+    ],
+    actionLabel: "Launch 6-Model Pipeline",
+    actionLabelHi: "6-मॉडल पाइपलाइन चलाएं",
+    actionHref: "/pipeline",
   },
   {
+    id: "vision",
+    badge: "Gemini 2.5 Multimodal Vision",
+    badgeBg: "bg-violet-100/90",
+    badgeText: "text-violet-800",
+    accentColor: "#7c3aed",
     icon: <ShieldAlert className="h-4 w-4 text-violet-600" />,
-    label: "AI दृष्टि रोग व कीट पहचान",
-    sublabel: "पत्ती स्कैन से तुरंत सटीक समाधान",
-    labelEn: "Vision Diagnostics",
-    sublabelEn: "Instant Leaf Necrosis Analysis",
+    iconBg: "bg-violet-100/80",
     bg: "bg-violet-50/70 hover:bg-violet-50",
     border: "border-violet-100 hover:border-violet-300",
     text: "text-violet-950",
     subtext: "text-violet-700/80",
-    iconBg: "bg-violet-100/80",
     delay: "600ms",
+    label: "AI दृष्टि रोग व कीट पहचान",
+    sublabel: "पत्ती स्कैन से तुरंत सटीक समाधान",
+    labelEn: "Vision Diagnostics",
+    sublabelEn: "Instant Leaf Necrosis Analysis",
+    title: "Instant Multimodal Vision & Disease Diagnostics",
+    titleHi: "AI कैमरा द्वारा पत्ती रोग व कीट निदान",
+    subtitle: "Snap a photo of any crop leaf with your phone camera for instant diagnosis and certified treatment.",
+    subtitleHi: "फोन कैमरे से पत्ती का फोटो खींचें, रोग की तुरंत पहचान करें और सुरक्षित छिड़काव का नुस्खा पाएं।",
+    simpleExplanation: "When leaves turn yellow, curl, or develop dark spots, guessing the medicine wastes money and can kill the plant. Snap a photo with your smartphone camera. AASRA's vision AI identifies fungal rusts, blights, or heat stress in 2 seconds and prescribes certified safe treatments.",
+    simpleExplanationHi: "जब फसल की पत्तियां पीली पड़ने लगें या धब्बे आ जाएं, तो गलत दवा डालने से नुकसान हो सकता है। बीमार पत्ती का फोटो खींचिए—AASRA का AI कैमरा तुरंत फंगस, कीट या गर्मी के तनाव की पहचान करता है और सुरक्षित समाधान बताता है।",
+    benefits: [
+      {
+        title: "2-Second Camera Photo Diagnosis",
+        titleHi: "2 सेकंड में कैमरे से रोग पहचान",
+        desc: "Instantly detects blights, powdery mildew, caterpillar bites, and nutrient deficiencies from a single leaf photo.",
+        descHi: "स्मार्टफोन कैमरे से रोगग्रस्त पत्ती की फोटो लें और तुरंत बीमारी का नाम व गंभीरता जानें।",
+      },
+      {
+        title: "Separates Heat Scorch from Fungus",
+        titleHi: "धूप के झुलसाव बनाम फंगस में अंतर",
+        desc: "Differentiates abiotic sun scorch from fungal blight so you do not buy costly, unnecessary fungicides.",
+        descHi: "पहचानता है कि पत्ती गर्मी से झुलसी है या फंगस से, ताकि गलत दवा का बेवजह खर्च न हो।",
+      },
+      {
+        title: "Certified Tank-Mix Prescriptions",
+        titleHi: "प्रमाणित सुरक्षित दवा व सही मात्रा",
+        desc: "Provides certified compatibility ratios and safe water mixing steps for fast plant recovery.",
+        descHi: "दवा और पानी का सही अनुपात बताता है ताकि फसल तुरंत ठीक होकर बढ़वार शुरू कर दे।",
+      },
+    ],
+    techSpecs: [
+      { label: "Vision AI", value: "Gemini 2.5 Flash Multimodal" },
+      { label: "Speed", value: "Instant (< 2s)" },
+      { label: "Accuracy", value: "Field Tested & Grounded" },
+    ],
+    actionLabel: "Open Leaf Disease Scanner",
+    actionLabelHi: "रोग स्कैनर खोलें",
+    actionHref: "/plant-intelligence",
   },
 ];
 
@@ -84,6 +244,7 @@ export const DynamicHeroHeadline: React.FC = () => {
   const { activeFarm } = useFarm();
   const [mounted, setMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<FeatureDetailData | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -190,27 +351,33 @@ export const DynamicHeroHeadline: React.FC = () => {
             {/* 4. Feature chips */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg pt-1">
               {featureChips.map((chip) => (
-                <div
-                  key={chip.label}
-                  className={`group flex items-center gap-3 ${chip.bg} border ${chip.border} rounded-xl px-3.5 py-3 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer`}
+                <button
+                  key={chip.id}
+                  type="button"
+                  onClick={() => setSelectedFeature(chip)}
+                  className={`group flex items-center justify-between gap-3 ${chip.bg} border ${chip.border} rounded-xl px-3.5 py-3 shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer text-left w-full`}
                   style={{
                     opacity: mounted ? 1 : 0,
                     transform: mounted ? "translateY(0)" : "translateY(14px)",
-                    transition: `opacity 450ms ease ${chip.delay}, transform 450ms cubic-bezier(0.16, 1, 0.3, 1) ${chip.delay}`,
+                    transition: `opacity 450ms ease ${chip.delay || "300ms"}, transform 450ms cubic-bezier(0.16, 1, 0.3, 1) ${chip.delay || "300ms"}`,
                   }}
+                  title={isHindi ? "विस्तृत जानकारी के लिए क्लिक करें" : "Click to view detailed explanation"}
                 >
-                  <div className={`${chip.iconBg} rounded-lg p-2 shrink-0 transition-transform duration-200 group-hover:scale-105`}>
-                    {chip.icon}
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`${chip.iconBg} rounded-lg p-2 shrink-0 transition-transform duration-200 group-hover:scale-110 shadow-2xs`}>
+                      {chip.icon}
+                    </div>
+                    <div className="space-y-0.5 min-w-0 flex-1">
+                      <p className={`text-xs font-bold ${chip.text} leading-tight truncate`}>
+                        {isHindi ? chip.label : chip.labelEn}
+                      </p>
+                      <p className={`text-[11px] ${chip.subtext} leading-tight truncate`}>
+                        {isHindi ? chip.sublabel : chip.sublabelEn}
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-0.5">
-                    <p className={`text-xs font-bold ${chip.text} leading-tight`}>
-                      {isHindi ? chip.label : chip.labelEn}
-                    </p>
-                    <p className={`text-[11px] ${chip.subtext} leading-tight`}>
-                      {isHindi ? chip.sublabel : chip.sublabelEn}
-                    </p>
-                  </div>
-                </div>
+                  <ChevronRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-slate-500 shrink-0" />
+                </button>
               ))}
             </div>
 
@@ -279,6 +446,14 @@ export const DynamicHeroHeadline: React.FC = () => {
 
         </div>
       </div>
+
+      {/* Interactive Feature Detail Modal */}
+      <FeatureDetailModal
+        isOpen={!!selectedFeature}
+        feature={selectedFeature}
+        onClose={() => setSelectedFeature(null)}
+        isHindi={isHindi}
+      />
     </section>
   );
 };

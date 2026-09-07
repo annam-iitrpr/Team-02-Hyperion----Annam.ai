@@ -44,15 +44,19 @@ class PipelineRunRequest(BaseModel):
     soil_ec_ds_m: Optional[float] = None
     soil_ph: Optional[float] = None
     mandi_price_inr_q: Optional[float] = 2800.0
+    product_cost_inr_acre: Optional[float] = 400.0
+    treatment_applied: Optional[int] = Field(1, description="1=Syngenta Biological applied, 0=Untreated control")
+    area_acres: Optional[float] = Field(5.0, description="Farm field size in acres")
 
 @router.post("/run")
 async def run_pipeline(request: PipelineRunRequest):
     """
-    Executes the unified 4-model machine learning pipeline:
+    Executes the unified 5-model machine learning pipeline:
     - Model 1 (PS-02): Climate Stress Early Warning Classifier
     - Model 2 (PS-02): Biological Intervention Readiness Engine & Safety Gating
     - Model 3 (PS-03): Syngenta 50 Biological Products LambdaMART Ranker
     - Model 5 (PS-07): Field Yield Baseline Regressor
+    - Model 6 (PS-07): Causal Double ML & ROBI Attribution (Microsoft EconML)
     """
     try:
         payload = request.model_dump()
@@ -64,7 +68,7 @@ async def run_pipeline(request: PipelineRunRequest):
 
 @router.get("/models")
 async def get_models_status():
-    """Returns registration metadata, serving mode, and feature specs for the 4 models."""
+    """Returns registration metadata, serving mode, and feature specs for the models."""
     client = orchestrator.client
     return {
         "models": {
@@ -96,6 +100,13 @@ async def get_models_status():
                 "framework": "XGBoost Regressor",
                 "status": "LOADED" if client.m5_model is not None else "ERROR",
                 "serving_mode": "vertex_ai_endpoint" if client.use_remote_vertex and client.endpoint_m5 else "local_optimized_runtime"
+            },
+            "model6": {
+                "name": "Model 6: Causal Biological Impact & ROBI Attribution",
+                "track": "PS-07 (Causal ROBI)",
+                "framework": "Microsoft EconML (LinearDML) + Scikit-Learn",
+                "status": "LOADED" if client.m6_dml is not None else "ERROR",
+                "serving_mode": "vertex_ai_endpoint" if client.use_remote_vertex and client.endpoint_m6 else "local_optimized_runtime"
             }
         },
         "vertex_ai_config": {
@@ -142,3 +153,53 @@ async def simulate_scenario(scenario: str = Query("heatwave", pattern="^(heatwav
     }
     payload = scenarios.get(scenario, scenarios["heatwave"])
     return orchestrator.run_pipeline(payload)
+
+class CausalROBIRequest(BaseModel):
+    crop: str = "potato"
+    growth_stage: str = "podFormation"
+    stress_intensity: Optional[float] = 0.75
+    temp_max_c: Optional[float] = 38.5
+    extreme_heat_days_count: Optional[float] = 4.0
+    soil_clay_pct: Optional[float] = 35.0
+    treatment_applied: Optional[int] = 1
+    mandi_price_inr_q: Optional[float] = 2800.0
+    product_cost_inr_acre: Optional[float] = 400.0
+    baseline_yield_q_acre: Optional[float] = 21.0
+    area_acres: Optional[float] = 5.0
+    product_name: Optional[str] = "Quantis"
+
+@router.post("/causal-robi")
+async def calculate_causal_robi(req: CausalROBIRequest):
+    """
+    Direct endpoint for Model 6: PS-07 Double Machine Learning Causal ROBI Attribution.
+    Partial out irrigation and weather confounders to return true counterfactual yield gain and ROBI multiplier.
+    """
+    try:
+        client = orchestrator.client
+        farm_context = {
+            "crop": req.crop,
+            "growth_stage": req.growth_stage,
+            "temp_max_c": req.temp_max_c,
+            "extreme_heat_days_count": req.extreme_heat_days_count,
+            "soil_clay_pct": req.soil_clay_pct
+        }
+        m1_result = {
+            "stress_class": 1 if (req.stress_intensity or 0) > 0.3 else 0,
+            "confidence": req.stress_intensity or 0.75
+        }
+        m5_result = {
+            "expected_baseline_yield_q_acre": req.baseline_yield_q_acre or 21.0
+        }
+        return client.predict_model6(
+            farm_context=farm_context,
+            m1_result=m1_result,
+            m5_result=m5_result,
+            treatment_applied=req.treatment_applied or 1,
+            mandi_price_inr_q=req.mandi_price_inr_q or 2800.0,
+            product_cost_inr_acre=req.product_cost_inr_acre or 400.0,
+            area_acres=req.area_acres or 5.0,
+            product_name=req.product_name or "Quantis"
+        )
+    except Exception as e:
+        logger.error(f"Error in causal ROBI endpoint: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))

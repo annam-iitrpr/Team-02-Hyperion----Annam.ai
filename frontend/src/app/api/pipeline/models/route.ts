@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
+const FASTAPI_URL = process.env.FASTAPI_URL || "http://127.0.0.1:8000";
 
 const CLOUD_MODELS_METADATA = {
   models: {
@@ -54,6 +54,15 @@ const CLOUD_MODELS_METADATA = {
       serving_mode: "cloud_runtime",
       target: "Counterfactual Benchmark Yield (q/ha & q/acre)",
     },
+    model6: {
+      name: "Model 6: Causal Biological Impact & ROBI Attribution",
+      track: "PS-07 (Causal ROBI)",
+      framework: "Microsoft EconML (LinearDML) + Scikit-Learn",
+      status: "LOADED",
+      serving_mode: "cloud_runtime",
+      target: "True Causal Treatment Effect (tau) & Unbiased ROBI Multiplier",
+      confounders_controlled: ["Rainfall", "Soil Moisture", "Irrigation Type", "Farm Wealth"],
+    },
   },
   vertex_ai_config: {
     project_id: "annam-ai-hackathon-2026",
@@ -65,7 +74,7 @@ const CLOUD_MODELS_METADATA = {
 export async function GET() {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     const response = await fetch(`${FASTAPI_URL}/api/pipeline/models`, {
       cache: "no-store",

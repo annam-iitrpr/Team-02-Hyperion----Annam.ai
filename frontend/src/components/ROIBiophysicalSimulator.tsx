@@ -475,11 +475,11 @@ export function ROIBiophysicalSimulator() {
           </div>
 
           <Link
-            href={isLoggedIn ? "/what-if" : "/signup"}
+            href={isLoggedIn ? "/impact" : "/signup"}
             className="px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] shrink-0"
             style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
           >
-            <span>{isHindi ? "विस्तृत वॉट-इफ सिमुलेटर खोलें" : "Launch Advanced What-If Simulator"}</span>
+            <span>{isHindi ? "विस्तृत ROBI प्रभाव विश्लेषण खोलें" : "Launch Advanced ROBI Impact"}</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
 

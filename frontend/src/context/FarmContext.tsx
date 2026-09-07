@@ -93,6 +93,33 @@ interface FarmContextType {
 const STORAGE_KEY_FARMS = "nimbooz_farms_v5";
 const STORAGE_KEY_ACTIVE_FARM_ID = "nimbooz_active_farm_id_v5";
 const STORAGE_KEY_INTERVENTIONS = "nimbooz_interventions_v5";
+const STORAGE_KEY_REAL_FIELDS = "aasra_farmer_real_fields_v4";
+const STORAGE_KEY_ACTIVE_FIELD = "aasra_active_field_id_v4";
+
+function mapFieldToFarm(field: any): FarmRecord {
+  return {
+    id: field.id,
+    name: field.name || "Farm Plot",
+    district: field.district || "Bhopal",
+    state: field.state || "Madhya Pradesh",
+    village: field.village || "Local Village",
+    country: "India",
+    center: field.center || [23.2599, 77.4126],
+    polygon: field.polygon || [],
+    areaAcres: field.areaAcres || 5.0,
+    areaHa: field.areaHa || +( (field.areaAcres || 5.0) * 0.404686 ).toFixed(2),
+    areaM2: Math.round((field.areaAcres || 5.0) * 4046.86),
+    primaryCrop: field.crop || "Soybean",
+    cropVariety: field.cropVariety || "JS-335",
+    sowingDate: field.sowingDate || new Date().toISOString().split("T")[0],
+    growthStage: field.growthStage || "Flowering & Pod Formation",
+    soilType: field.soilType || "Black Cotton Soil",
+    irrigationType: field.irrigationType || "Rainfed + Borewell",
+    color: field.color || "#10B981",
+    healthScore: field.healthScore || 92,
+    soilTest: null,
+  };
+}
 
 export function createDefaultFarm(profile?: any): FarmRecord {
   const p = profile || getStoredProfile();
@@ -161,45 +188,93 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [interventions, setInterventions] = useState<InterventionRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Initialize from LocalStorage on mount
-  useEffect(() => {
+  const syncFarmsFromStorage = useCallback(() => {
     try {
+      const storedRealFields = localStorage.getItem(STORAGE_KEY_REAL_FIELDS);
       const storedFarms = localStorage.getItem(STORAGE_KEY_FARMS);
-      const storedActiveId = localStorage.getItem(STORAGE_KEY_ACTIVE_FARM_ID);
-      const storedInterventions = localStorage.getItem(STORAGE_KEY_INTERVENTIONS);
+      const storedActiveFieldId = localStorage.getItem(STORAGE_KEY_ACTIVE_FIELD);
+      const storedActiveFarmId = localStorage.getItem(STORAGE_KEY_ACTIVE_FARM_ID);
 
-      let parsedFarms: FarmRecord[] = [];
-      if (storedFarms) {
+      const profile = getStoredProfile();
+      let loadedFarms: FarmRecord[] = [];
+
+      if (profile && profile.isRegistered && profile.fullName) {
+        const userFarm = createDefaultFarm(profile);
+        loadedFarms.push(userFarm);
+      }
+
+      if (storedRealFields) {
         try {
-          parsedFarms = JSON.parse(storedFarms);
+          const parsed = JSON.parse(storedRealFields);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const mapped = parsed.map(mapFieldToFarm);
+            // Deduplicate with userFarm
+            mapped.forEach((f: FarmRecord) => {
+              if (!loadedFarms.some((existing) => existing.id === f.id || existing.name === f.name)) {
+                loadedFarms.push(f);
+              }
+            });
+          }
         } catch (_) {}
       }
 
-      if (!parsedFarms || parsedFarms.length === 0) {
+      if (loadedFarms.length === 0 && storedFarms) {
+        try {
+          const parsed = JSON.parse(storedFarms);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            loadedFarms = parsed;
+          }
+        } catch (_) {}
+      }
+
+      if (loadedFarms.length === 0) {
         const initial = createDefaultFarm();
-        parsedFarms = [initial];
-        localStorage.setItem(STORAGE_KEY_FARMS, JSON.stringify(parsedFarms));
+        loadedFarms = [initial];
       }
 
-      let activeId = storedActiveId || parsedFarms[0]?.id || "";
-      if (!parsedFarms.some((f) => f.id === activeId)) {
-        activeId = parsedFarms[0]?.id || "";
+      let activeId = storedActiveFieldId || storedActiveFarmId || loadedFarms[0]?.id || "";
+      if (!loadedFarms.some((f) => f.id === activeId)) {
+        activeId = loadedFarms[0]?.id || "";
       }
 
-      setFarms(parsedFarms);
+      setFarms(loadedFarms);
       setActiveFarmId(activeId);
+      localStorage.setItem(STORAGE_KEY_FARMS, JSON.stringify(loadedFarms));
+      localStorage.setItem(STORAGE_KEY_ACTIVE_FARM_ID, activeId);
 
-      if (storedInterventions) {
-        try {
-          setInterventions(JSON.parse(storedInterventions));
-        } catch (_) {}
+      // Also trigger Weather sync if active farm has coordinates
+      const currentActive = loadedFarms.find((f) => f.id === activeId) || loadedFarms[0];
+      if (currentActive && currentActive.center && setCustomCoordinates) {
+        setCustomCoordinates(currentActive.center[0], currentActive.center[1], currentActive.name);
       }
     } catch (e) {
-      console.error("[FarmContext] Initialization error:", e);
-    } finally {
-      setIsLoading(false);
+      console.error("[FarmContext] sync error:", e);
     }
-  }, []);
+  }, [setCustomCoordinates]);
+
+  // Initialize from LocalStorage on mount & listen to updates
+  useEffect(() => {
+    syncFarmsFromStorage();
+
+    try {
+      const storedInterventions = localStorage.getItem(STORAGE_KEY_INTERVENTIONS);
+      if (storedInterventions) {
+        setInterventions(JSON.parse(storedInterventions));
+      }
+    } catch (_) {}
+    setIsLoading(false);
+
+    const handleUpdate = () => syncFarmsFromStorage();
+    window.addEventListener("aasra_fields_updated", handleUpdate);
+    window.addEventListener("aasra-profile-updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+
+    return () => {
+      window.removeEventListener("aasra_fields_updated", handleUpdate);
+      window.removeEventListener("aasra-profile-updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
+  }, [syncFarmsFromStorage]);
 
   const activeFarm = farms.find((f) => f.id === activeFarmId) || farms[0] || createDefaultFarm();
   const activeField = activeFarm.fields?.[0] || createFieldFromFarm(activeFarm);
@@ -212,6 +287,7 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setActiveFarmId(farmId);
         try {
           localStorage.setItem(STORAGE_KEY_ACTIVE_FARM_ID, farmId);
+          localStorage.setItem(STORAGE_KEY_ACTIVE_FIELD, farmId);
         } catch (_) {}
 
         // Update WeatherContext GPS and telemetry immediately

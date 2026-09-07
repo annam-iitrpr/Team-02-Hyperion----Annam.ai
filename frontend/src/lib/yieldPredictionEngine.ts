@@ -70,10 +70,49 @@ const REGIONAL_VARIETY_POTENTIALS: Record<string, Record<string, number>> = {
     "jak-9218": 9.2,
     "default": 9.0,
   },
+  gram: {
+    "jg-11": 9.5,
+    "desi": 8.5,
+    "default": 9.0,
+  },
   mustard: {
     "pusa-bold": 8.8,
     "pioneer-45s46": 9.5,
     "default": 8.5,
+  },
+  tomato: {
+    "localhybrid": 10.5,
+    "hybrid": 11.5,
+    "pusaruby": 9.2,
+    "default": 10.5,
+  },
+  maize: {
+    "hybrid": 24.0,
+    "pioneer": 26.5,
+    "default": 22.0,
+  },
+  rice: {
+    "basmati": 16.5,
+    "ir64": 22.0,
+    "default": 18.0,
+  },
+  paddy: {
+    "basmati": 16.5,
+    "ir64": 22.0,
+    "default": 18.0,
+  },
+  chilli: {
+    "g4": 11.5,
+    "byadgi": 9.0,
+    "default": 10.0,
+  },
+  onion: {
+    "nasikred": 85.0,
+    "default": 75.0,
+  },
+  potato: {
+    "kufrijyoti": 95.0,
+    "default": 90.0,
   },
 };
 
@@ -121,10 +160,10 @@ export function predictCropYield(input: YieldPredictionInput): YieldPredictionOu
   // 4. Intervention Gain Factor
   const interventions = input.interventionsApplied || [];
   let interventionMitigationPct = 0;
-  if (interventions.some(i => i.toLowerCase().includes("quantis"))) interventionMitigationPct += 14.5;
+  if (interventions.some(i => i.toLowerCase().includes("quantis") || i.toLowerCase().includes("stress buster") || i.toLowerCase().includes("cropfit") || i.toLowerCase().includes("biological"))) interventionMitigationPct += 14.5;
   if (interventions.some(i => i.toLowerCase().includes("ampligo") || i.toLowerCase().includes("alika"))) interventionMitigationPct += 12.0;
   if (interventions.some(i => i.toLowerCase().includes("isabion"))) interventionMitigationPct += 8.5;
-  if (interventions.length === 0) interventionMitigationPct = 16.0; // Projected potential if recommended products are applied
+  if (interventions.length === 0 || interventionMitigationPct === 0) interventionMitigationPct = 14.5; // Default biological mitigation gain
 
   const weatherFactorTreated = Math.min(1.05, weatherFactorUntreated + (interventionMitigationPct / 100));
 
