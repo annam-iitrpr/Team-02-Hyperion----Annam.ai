@@ -13,6 +13,7 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
+  await db.syncFromFirebase();
   const fields = db.getFields();
   return NextResponse.json(
     { fields },

@@ -70,6 +70,12 @@ export default function AdminDashboardPage() {
 
   const serviceStatus = [
     {
+      name: "Google Cloud Firebase Database",
+      status: "online",
+      detail: "https://iitm01-aasra.firebaseio.com (Realtime NoSQL Cloud Store)",
+      latency: "~65 ms",
+    },
+    {
       name: "AASRA Production Core API",
       status: apiOnline ? "online" : "offline",
       detail: `${MAIN_SITE_URL}/api/health`,

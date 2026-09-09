@@ -13,6 +13,7 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
+  await db.syncFromFirebase();
   const stats = db.getStats();
   const farmers = db.getFarmers();
   const fields = db.getFields();

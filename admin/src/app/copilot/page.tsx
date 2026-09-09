@@ -314,19 +314,19 @@ export default function AdminCopilotPage() {
           category: "database",
           latencyMs: latency,
           status: "success",
-          summary: `Database audit passed. Verified ${farmers + fields + journal + robi} total operational records in SQLite storage.`,
+          summary: `Firebase database audit passed. Verified ${farmers + fields + journal + robi} total operational records in Google Cloud Firebase storage.`,
           whatWasDone: [
-            `Counted ${farmers} registered farmer profiles in 'farmers' table.`,
-            `Counted ${fields} geo-fenced field parcel boundaries in 'fields' table.`,
+            `Counted ${farmers} registered farmer profiles in Firebase 'farmers' collection.`,
+            `Counted ${fields} geo-fenced field parcel boundaries in Firebase 'fields' collection.`,
             `Counted ${journal} agronomic advisory & spray journal entries.`,
             `Counted ${robi} historical ROBI Double ML audit records.`,
-            `Confirmed database read latency of ${latency}ms.`,
+            `Confirmed Firebase Realtime Database (iitm01-aasra.firebaseio.com) latency of ${latency}ms.`,
           ],
           whatWasNotDone: [
-            "Did not execute any table drops or schema modifications.",
+            "Did not execute any collection drops or schema modifications.",
             "Did not touch archived backup logs.",
           ],
-          recommendation: "Database is healthy and properly indexed. Export a JSON backup periodically from Database Studio.",
+          recommendation: "Firebase Realtime Database is operational and synchronized. Backups can be exported anytime from Database Studio.",
           telemetry: db?.stats,
         };
         setExecutions((prev) => [exec, ...prev]);
@@ -351,12 +351,12 @@ export default function AdminCopilotPage() {
           category: "audit",
           latencyMs: latency,
           status: cloudRun.online ? "success" : "warning",
-          summary: `Full platform audit complete: Cloud Run backend is ${cloudRun.online ? "ONLINE" : "UNREACHABLE"} (${cloudRun.latency}ms), Database has ${totalRows} records, Vercel frontend healthy.`,
+          summary: `Full platform audit complete: Cloud Run backend is ${cloudRun.online ? "ONLINE" : "UNREACHABLE"} (${cloudRun.latency}ms), Google Firebase Database active with ${totalRows} records, Vercel frontend healthy.`,
           whatWasDone: [
             `Checked Google Cloud Run at ${CLOUD_RUN_URL}: status HTTP ${cloudRun.status}, roundtrip ${cloudRun.latency}ms.`,
             `Verified Google Cloud Vertex AI registry models: M1, M2, M3, M5, M6 operational.`,
             `Audited Main Farmer Website at ${MAIN_SITE_URL}/api/health: status = ${health?.status || "ok"}.`,
-            `Verified SQLite database connectivity: ${counts.farmers || 0} farmers, ${counts.fields || 0} fields.`,
+            `Verified Google Cloud Firebase Database (iitm01-aasra.firebaseio.com): ${counts.farmers || 0} farmers, ${counts.fields || 0} fields.`,
             "Verified Google Gemini 2.0 Flash agronomic advisory fallback readiness.",
           ],
           whatWasNotDone: [

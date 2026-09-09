@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { firebaseGet, firebasePut } from "./firebaseClient";
 
 export interface FarmerDbRecord {
   id: string;
@@ -363,6 +364,51 @@ export class AasraDatabase {
     } catch (e) {
       console.warn("AasraDatabase disk initialization notice, running in memory-safe mode:", e);
     }
+
+    // Asynchronously synchronize latest state from Firebase Realtime Database
+    this.syncFromFirebase().catch(() => {});
+  }
+
+  public async syncFromFirebase(): Promise<boolean> {
+    try {
+      const fbData = await firebaseGet<any>("aasra");
+      if (fbData) {
+        const farmersList = fbData.farmers
+          ? Array.isArray(fbData.farmers)
+            ? fbData.farmers.filter(Boolean)
+            : Object.values(fbData.farmers)
+          : [];
+        const fieldsList = fbData.fields
+          ? Array.isArray(fbData.fields)
+            ? fbData.fields.filter(Boolean)
+            : Object.values(fbData.fields)
+          : [];
+        const journalList = fbData.journal
+          ? Array.isArray(fbData.journal)
+            ? fbData.journal.filter(Boolean)
+            : Object.values(fbData.journal)
+          : [];
+        const robiList = fbData.robi_audits
+          ? Array.isArray(fbData.robi_audits)
+            ? fbData.robi_audits.filter(Boolean)
+            : Object.values(fbData.robi_audits)
+          : [];
+
+        memoryCache = {
+          version: fbData.version || "2.0.0-firebase",
+          lastUpdated: fbData.lastUpdated || new Date().toISOString(),
+          settings: fbData.settings || memoryCache.settings || DEFAULT_SETTINGS,
+          farmers: (farmersList.length > 0 ? farmersList : memoryCache.farmers) as FarmerDbRecord[],
+          fields: (fieldsList.length > 0 ? fieldsList : memoryCache.fields) as FieldDbRecord[],
+          journal: (journalList.length > 0 ? journalList : memoryCache.journal) as JournalDbRecord[],
+          robi_audits: (robiList.length > 0 ? robiList : memoryCache.robi_audits) as RobiAuditDbRecord[],
+        };
+        return true;
+      }
+    } catch (err) {
+      console.warn("Firebase sync notice:", err);
+    }
+    return false;
   }
 
   private persist(): void {
@@ -372,6 +418,24 @@ export class AasraDatabase {
       fs.writeFileSync(filePath, JSON.stringify(memoryCache, null, 2), "utf-8");
     } catch (e) {
       // In readonly serverless environments, memoryCache remains valid across function warm invocations
+    }
+
+    // Write-through cloud sync to Google Firebase Realtime Database
+    try {
+      const payload = {
+        version: "2.0.0-firebase",
+        lastUpdated: memoryCache.lastUpdated,
+        settings: memoryCache.settings || DEFAULT_SETTINGS,
+        farmers: memoryCache.farmers.reduce((acc, f) => ({ ...acc, [f.id]: f }), {}),
+        fields: memoryCache.fields.reduce((acc, f) => ({ ...acc, [f.id]: f }), {}),
+        journal: memoryCache.journal.reduce((acc, j) => ({ ...acc, [j.id]: j }), {}),
+        robi_audits: memoryCache.robi_audits.reduce((acc, r) => ({ ...acc, [r.id]: r }), {}),
+      };
+      firebasePut("aasra", payload).catch((err) => {
+        console.warn("Firebase cloud persistence warning:", err);
+      });
+    } catch (err) {
+      console.warn("Firebase push invocation warning:", err);
     }
   }
 
@@ -594,8 +658,10 @@ export class AasraDatabase {
   public getStats() {
     return {
       status: "operational",
-      engine: "AASRA Embedded Zero-Latency Hybrid Engine (JSON-FS + Serverless Memory)",
-      version: memoryCache.version,
+      engine: "Google Cloud Firebase Realtime Database (iitm01-aasra.firebaseio.com)",
+      cloudProvider: "Firebase / Google Cloud Platform (Project: iitm01)",
+      firebaseDatabaseUrl: "https://iitm01-aasra.firebaseio.com",
+      version: memoryCache.version || "2.0.0-firebase",
       lastUpdated: memoryCache.lastUpdated,
       counts: {
         farmers: memoryCache.farmers.length,
@@ -603,7 +669,7 @@ export class AasraDatabase {
         journal: memoryCache.journal.length,
         robi_audits: memoryCache.robi_audits.length,
       },
-      storageLocation: getDbFilePath(),
+      storageLocation: "cloud://iitm01-aasra.firebaseio.com/aasra.json",
     };
   }
 

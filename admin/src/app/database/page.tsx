@@ -243,19 +243,19 @@ export default function DatabaseAdminPage() {
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <span className="badge badge-primary">
-              <Database size={11} /> High-Speed Live Store
+              <Database size={11} /> Google Cloud Firebase
             </span>
             <span
               style={{
                 fontSize: 10,
                 fontFamily: "monospace",
-                color: "var(--primary)",
-                background: "rgba(99, 102, 241, 0.1)",
+                color: "#27a644",
+                background: "rgba(39, 166, 68, 0.12)",
                 padding: "2px 8px",
                 borderRadius: 9999,
               }}
             >
-              Zero-Latency JSON-FS
+              Realtime Database (iitm01-aasra)
             </span>
           </div>
           <h1 className="page-title">Database Management &amp; Explorer</h1>

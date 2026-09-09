@@ -13,6 +13,7 @@ export async function OPTIONS() {
 }
 
 export async function GET(req: NextRequest) {
+  await db.syncFromFirebase();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (id) {
