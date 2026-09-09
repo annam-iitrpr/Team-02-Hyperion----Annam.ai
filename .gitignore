@@ -57,3 +57,4 @@ cloudflared.exe
 *.exe
 
 .vercel
+.agents/
