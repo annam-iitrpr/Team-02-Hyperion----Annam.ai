@@ -8,7 +8,6 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useFarm } from "@/context/FarmContext";
 import { isUserLoggedIn, getStoredProfile, saveProfile, logoutUser, INDIAN_LANGUAGES } from "@/lib/userStore";
 import { Footer } from "@/components/Footer";
-import { ModelServerStatusPill } from "@/components/ModelServerStatusPill";
 import {
   Globe,
   User,
@@ -441,11 +440,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             )}
           </nav>
 
-          {/* Right Action Tools: Model Status Pill + Language Selector + User Profile + Mobile Toggle */}
+          {/* Right Action Tools: Language Selector + User Profile + Mobile Toggle */}
           <div className="flex items-center gap-2">
-            
-            {/* Live Model Server Status Indicator */}
-            <ModelServerStatusPill />
 
             {/* Language Switcher Dropdown */}
             <div className="relative" ref={langDropdownRef}>

@@ -1,8 +1,11 @@
-// API client for admin panel — connects to the live production AASRA frontend API
+// API client for admin panel — connects to the live production AASRA frontend API & Cloud Run
 export const MAIN_SITE_URL =
   process.env.NEXT_PUBLIC_MAIN_API_URL && process.env.NEXT_PUBLIC_MAIN_API_URL.startsWith("http")
     ? process.env.NEXT_PUBLIC_MAIN_API_URL
-    : "https://frontend-phi-flame-21.vercel.app";
+    : "https://nibooz-whatup.vercel.app";
+
+export const CLOUD_RUN_URL =
+  process.env.NEXT_PUBLIC_CLOUD_RUN_URL || "https://aasra-backend-wognmk3jfq-el.a.run.app";
 
 export async function apiFetch(path: string, options?: RequestInit) {
   const url = `${MAIN_SITE_URL}${path}`;
@@ -19,6 +22,48 @@ export async function apiFetch(path: string, options?: RequestInit) {
   } catch (err) {
     console.error(`Admin API call failed: ${url}`, err);
     throw new Error(`API call failed: ${url} — ${err}`);
+  }
+}
+
+// Direct ping to Google Cloud Run backend for Vertex AI models
+export async function pingCloudRunBackend() {
+  const t0 = performance.now();
+  try {
+    const res = await fetch(`${CLOUD_RUN_URL}/health`, { cache: "no-store" });
+    const latency = Math.round(performance.now() - t0);
+    const data = res.ok ? await res.json() : null;
+    return {
+      online: res.ok,
+      latency,
+      status: res.status,
+      data,
+    };
+  } catch (err: any) {
+    return {
+      online: false,
+      latency: Math.round(performance.now() - t0),
+      status: 500,
+      error: err?.message,
+    };
+  }
+}
+
+// Run interactive 5-model pipeline test from admin console
+export async function testVertexModelsPipeline(payload: any) {
+  const t0 = performance.now();
+  try {
+    const res = await fetch(`${MAIN_SITE_URL}/api/pipeline/run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+    const latency = Math.round(performance.now() - t0);
+    if (!res.ok) throw new Error(`Model execution returned HTTP ${res.status}`);
+    const data = await res.json();
+    return { success: true, latency, data };
+  } catch (err: any) {
+    return { success: false, latency: Math.round(performance.now() - t0), error: err?.message };
   }
 }
 

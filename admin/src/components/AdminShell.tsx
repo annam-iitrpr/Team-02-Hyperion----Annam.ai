@@ -16,13 +16,17 @@ import {
   X,
   Shield,
   ExternalLink,
+  Cpu,
+  Bot,
 } from "lucide-react";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/users", label: "User Management", icon: Users },
+  { href: "/models", label: "Vertex AI Models", icon: Cpu },
+  { href: "/copilot", label: "AI Admin Copilot", icon: Bot },
+  { href: "/database", label: "Database Studio", icon: Database },
+  { href: "/users", label: "Farmer Directory", icon: Users },
   { href: "/diagnostics", label: "Diagnostics", icon: Activity },
-  { href: "/database", label: "Database", icon: Database },
   { href: "/website", label: "Website Controls", icon: Settings },
 ];
 
@@ -91,13 +95,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
           <div className="sidebar-section-label" style={{ marginTop: 8 }}>External</div>
           <a
-            href={MAIN_SITE_URL}
+            href={`${MAIN_SITE_URL}/plant-intelligence`}
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"
           >
             <ExternalLink size={15} />
-            <span>Main Website</span>
+            <span>Main Farmer Site</span>
           </a>
         </nav>
 
