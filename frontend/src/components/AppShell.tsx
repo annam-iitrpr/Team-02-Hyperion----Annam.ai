@@ -42,7 +42,7 @@ import {
   Cpu,
 } from "lucide-react";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/how-it-works", "/product", "/impact-story", "/architecture", "/pipeline"];
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/how-it-works", "/product", "/impact-story", "/architecture", "/plant-intelligence"];
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
@@ -351,17 +351,17 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                       <div className="border-t border-slate-100 my-1" />
 
                       <Link
-                        href="/pipeline"
+                        href="/plant-intelligence"
                         onClick={() => setMoreDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
                       >
                         <Cpu className="h-4 w-4 text-[#533afd]" />
                         <div>
                           <span className="font-bold block flex items-center gap-1.5">
-                            Vertex AI ML Pipeline
-                            <span className="text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.2 rounded font-mono font-bold">M1,2,3,5</span>
+                            Plant Intelligence Models
+                            <span className="text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.2 rounded font-mono font-bold">M1,2,3,5,6</span>
                           </span>
-                          <span className="text-[10px] text-slate-500">Live 4-Model System</span>
+                          <span className="text-[10px] text-slate-500">Connected 5-Model Engine</span>
                         </div>
                       </Link>
 
@@ -383,15 +383,15 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             ) : (
               <>
                 <Link
-                  href="/pipeline"
+                  href="/plant-intelligence"
                   className={`py-2 px-3 rounded-xl transition-all text-sm flex items-center gap-1.5 ${
-                    pathname === "/pipeline"
+                    pathname === "/plant-intelligence"
                       ? "bg-indigo-50 text-[#533afd] font-extrabold border border-indigo-200"
                       : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-indigo-50/50"
                   }`}
                 >
                   <Cpu className="h-4 w-4 text-[#533afd]" />
-                  <span>{language === "hi" ? "ML पाइपलाइन" : "ML Pipeline"}</span>
+                  <span>{language === "hi" ? "पादप बुद्धिमत्ता" : "Plant Intelligence"}</span>
                 </Link>
 
                 <Link

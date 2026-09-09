@@ -266,17 +266,17 @@ export const KisanActionVerdict: React.FC = () => {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
           <span className="text-xs font-semibold text-slate-800">
-            {isHindi ? "4-मॉडल ML इंटेलिजेंस पाइपलाइन सक्रिय है" : "4-Model ML Intelligence Pipeline Active"}
+            {isHindi ? "5-मॉडल ML इंटेलिजेंस पाइपलाइन सक्रिय है" : "5-Model ML Intelligence Pipeline Active"}
           </span>
           <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-            Models 1, 2, 3, 5 + Gemini
+            Models 1, 2, 3, 5, 6 (Vertex AI)
           </span>
         </div>
         <a
-          href="/pipeline"
+          href="/plant-intelligence"
           className="inline-flex items-center gap-1 text-xs font-bold text-[#5e6ad2] hover:text-[#4b55be] transition-colors"
         >
-          <span>{isHindi ? "पाइपलाइन व मॉडल विश्लेषण देखें" : "Inspect Live Pipeline & Model Telemetry"}</span>
+          <span>{isHindi ? "पादप बुद्धिमत्ता व मॉडल देखें" : "Inspect Plant Intelligence & Models"}</span>
           <ArrowRight className="w-3 h-3" />
         </a>
       </div>

@@ -334,7 +334,7 @@ export default function LandingPage() {
                 { href: "/how-it-works", label: isHindi ? "हाउ इट वर्क्स" : "How It Works", desc: isHindi ? "प्लेटफॉर्म कार्यप्रणाली" : "Step-by-step tour", icon: Sparkles },
                 { href: "/product", label: isHindi ? "उत्पाद विशेषताएँ" : "Product Features", desc: isHindi ? "तकनीकी क्षमताएं" : "System capabilities", icon: Layers },
                 { href: "/impact-story", label: isHindi ? "सफलता की कहानियाँ" : "Farmer Stories", desc: isHindi ? "किसानों के अनुभव" : "Attributed field ROI", icon: TrendingUp },
-                { href: "/pipeline", label: isHindi ? "6-मॉडल AI इंजन" : "6-Model Pipeline", desc: isHindi ? "वर्टेक्स AI विवरण" : "Vertex ML Engine", icon: FileText },
+                { href: "/plant-intelligence", label: isHindi ? "पादप बुद्धिमत्ता (5 मॉडल)" : "Plant Intelligence (5 Models)", desc: isHindi ? "वर्टेक्स AI इंजन" : "Vertex AI Models", icon: FileText },
               ].map((m) => {
                 const Icon = m.icon;
                 return (
