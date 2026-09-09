@@ -16,8 +16,20 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "AASRA — Evidence-Based Precision Agriculture Intelligence",
+  metadataBase: new URL("https://nibooz-whatup.vercel.app"),
+  title: {
+    default: "AASRA — Evidence-Based Precision Agriculture Intelligence",
+    template: "%s | AASRA"
+  },
   description: "Production-grade, location-aware decision support for farmers combining real weather telemetry, satellite monitoring, and deterministic agronomics. No fabricated data.",
+  keywords: [
+    "precision agriculture",
+    "crop intelligence",
+    "climate stress prediction",
+    "farm advisory AI",
+    "Syngenta biologicals",
+    "smart farming India"
+  ],
   manifest: "/manifest.json",
   applicationName: "AASRA Kisan AI",
   appleWebApp: {
@@ -28,6 +40,23 @@ export const metadata: Metadata = {
   icons: {
     icon: "/images/aasra_logo.png",
     apple: "/images/aasra_logo.png",
+  },
+  openGraph: {
+    title: "AASRA — Evidence-Based Precision Agriculture Intelligence",
+    description: "Production-grade, location-aware decision support for farmers with real telemetry and deterministic agronomics.",
+    url: "https://nibooz-whatup.vercel.app",
+    siteName: "AASRA",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AASRA — Precision Agriculture Intelligence",
+    description: "Location-aware decision support for farmers with real telemetry.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
