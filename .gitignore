@@ -5,6 +5,11 @@
 *.env
 .env.local
 .env.production
+*service-account*.json
+*gcp*.json
+gcp-key.json
+*.pem
+*.key
 
 # Python
 __pycache__/

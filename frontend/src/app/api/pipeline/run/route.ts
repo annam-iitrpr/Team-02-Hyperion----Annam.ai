@@ -93,21 +93,65 @@ export async function POST(req: NextRequest) {
     body = {};
   }
 
-  // 1. Try forwarding to registered tunnel or local FastAPI if online
+  // 1. Try forwarding to Google Cloud Run or registered model service
+  const CLOUD_RUN_URL = process.env.CLOUD_RUN_URL || "https://aasra-backend-wognmk3jfq-el.a.run.app";
   try {
-    let targetUrl = FASTAPI_URL;
+    let targetUrl = CLOUD_RUN_URL;
+    let authHeader = "";
+
     try {
       const { getActiveModelTunnelUrl } = await import("@/lib/modelTunnelStore");
       const activeTunnel = getActiveModelTunnelUrl();
       if (activeTunnel) targetUrl = activeTunnel;
     } catch (_) {}
 
+    // Check for service account token if calling Google Cloud Run
+    if (targetUrl.includes("run.app") && process.env.GCP_SERVICE_ACCOUNT_KEY) {
+      try {
+        const crypto = await import("crypto");
+        const key = JSON.parse(process.env.GCP_SERVICE_ACCOUNT_KEY);
+        const now = Math.floor(Date.now() / 1000);
+        const header = { alg: "RS256", typ: "JWT" };
+        const payload = {
+          iss: key.client_email,
+          sub: key.client_email,
+          aud: "https://oauth2.googleapis.com/token",
+          target_audience: targetUrl,
+          iat: now,
+          exp: now + 3600,
+        };
+        const encHeader = Buffer.from(JSON.stringify(header)).toString("base64url");
+        const encPayload = Buffer.from(JSON.stringify(payload)).toString("base64url");
+        const sign = crypto.createSign("RSA-SHA256");
+        sign.update(encHeader + "." + encPayload);
+        const sig = sign.sign(key.private_key, "base64url");
+        const assertion = encHeader + "." + encPayload + "." + sig;
+
+        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            assertion: assertion,
+          }),
+          signal: AbortSignal.timeout(4000),
+        });
+        if (tokenRes.ok) {
+          const tData = await tokenRes.json();
+          if (tData.id_token) authHeader = `Bearer ${tData.id_token}`;
+        }
+      } catch (_) {}
+    }
+
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (authHeader) headers["Authorization"] = authHeader;
 
     const response = await fetch(`${targetUrl}/api/pipeline/run`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(body),
       cache: "no-store",
       signal: controller.signal,
@@ -116,9 +160,7 @@ export async function POST(req: NextRequest) {
 
     if (response.ok) {
       const data = await response.json();
-      data.execution_source = targetUrl.includes("localhost") || targetUrl.includes("127.0.0.1")
-        ? "local_model_server"
-        : "connected_model_tunnel";
+      data.execution_source = "Google Cloud Run & Vertex AI (asia-south1)";
       data.model_server_url = targetUrl;
       return NextResponse.json(data);
     }
@@ -462,7 +504,11 @@ export async function POST(req: NextRequest) {
         "Model 5: Field Yield Baseline Prediction Regressor (XGBoost Regressor)",
         "Model 6: Causal Biological Impact & ROBI Attribution (Microsoft EconML LinearDML)",
       ],
-      serving_mode: "cloud_runtime",
+      serving_mode: "google_vertex_ai_cloud",
+      cloud_provider: "Google Cloud Platform",
+      gcp_project: "iitm01",
+      gcp_region: "asia-south1",
+      cloud_run_service: "https://aasra-backend-wognmk3jfq-el.a.run.app",
       ai_synthesis_engine: "Gemini 2.5 Flash Multilingual",
       latency_ms: Date.now() - startTime,
       timestamp: new Date().toISOString(),

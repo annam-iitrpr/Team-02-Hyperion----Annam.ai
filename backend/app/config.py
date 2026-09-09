@@ -70,9 +70,17 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = "*"
     LOG_LEVEL: str = "INFO"
 
+    # GCP / Vertex AI
+    GCP_ACCOUNT: Optional[str] = None
+    GCP_PROJECT_ID: Optional[str] = None
+    VERTEX_AI_PROJECT_ID: Optional[str] = None
+    VERTEX_AI_REGION: str = "asia-south1"
+    GOOGLE_APPLICATION_CREDENTIALS: Optional[str] = None
+
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
     def get_google_keys(self) -> List[str]:
         keys = [self.GOOGLE_API_KEY, self.GOOGLE_API_KEY_1, self.GOOGLE_API_KEY_2, self.GOOGLE_API_KEY_3, self.GOOGLE_API_KEY_4]
