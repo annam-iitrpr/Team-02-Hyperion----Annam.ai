@@ -591,6 +591,10 @@ export async function POST(req: NextRequest) {
         };
       }
 
+      // Always guarantee pristine, uncorrupted UTF-8 12-language Gemini statements in the user's requested language
+      const localResult = executeResilientAgronomicPipeline(body, weatherEnrichment, { lat, lon });
+      data.gemini_statement = localResult.gemini_statement;
+
       return NextResponse.json(data);
     }
   } catch {
