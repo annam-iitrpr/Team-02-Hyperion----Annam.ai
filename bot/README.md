@@ -10,7 +10,7 @@ This package provides complete, ready-to-use bot clients in **Python** and **Nod
 The bot client automatically connects to the live production database using the settings in `config.json`:
 ```json
 {
-  "api_base_url": "https://frontend-phi-flame-21.vercel.app",
+  "api_base_url": "https://krishyantra.vercel.app",
   "database_api_key": "aasra-bot-access-2026",
   "endpoints": {
     "database": "/api/database",
@@ -95,12 +95,12 @@ If you are using another programming language (Go, Rust, cURL, etc.), you can ca
 
 | HTTP Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `https://frontend-phi-flame-21.vercel.app/api/database` | Full database snapshot |
-| `GET` | `https://frontend-phi-flame-21.vercel.app/api/farmers` | List all farmers |
-| `GET` | `https://frontend-phi-flame-21.vercel.app/api/farmers?id=farmer-001` | Query farmer by ID / Phone |
-| `POST` | `https://frontend-phi-flame-21.vercel.app/api/farmers` | Save / update farmer profile |
-| `GET` | `https://frontend-phi-flame-21.vercel.app/api/mandi/rates` | Live APMC Mandi market rates |
-| `GET` | `https://frontend-phi-flame-21.vercel.app/api/weather/current` | Real-time weather telemetry |
+| `GET` | `https://krishyantra.vercel.app/api/database` | Full database snapshot |
+| `GET` | `https://krishyantra.vercel.app/api/farmers` | List all farmers |
+| `GET` | `https://krishyantra.vercel.app/api/farmers?id=farmer-001` | Query farmer by ID / Phone |
+| `POST` | `https://krishyantra.vercel.app/api/farmers` | Save / update farmer profile |
+| `GET` | `https://krishyantra.vercel.app/api/mandi/rates` | Live APMC Mandi market rates |
+| `GET` | `https://krishyantra.vercel.app/api/weather/current` | Real-time weather telemetry |
 
 **Headers:**
 ```http

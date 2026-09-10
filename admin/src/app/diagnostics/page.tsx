@@ -89,8 +89,8 @@ const ENDPOINTS = [
     healthKey: "ps02_engine_configured",
   },
   {
-    name: "AASRA Production Serverless Core",
-    endpoint: "https://frontend-phi-flame-21.vercel.app/api/health",
+    name: "KrishYantra Production Serverless Core",
+    endpoint: "https://krishyantra.vercel.app/api/health",
     category: "Core",
     icon: Server,
     latency: "24 ms",

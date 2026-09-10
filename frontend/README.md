@@ -14,6 +14,7 @@ The **KrishYantra (AASRA)** frontend is a modern, responsive, progressive web ap
 - **Speech Synthesis**: Native Web Speech API for voice readouts in Hindi and English
 - **Mapping & Geo**: Leaflet & MapLibre for farm polygon geofencing and APMC mandi logistics routing
 - **Deployment**: Vercel Serverless Edge
+- **Live Production URL**: [https://krishyantra.vercel.app](https://krishyantra.vercel.app)
 
 ---
 

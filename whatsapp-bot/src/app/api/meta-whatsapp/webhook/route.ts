@@ -4154,7 +4154,7 @@ export async function POST(req: NextRequest) {
                   `• Primary Crop: ${farmer.primaryCrop} (${farmer.fieldAreaAcres} Acres)\n` +
                   `• Recorded Observation: "${textBody}"\n` +
                   `• Timestamp: ${new Date().toISOString().split("T")[0]}\n\n` +
-                  `View full ledger: https://frontend-phi-flame-21.vercel.app/journal`
+                  `View full ledger: https://krishyantra.vercel.app/journal`
                 : `[KrishYantra FIELD JOURNAL SYSTEM | v2.4]\n` +
                   `किसान: ${farmer.fullName} जी | स्थान: ${farmer.district}, ${farmer.state}\n` +
                   `============================================================\n` +
@@ -4162,7 +4162,7 @@ export async function POST(req: NextRequest) {
                   `• फसल: ${farmer.primaryCrop} (${farmer.fieldAreaAcres} एकड़)\n` +
                   `• विवरण: "${textBody}"\n` +
                   `• दिनांक: ${new Date().toLocaleDateString("hi-IN")}\n\n` +
-                  `पोर्टल पर देखें: https://frontend-phi-flame-21.vercel.app/journal`;
+                  `पोर्टल पर देखें: https://krishyantra.vercel.app/journal`;
 
             await sendWhatsAppMessage(from, journalConfirm);
             continue;

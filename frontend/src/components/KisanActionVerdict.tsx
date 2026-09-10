@@ -124,7 +124,7 @@ export const KisanActionVerdict: React.FC = () => {
         `🧪 खुराक: ${totalDoseLiters} लीटर Syngenta Quantis + ${totalWaterLiters} लीटर पानी\n` +
         `💰 अनुमानित शुद्ध लाभ: +₹${estimatedSavings.toLocaleString("en-IN")}\n` +
         `📞 सिंजेंटा हेल्पलाइन: 1800-102-7964\n` +
-        `👉 देखें: https://frontend-phi-flame-21.vercel.app/dashboard`
+        `👉 देखें: https://krishyantra.vercel.app/dashboard`
       : `🌾 *AASRA Farmer Advisory Note — ${farmerName} (${crop})*\n` +
         `📍 Location: ${village ? village + ", " : ""}${district} (${acreage} Acres)\n` +
         `🌡️ Live Temp: ${weather.temperature}°C | Night Temp: ${weather.nightTemperature || weather.temperature}°C\n` +
@@ -132,7 +132,7 @@ export const KisanActionVerdict: React.FC = () => {
         `🧪 Dosage: ${totalDoseLiters}L Syngenta Quantis + ${totalWaterLiters}L Water\n` +
         `💰 Net Protected Benefit: +₹${estimatedSavings.toLocaleString("en-IN")}\n` +
         `📞 Syngenta Helpline: 1800-102-7964\n` +
-        `👉 Open: https://frontend-phi-flame-21.vercel.app/dashboard`;
+        `👉 Open: https://krishyantra.vercel.app/dashboard`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, "_blank");
   };
 
