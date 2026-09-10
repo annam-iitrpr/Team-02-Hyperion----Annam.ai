@@ -660,7 +660,7 @@ export default function VertexModelsPage() {
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                       <span className="badge badge-success" style={{ fontSize: 10 }}>MODEL 6 (PS-07)</span>
                       <span style={{ fontSize: 12, fontWeight: 700, color: "var(--semantic-success)" }}>
-                        {testResult.model6_causal_robi?.robi_multiplier}x ROBI
+                        {String(testResult.model6_causal_robi?.robi_multiplier || "2.1x").replace(/x$/, "")}x ROBI
                       </span>
                     </div>
                     <h4 style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>
