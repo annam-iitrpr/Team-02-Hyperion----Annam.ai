@@ -97,23 +97,40 @@ export default function ImpactPage() {
     nightTemp,
     isNightHeatStress: nightTemp > 24.0,
   });
-  const fallbackMandiPrice = mandiRateObj.modalPrice || 4600;
-  const mandiPrice =
-    pipelineData?.model6_causal_robi?.mandi_price_inr_q || fallbackMandiPrice;
+  const fallbackMandiPrice = mandiRateObj.modalPrice || 4850;
+
+  // Guard against stale cached 2800 or flat fallback on crops with very different market prices
+  const rawPipelineMandi = Number(pipelineData?.model6_causal_robi?.mandi_price_inr_q);
+  const isPipelineMandiValid = !isNaN(rawPipelineMandi) && rawPipelineMandi > 200 && (
+    (crop.includes("sugar") || crop.includes("ganna")) ? rawPipelineMandi < 800 :
+    (crop.includes("cotton") || crop.includes("kapas")) ? rawPipelineMandi > 4500 :
+    (crop.includes("chilli")) ? rawPipelineMandi > 6000 :
+    (crop.includes("potato") || crop.includes("alu") || crop.includes("aaloo")) ? rawPipelineMandi < 3500 :
+    true
+  );
+  const mandiPrice = isPipelineMandiValid ? rawPipelineMandi : fallbackMandiPrice;
 
   // ──────────────────────────────────────────────────────────────────────────
   // 3. Solution & 3-Step Investment Story Setup
   // ──────────────────────────────────────────────────────────────────────────
-  const solutionName =
-    pipelineData?.model6_causal_robi?.product_name ||
-    (crop.includes("soy") || crop.includes("wheat")
-      ? "Syngenta Quantis®"
-      : "Syngenta Stress Buster");
-  const costPerAcre =
-    pipelineData?.model6_causal_robi?.product_cost_inr_acre || 1280;
-  const treatmentCostTotal =
-    pipelineData?.model6_causal_robi?.total_treatment_cost_inr ||
-    Math.round(costPerAcre * acres);
+  const defaultProduct = (crop.includes("sugar") || crop.includes("ganna") || crop.includes("potato") || crop.includes("alu") || crop.includes("aaloo") || crop.includes("rice") || crop.includes("paddy") || crop.includes("chilli") || crop.includes("onion"))
+    ? "Syngenta Isabion®"
+    : "Syngenta Quantis®";
+
+  const rawProductName = pipelineData?.model6_causal_robi?.product_name;
+  const solutionName = rawProductName
+    ? (rawProductName.includes("®") ? rawProductName : `${rawProductName}®`)
+    : defaultProduct;
+
+  const defaultCostPerAcre = (crop.includes("sugar") || crop.includes("ganna")) ? 1350
+    : (crop.includes("cotton") || crop.includes("kapas")) ? 1280
+    : (crop.includes("potato") || crop.includes("alu")) ? 1320
+    : (crop.includes("chilli")) ? 1420
+    : 1200;
+
+  const rawCostAcre = Number(pipelineData?.model6_causal_robi?.product_cost_inr_acre);
+  const costPerAcre = (!isNaN(rawCostAcre) && rawCostAcre >= 600) ? rawCostAcre : defaultCostPerAcre;
+  const treatmentCostTotal = Math.round(costPerAcre * acres);
 
   // ──────────────────────────────────────────────────────────────────────────
   // 4. Feature 8: Scientific Yield Estimator (Model 5 + Causal Model 6)
@@ -164,21 +181,61 @@ export default function ImpactPage() {
     ? Math.round(((mitigatedYield - untreatedYield) / untreatedYield) * 100)
     : 18;
 
-  const grossHarvestValue =
-    pipelineData?.model6_causal_robi?.revenue_saved_inr ||
-    Math.round(totalSavedQtl * mandiPrice);
-
-  const netProfit =
-    pipelineData?.model6_causal_robi?.net_farmer_profit_inr ||
-    grossHarvestValue - treatmentCostTotal;
-
-  const robiMultiplier =
-    pipelineData?.model6_causal_robi?.robi_multiplier ||
-    `${+(grossHarvestValue / Math.max(1, treatmentCostTotal)).toFixed(2)}x`;
-
-  const robiNum = parseFloat(robiMultiplier) || 4.5;
+  // Grounded Economic Returns
+  const grossHarvestValue = Math.round(totalSavedQtl * mandiPrice);
+  const netProfit = grossHarvestValue - treatmentCostTotal;
+  const robiNum = +(grossHarvestValue / Math.max(1, treatmentCostTotal)).toFixed(1);
+  const robiMultiplier = `${robiNum}x`;
   const netGainPct = Math.round((netProfit / Math.max(1, treatmentCostTotal)) * 100);
   const oneThousandReturn = Math.round(1000 * robiNum);
+  const oneThousandNet = Math.max(0, oneThousandReturn - 1000);
+
+  // Dynamic Biological Mechanism tailored per crop
+  const cropLower = crop.toLowerCase();
+  let defaultMechanismEn = "Prevented flower abortion and heat scorch during night stress, securing extra harvest.";
+  let defaultMechanismHi = "रात के उच्च तापमान व मौसम के तनाव में फूलों को झड़ने से रोककर अतिरिक्त पैदावार सुरक्षित की।";
+
+  if (cropLower.includes("sugar") || cropLower.includes("ganna") || cropLower.includes("oos")) {
+    defaultMechanismEn = "Maintained tillering density, protected internode elongation, and prevented sucrose inversion during heat spells.";
+    defaultMechanismHi = "गर्मी के तनाव में गन्ने की पोरियों की लंबाई, किल्लों की संख्या और सुक्रोज (मिठास) को सुरक्षित रखा।";
+  } else if (cropLower.includes("cotton") || cropLower.includes("kapas") || cropLower.includes("narma")) {
+    defaultMechanismEn = "Prevented floral square shedding and boll abortion during high daytime heat and nocturnal vapor pressure deficit.";
+    defaultMechanismHi = "दिन की तेज धूप और रात के उच्च तापमान में कपास के फूलों (स्क्वायर) और टिंडों को झड़ने से रोका।";
+  } else if (cropLower.includes("wheat") || cropLower.includes("gehu") || cropLower.includes("kanak")) {
+    defaultMechanismEn = "Protected flag leaf chlorophyll and prevented premature forced grain shriveling during terminal heat waves.";
+    defaultMechanismHi = "पछुआ हवा व अचानक बढ़ी गर्मी से झंडा पत्ती को हरी रखकर दानों के सिकुड़न को रोका।";
+  } else if (cropLower.includes("potato") || cropLower.includes("alu") || cropLower.includes("aaloo")) {
+    defaultMechanismEn = "Accelerated stolon initiation, prevented heat necrosis, and stimulated uniform tuber bulking.";
+    defaultMechanismHi = "आलू के कंदों के फैलाव और एक समान बढ़वार को तेज कर गर्मी की जलन से बचाया।";
+  } else if (cropLower.includes("rice") || cropLower.includes("paddy") || cropLower.includes("dhan")) {
+    defaultMechanismEn = "Shielded spikelet fertility and enhanced effective tillers during high humidity heat stress.";
+    defaultMechanismHi = "बाली निकलते समय पराग कणों की उर्वरता बचाकर और प्रभावी किल्ले बढ़ाकर दानों का भराव सुरक्षित किया।";
+  } else if (cropLower.includes("mustard") || cropLower.includes("sarson") || cropLower.includes("rai")) {
+    defaultMechanismEn = "Protected siliqua pod setting and oil accumulation during nocturnal cold snaps and temperature swings.";
+    defaultMechanismHi = "फूल से फली बनते समय पाले व तापमान के उतार-चढ़ाव से बचाकर तेल की मात्रा बढ़ाई।";
+  } else if (cropLower.includes("tomato") || cropLower.includes("tamatar")) {
+    defaultMechanismEn = "Prevented blossom drop and sunscald, enhancing fruit firmness and harvest grade.";
+    defaultMechanismHi = "फूलों के झड़ने और धूप की कालिमा से बचाकर फलों की गुणवत्ता व चमक बढ़ाई।";
+  } else if (cropLower.includes("onion") || cropLower.includes("pyaz") || cropLower.includes("kanda")) {
+    defaultMechanismEn = "Promoted uniform bulb expansion and neck tightness, preventing split bulbs under temperature fluctuations.";
+    defaultMechanismHi = "तापमान के उतार-चढ़ाव में प्याज के कंदों के फटने को रोककर एक समान मोटा छिलका तैयार किया।";
+  } else if (cropLower.includes("chilli") || cropLower.includes("mirch")) {
+    defaultMechanismEn = "Prevented heavy flower and young pin-head fruit drop during intense atmospheric evaporative pull.";
+    defaultMechanismHi = "तेज धूप और शुष्क हवा में मिर्च के फूलों व नन्हे फलों को झड़ने से रोका।";
+  } else if (cropLower.includes("maize") || cropLower.includes("makka") || cropLower.includes("corn")) {
+    defaultMechanismEn = "Synchronized pollen shed and silking interval during thermal stress, preventing tip cob sterility.";
+    defaultMechanismHi = "गर्मी के दौरान भुट्टे में दानों के संपूर्ण भराव को सुनिश्चित कर ऊपर के खालीपन को रोका।";
+  } else if (cropLower.includes("groundnut") || cropLower.includes("moongfali")) {
+    defaultMechanismEn = "Facilitated subterranean peg penetration and protected pod shell hardening under soil surface crusting.";
+    defaultMechanismHi = "जमीन में सुइयां (पेग्स) धंसने की प्रक्रिया को तेज कर मिट्टी की गर्मी से फलियों को सुरक्षित किया।";
+  } else if (cropLower.includes("gram") || cropLower.includes("chana")) {
+    defaultMechanismEn = "Prevented flower drop and stimulated pod setting during sudden early spring temperature spikes.";
+    defaultMechanismHi = "बसंत के अंत में अचानक बढ़ी गर्मी से चने के फूलों को झड़ने से बचाकर फलियों में दानों का पूरा भराव किया।";
+  }
+
+  const protectionMechanism = isHindi
+    ? (pipelineData?.model6_causal_robi?.protection_mechanism_hi || defaultMechanismHi)
+    : (pipelineData?.model6_causal_robi?.protection_mechanism_en || defaultMechanismEn);
 
   // ──────────────────────────────────────────────────────────────────────────
   // 5. Pillar 5: Dynamic 5 Nearby APMC Mandis Comparison
@@ -415,7 +472,11 @@ export default function ImpactPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-600 font-bold">&bull;</span>
-                    <span>Protects pollen viability during {nightTemp}&deg;C nocturnal temperature peaks</span>
+                    <span>
+                      {crop.toLowerCase().includes("sugar") || crop.toLowerCase().includes("ganna")
+                        ? `Shields internode sucrose brix and prevents stalk desiccation at ${nightTemp}°C night temp`
+                        : `Protects cellular membrane integrity & pollination during ${nightTemp}°C nocturnal temperature peaks`}
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -455,10 +516,14 @@ export default function ImpactPage() {
                 3-STEP INVESTMENT STORY &middot; MODEL 6 CAUSAL ROBI &middot; {acres} ACRES
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#11261f] font-display tracking-tight">
-                How Every ₹1 Spent on Biologicals Returns ₹{robiNum} in Cash
+                {isHindi
+                  ? `जैविक उत्पाद पर खर्च किया गया हर ₹1 कैसे ₹${robiNum} नकद वापस देता है`
+                  : `How Every ₹1 Spent on Biologicals Returns ₹${robiNum} in Cash`}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500">
-                Transparent biophysical and APMC Mandi economics calculated for your {displayCropName} crop:
+                {isHindi
+                  ? `आपके ${displayCropName} खेत (${acres} एकड़) और ${district} मंडी भाव के आधार पर पारदर्शी बायोफिजिकल अर्थशास्त्र:`
+                  : `Transparent biophysical and APMC Mandi economics calculated for your ${displayCropName} crop (${acres} Acres, ${district}):`}
               </p>
             </div>
 
@@ -469,7 +534,7 @@ export default function ImpactPage() {
               <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-6 shadow-[0_4px_24px_rgba(27,67,50,0.04)] flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
-                    STEP 1 &middot; INPUT INVESTMENT
+                    {isHindi ? "चरण 1 · निवेश लागत" : "STEP 1 · INPUT INVESTMENT"}
                   </span>
                   <span className="h-6 w-6 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">
                     1
@@ -481,7 +546,9 @@ export default function ImpactPage() {
                     ₹{treatmentCostTotal.toLocaleString("en-IN")}
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Application of {solutionName} @ ₹{costPerAcre}/acre across your {acres} acres (product + tractor spray).
+                    {isHindi
+                      ? `${acres} एकड़ में ${solutionName} का छिड़काव @ ₹${costPerAcre}/एकड़ (उत्पाद + ट्रैक्टर स्प्रे खर्च)।`
+                      : `Application of ${solutionName} @ ₹${costPerAcre}/acre across your ${acres} acres (product + tractor spray).`}
                   </p>
                 </div>
 
@@ -494,7 +561,7 @@ export default function ImpactPage() {
               <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-6 shadow-[0_4px_24px_rgba(27,67,50,0.04)] flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-md border border-[#cbe5cb]">
-                    STEP 2 &middot; HARVEST SHIELDED
+                    {isHindi ? "चरण 2 · सुरक्षित फसल" : "STEP 2 · HARVEST SHIELDED"}
                   </span>
                   <span className="h-6 w-6 rounded-full bg-[#e8f5e9] text-[#1b4332] font-bold text-xs flex items-center justify-center">
                     2
@@ -503,10 +570,10 @@ export default function ImpactPage() {
 
                 <div className="space-y-2">
                   <div className="text-3xl sm:text-4xl font-black text-emerald-700 font-display">
-                    +{totalSavedQtl} <span className="text-sm font-sans font-normal text-slate-500">Quintals</span>
+                    +{totalSavedQtl} <span className="text-sm font-sans font-normal text-slate-500">{isHindi ? "क्विंटल" : "Quintals"}</span>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Prevented flower abortion and heat scorch during night stress, securing +{yieldGainPerAcre} q/acre extra harvest.
+                    {protectionMechanism}
                   </p>
                 </div>
 
@@ -519,7 +586,7 @@ export default function ImpactPage() {
               <div className="bg-[#e8f5e9]/60 border-2 border-[#a3d9a5] rounded-3xl p-6 shadow-[0_4px_24px_rgba(27,67,50,0.06)] flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-900 bg-[#cbe5cb] px-2.5 py-1 rounded-md border border-[#a3d9a5]">
-                    STEP 3 &middot; NET CASH RETURN
+                    {isHindi ? "चरण 3 · शुद्ध नकद वापसी" : "STEP 3 · NET CASH RETURN"}
                   </span>
                   <span className="h-6 w-6 rounded-full bg-[#1b4332] text-white font-bold text-xs flex items-center justify-center">
                     3
@@ -531,7 +598,9 @@ export default function ImpactPage() {
                     +₹{netProfit.toLocaleString("en-IN")}
                   </div>
                   <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                    Sold saved harvest at Mandi rate (₹{mandiPrice}/q) for ₹{grossHarvestValue.toLocaleString("en-IN")} gross. Minus spray cost = ₹{netProfit.toLocaleString("en-IN")} net in-hand profit!
+                    {isHindi
+                      ? `सुरक्षित फसल को ${district} मंडी भाव (₹${mandiPrice.toLocaleString("en-IN")}/क्विंटल) पर बेचकर ₹${grossHarvestValue.toLocaleString("en-IN")} की कुल उपज मिली। इसमें से छिड़काव लागत घटाने पर ₹${netProfit.toLocaleString("en-IN")} का सीधा शुद्ध इन-हैंड मुनाफा!`
+                      : `Sold saved harvest at ${district} Mandi rate (₹${mandiPrice.toLocaleString("en-IN")}/q) for ₹${grossHarvestValue.toLocaleString("en-IN")} gross. Minus spray cost = ₹${netProfit.toLocaleString("en-IN")} net in-hand profit!`}
                   </p>
                 </div>
 
@@ -543,34 +612,94 @@ export default function ImpactPage() {
             </div>
 
             {/* VERIFIED ROBI RESULT Banner (Krishyantra Deep Emerald Aesthetic) */}
-            <div className="bg-[#11261f] text-white rounded-3xl p-6 sm:p-7 border border-[#2d6a4f]/50 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase tracking-wider">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    MICROSOFT ECONML LINEARDML CERTIFIED
+            <div className="bg-[#11261f] text-white rounded-3xl p-6 sm:p-7 border border-[#2d6a4f]/50 shadow-xl space-y-5">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase tracking-wider">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      MICROSOFT ECONML LINEARDML CERTIFIED
+                    </span>
+                    <span className="text-xs font-mono font-semibold text-emerald-300">
+                      {robiMultiplier} Capital Multiplier
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-md border border-white/10">
+                      {displayCropName} &middot; {acres} Acres &middot; {district} Mandi
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight font-display">
+                    {isHindi
+                      ? `जैविक निवेश पर ${robiMultiplier} का रिटर्न (${netGainPct}% शुद्ध लाभ)`
+                      : `${robiMultiplier} Return on Biological Investment (${netGainPct}% Net Gain)`}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                    {isHindi
+                      ? `सरल शब्दों में: अनुशंसित ${solutionName} पर खर्च किए गए हर ₹1,000 के बदले आपको ${district} मंडी भाव पर ₹${oneThousandReturn.toLocaleString("en-IN")} की फसल मिलती है, जिससे सभी खर्च काटकर ₹${oneThousandNet.toLocaleString("en-IN")} का सीधा शुद्ध मुनाफा आपकी जेब में रहता है।`
+                      : `In plain terms: Every ₹1,000 you invest in recommended ${solutionName} treatment returns ₹${oneThousandReturn.toLocaleString("en-IN")} in cash harvest value at ${district} Mandi rates, leaving you with ₹${oneThousandNet.toLocaleString("en-IN")} clean net profit directly in your pocket.`}
+                  </p>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-center shrink-0 min-w-[180px]">
+                  <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-slate-400 block">
+                    {isHindi ? "कुल शुद्ध मुनाफा" : "TOTAL NET PROFIT"}
                   </span>
-                  <span className="text-xs font-mono font-semibold text-emerald-300">
-                    {robiMultiplier} Capital Multiplier
+                  <span className="text-2xl sm:text-3xl font-black font-mono text-emerald-400 block mt-1">
+                    ₹{netProfit.toLocaleString("en-IN")}
+                  </span>
+                </div>
+              </div>
+
+              {/* 4-Stat Grounded Breakdown Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                  <span className="text-[10px] uppercase font-mono text-slate-400 block">
+                    {isHindi ? "उपचार लागत" : "TREATMENT COST"}
+                  </span>
+                  <span className="text-sm sm:text-base font-mono font-bold text-white block mt-0.5">
+                    ₹{treatmentCostTotal.toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    @ ₹{costPerAcre}/ac
                   </span>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight font-display">
-                  {robiMultiplier} Return on Biological Investment ({netGainPct}% Net Gain)
-                </h3>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                  <span className="text-[10px] uppercase font-mono text-slate-400 block">
+                    {isHindi ? "सुरक्षित पैदावार" : "HARVEST SHIELDED"}
+                  </span>
+                  <span className="text-sm sm:text-base font-mono font-bold text-emerald-300 block mt-0.5">
+                    +{totalSavedQtl} Q
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    +{yieldGainPerAcre} q/ac
+                  </span>
+                </div>
 
-                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-                  Every ₹1,000 you invest in recommended biostimulant treatment returns ₹{oneThousandReturn.toLocaleString("en-IN")} in cash harvest value directly into your pocket.
-                </p>
-              </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                  <span className="text-[10px] uppercase font-mono text-slate-400 block">
+                    {isHindi ? "मंडी भाव" : "MANDI BENCHMARK"}
+                  </span>
+                  <span className="text-sm sm:text-base font-mono font-bold text-white block mt-0.5">
+                    ₹{mandiPrice.toLocaleString("en-IN")}/q
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {district} APMC
+                  </span>
+                </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-center shrink-0 min-w-[180px]">
-                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-slate-400 block">
-                  TOTAL NET PROFIT
-                </span>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-emerald-400 block mt-1">
-                  ₹{netProfit.toLocaleString("en-IN")}
-                </span>
+                <div className="bg-emerald-500/15 border border-emerald-500/30 rounded-xl p-3">
+                  <span className="text-[10px] uppercase font-mono text-emerald-300 font-bold block">
+                    {isHindi ? "इन-हैंड शुद्ध लाभ" : "IN-HAND PROFIT"}
+                  </span>
+                  <span className="text-sm sm:text-base font-mono font-black text-emerald-400 block mt-0.5">
+                    +₹{netProfit.toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-[10px] text-emerald-300/80 font-mono">
+                    +{netGainPct}% Net Gain
+                  </span>
+                </div>
               </div>
             </div>
 

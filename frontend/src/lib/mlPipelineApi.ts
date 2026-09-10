@@ -76,6 +76,10 @@ export interface UnifiedPipelineResponse {
     product_name?: string;
     product_cost_inr_acre?: number;
     mandi_price_inr_q?: number;
+    protection_mechanism_en?: string;
+    protection_mechanism_hi?: string;
+    net_gain_pct?: number;
+    one_thousand_return?: number;
     confounders_controlled: string[];
     methodology: string;
   };

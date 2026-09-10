@@ -6,6 +6,7 @@ import { useWeather } from "@/context/WeatherContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { getStoredProfile } from "@/lib/userStore";
 import { runAASRAPipeline, UnifiedPipelineResponse } from "@/lib/mlPipelineApi";
+import { findCropMandiRate } from "@/lib/mandiEngine";
 
 export interface DailyStressPrediction {
   dayIndex: number;
@@ -115,24 +116,35 @@ export function usePipelinePrediction() {
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
           const parsed = JSON.parse(cached);
-          // 30-minute validity
-          if (Date.now() - parsed.timestamp < 30 * 60 * 1000 && parsed.payload) {
+          // Check if cached result has the legacy 19.6x ROBI or mismatched crop mandi rates
+          const isStaleOldRobi = parsed?.payload?.model6_causal_robi?.robi_multiplier === "19.6x";
+          const isStaleSugarcane = (crop.includes("sugar") || crop.includes("ganna")) && (parsed?.payload?.model6_causal_robi?.mandi_price_inr_q > 800 || parsed?.payload?.model6_causal_robi?.causal_gain_tau_q_acre < 10);
+          const isStaleCotton = (crop.includes("cotton") || crop.includes("kapas")) && (parsed?.payload?.model6_causal_robi?.mandi_price_inr_q < 5000 || parsed?.payload?.model6_causal_robi?.causal_gain_tau_q_acre > 2.0);
+          
+          if (!isStaleOldRobi && !isStaleSugarcane && !isStaleCotton && Date.now() - parsed.timestamp < 30 * 60 * 1000 && parsed.payload) {
             setData(parsed.payload);
             setLoading(false);
             return;
+          } else {
+            localStorage.removeItem(cacheKey);
           }
         }
       } catch {}
     }
 
     try {
+      const mandiItem = findCropMandiRate(crop, district, state);
+      const dynamicMandiPrice = mandiItem.modalPrice || 4850;
+
       const payload = {
         farmer_name: farmerName,
         farmer_id: profile?.id || farmId,
         district: district,
+        state: state,
         crop: crop,
         growth_stage: growthStage,
         area_acres: acres,
+        mandi_price_inr_q: dynamicMandiPrice,
         language: language,
         temp_max_c: weather?.temperature || 35.0,
         temp_min_c: weather?.nightTemperature || 25.2,
