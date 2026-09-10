@@ -1136,22 +1136,22 @@ export default function SignupPage() {
               {/* Soil & Irrigation */}
               <div className="space-y-3">
                 {detectedSoil && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#e8f5e9] border border-emerald-200 text-[#1b4332] text-xs shadow-2xs">
-                    <Sparkles className="h-4 w-4 text-emerald-600 shrink-0 animate-pulse" />
-                    <div className="flex-1 flex flex-wrap items-center gap-1.5">
-                      <span className="font-bold text-[11px] uppercase tracking-wider text-[#2d6a4f]">
-                        {isHindi ? "✨ AI द्वारा जांची गई मिट्टी:" : "✨ AI Soil Auto-Detected:"}
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#f8faf7] border border-[#e2e8df] text-[#11261f] text-xs shadow-2xs">
+                    <CheckCircle2 className="h-4 w-4 text-[#2d6a4f] shrink-0" />
+                    <div className="flex-1 flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-[11px] uppercase tracking-wider text-slate-500 font-mono">
+                        {isHindi ? "पहचानी गई मिट्टी:" : "Auto-Detected Soil:"}
                       </span>
-                      <span className="font-bold text-[#1b4332]">
+                      <span className="font-bold text-[#11261f]">
                         {detectedSoil.detectedSoilType}
                       </span>
                       {detectedSoil.typicalPh && (
-                        <span className="text-[10px] bg-emerald-100/90 text-emerald-800 px-2 py-0.5 rounded font-mono font-bold">
+                        <span className="text-[10px] bg-[#e8ede4] text-[#2d6a4f] px-2 py-0.5 rounded-md font-mono font-bold">
                           pH {detectedSoil.typicalPh}
                         </span>
                       )}
                       {detectedSoil.texture && (
-                        <span className="text-[10px] text-[#2d6a4f]">
+                        <span className="text-[10px] text-slate-500 font-medium">
                           • {detectedSoil.texture}
                         </span>
                       )}
@@ -1230,7 +1230,7 @@ export default function SignupPage() {
                 <span>{isHindi ? "फसल व कृषि इतिहास" : "Agronomic & Crop Intelligence"}</span>
               </h2>
                 <p className="text-xs text-[#52796f]">
-                  <span>{isHindi ? "फसल की किस्म व बुवाई की तारीख से AI आपके खेत के विकास चरण को स्वतः सेट करेगा।" : "Calibrates 14-day heat stress predictions and precise Syngenta product dosages."}</span>
+                  <span>{isHindi ? "फसल की किस्म व बुवाई की तारीख से आपके खेत के विकास चरण का स्वतः आकलन होगा।" : "Calibrates 14-day heat stress predictions and precise Syngenta product dosages."}</span>
                 </p>
               </div>
 
@@ -1238,7 +1238,7 @@ export default function SignupPage() {
                 {/* Regional Header & Custom Crop Button */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 bg-[#e8f5e9]/75 p-3.5 rounded-2xl border border-emerald-200">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-[#2d6a4f] shrink-0" />
+                    <Leaf className="h-4 w-4 text-[#2d6a4f] shrink-0" />
                     <div>
                       <span className="text-xs font-bold text-[#0d253d]">
                         {isHindi
@@ -1760,7 +1760,7 @@ export default function SignupPage() {
                     nameEn: cropId,
                     nameHi: cropId,
                     category: customCropCategory as any,
-                    icon: "✨",
+                    icon: "🌱",
                     image: "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=400&q=80",
                     varieties: customCropVariety.trim() ? [customCropVariety.trim()] : ["Local Hybrid"],
                     isMajorCrop: true,

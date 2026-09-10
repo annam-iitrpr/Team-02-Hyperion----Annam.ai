@@ -472,8 +472,8 @@ export function RealBoundaryMap({
             onClick={handleFlyToFarmlandOutskirts}
             className="px-3.5 py-2 rounded-xl bg-[#1b4332] hover:bg-[#143326] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-95 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>🌾 Fly to Farm Fields (2km)</span>
+            <Navigation className="h-3.5 w-3.5" />
+            <span>Fly to Farm Fields (2km)</span>
           </button>
 
           {/* Directional Nudges */}

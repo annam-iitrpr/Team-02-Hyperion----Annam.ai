@@ -1353,17 +1353,17 @@ export default function MyFieldsPage() {
 
                 {/* ICAR Soil Detection Badge */}
                 {wizDetectedSoil && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-emerald-900 text-xs shadow-2xs">
-                    <Sparkles className="h-4 w-4 text-emerald-600 shrink-0 animate-pulse" />
-                    <div className="flex-1 flex flex-wrap items-center gap-1.5">
-                      <span className="font-bold text-[11px] uppercase tracking-wider text-emerald-700">
-                        {isHindi ? "✨ ICAR द्वारा जांची गई मिट्टी:" : "✨ ICAR Soil Auto-Detected:"}
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#f8faf7] border border-[#e2e8df] text-[#11261f] text-xs shadow-2xs">
+                    <CheckCircle2 className="h-4 w-4 text-[#2d6a4f] shrink-0" />
+                    <div className="flex-1 flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-[11px] uppercase tracking-wider text-slate-500 font-mono">
+                        {isHindi ? "पहचानी गई मिट्टी:" : "Auto-Detected Soil:"}
                       </span>
-                      <span className="font-bold text-emerald-950">
+                      <span className="font-bold text-[#11261f]">
                         {wizDetectedSoil.detectedSoilType}
                       </span>
                       {wizDetectedSoil.typicalPh && (
-                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">
+                        <span className="text-[10px] bg-[#e8ede4] text-[#2d6a4f] px-2 py-0.5 rounded-md font-mono font-bold">
                           pH {wizDetectedSoil.typicalPh}
                         </span>
                       )}
