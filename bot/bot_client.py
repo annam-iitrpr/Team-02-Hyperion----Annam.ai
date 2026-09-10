@@ -22,7 +22,7 @@ try:
         CONFIG = json.load(f)
 except Exception:
     CONFIG = {
-        "api_base_url": "https://frontend-phi-flame-21.vercel.app",
+        "api_base_url": "https://krishyantra.vercel.app",
         "database_api_key": "aasra-bot-access-2026",
         "endpoints": {
             "database": "/api/database",
@@ -32,7 +32,7 @@ except Exception:
         }
     }
 
-BASE_URL = CONFIG.get("api_base_url", "https://frontend-phi-flame-21.vercel.app")
+BASE_URL = CONFIG.get("api_base_url", "https://krishyantra.vercel.app")
 API_KEY = CONFIG.get("database_api_key", "aasra-bot-access-2026")
 
 

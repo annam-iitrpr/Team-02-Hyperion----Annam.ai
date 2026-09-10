@@ -39,3 +39,8 @@ META_WHATSAPP_PHONE_ID=       # WhatsApp Business phone number ID
 META_VERIFY_TOKEN=            # Webhook verification token
 GEMINI_API_KEY=               # Google Gemini API key
 ```
+
+## Production Webhook Endpoint
+- **Live URL:** `https://krishyantra.vercel.app/api/meta-whatsapp/webhook`
+- **Verification Callback:** Configure in Meta Developer Portal under WhatsApp Cloud API > Webhooks.
+

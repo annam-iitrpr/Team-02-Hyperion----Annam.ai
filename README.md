@@ -14,10 +14,16 @@
 
 ## 🌐 Live Production Links
 - **Primary Live Web Application:** [https://krishyantra.vercel.app](https://krishyantra.vercel.app)
-- **Plant Intelligence & Prescription Engine:** [https://krishyantra.vercel.app/plant-intelligence/prescription](https://krishyantra.vercel.app/plant-intelligence/prescription)
-- **Economic ROBI Impact Calculator:** [https://krishyantra.vercel.app/impact](https://krishyantra.vercel.app/impact)
-- **Interactive Closed-Loop Audit Simulator:** [https://krishyantra.vercel.app/closed-loop](https://krishyantra.vercel.app/closed-loop)
-- **Interactive What-If Timing Simulator:** [https://krishyantra.vercel.app/what-if](https://krishyantra.vercel.app/what-if)
+- **Executive Cascade & Plant Intelligence:** [https://krishyantra.vercel.app/plant-intelligence](https://krishyantra.vercel.app/plant-intelligence)
+- **Precision Prescription & Dosage Engine:** [https://krishyantra.vercel.app/plant-intelligence/prescription](https://krishyantra.vercel.app/plant-intelligence/prescription)
+- **Biophysical Weather Gating & Diagnostics:** [https://krishyantra.vercel.app/diagnostics](https://krishyantra.vercel.app/diagnostics)
+- **Farmer Field Intelligence Dashboard:** [https://krishyantra.vercel.app/dashboard](https://krishyantra.vercel.app/dashboard)
+- **Economic ROBI Causal Impact Calculator:** [https://krishyantra.vercel.app/impact](https://krishyantra.vercel.app/impact)
+- **Closed-Loop 48h Remission Audit Engine:** [https://krishyantra.vercel.app/closed-loop](https://krishyantra.vercel.app/closed-loop)
+- **APMC Mandi Real-time Price Intelligence:** [https://krishyantra.vercel.app/mandi](https://krishyantra.vercel.app/mandi)
+- **Digital Field Journal & Spray Audit Ledger:** [https://krishyantra.vercel.app/journal](https://krishyantra.vercel.app/journal)
+- **AI Multilingual Voice Agro-Assistant:** [https://krishyantra.vercel.app/assistant](https://krishyantra.vercel.app/assistant)
+- **Interactive Timing What-If Simulator:** [https://krishyantra.vercel.app/what-if](https://krishyantra.vercel.app/what-if)
 
 ---
 

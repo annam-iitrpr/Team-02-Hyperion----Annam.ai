@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 
 let config = {
-  api_base_url: "https://frontend-phi-flame-21.vercel.app",
+  api_base_url: "https://krishyantra.vercel.app",
   database_api_key: "aasra-bot-access-2026",
   endpoints: {
     database: "/api/database",
@@ -28,7 +28,7 @@ try {
   }
 } catch (e) {}
 
-const BASE_URL = config.api_base_url || "https://frontend-phi-flame-21.vercel.app";
+const BASE_URL = config.api_base_url || "https://krishyantra.vercel.app";
 const API_KEY = config.database_api_key || "aasra-bot-access-2026";
 
 class AasraBotDatabase {

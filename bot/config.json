@@ -1,5 +1,5 @@
 {
-  "api_base_url": "https://frontend-phi-flame-21.vercel.app",
+  "api_base_url": "https://krishyantra.vercel.app",
   "database_api_key": "aasra-bot-access-2026",
   "endpoints": {
     "database": "/api/database",
