@@ -86,27 +86,6 @@ export const KrishyantraNavbar: React.FC = () => {
             )}
           </button>
 
-          <Link
-            href="/dashboard"
-            className="relative py-2 text-[#1b4332] font-bold hover:text-[#2d6a4f] flex items-center gap-1.5 transition-colors"
-          >
-            <span>🌾 Farm Dashboard</span>
-          </Link>
-
-          <Link
-            href="/closed-loop"
-            className="relative py-2 text-[#1b4332] font-bold hover:text-[#2d6a4f] flex items-center gap-1.5 transition-colors"
-          >
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>🔄 48h Follow-Up</span>
-          </Link>
-
-          <Link
-            href="/plant-intelligence"
-            className="relative py-2 text-[#1b4332] font-bold hover:text-[#2d6a4f] flex items-center gap-1.5 transition-colors"
-          >
-            <span>🌿 Plant Health AI</span>
-          </Link>
 
           <button
             type="button"
@@ -221,20 +200,20 @@ export const KrishyantraNavbar: React.FC = () => {
 
           {/* Primary Agricultural CTA */}
           <Link
-            href="/dashboard"
+            href={isLoggedIn ? "/dashboard" : "/signup"}
             className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-sm font-bold shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            <span>🌾 Farm Dashboard</span>
+            <span>{isLoggedIn ? "Open App" : "Get Started"}</span>
           </Link>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-2">
           <Link
-            href="/dashboard"
+            href={isLoggedIn ? "/dashboard" : "/signup"}
             className="px-3.5 py-1.5 rounded-full bg-[#1b4332] text-white text-xs font-bold shadow-xs"
           >
-            🌾 Dashboard
+            {isLoggedIn ? "App" : "Start"}
           </Link>
           <button
             type="button"
@@ -251,38 +230,6 @@ export const KrishyantraNavbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top duration-200 shadow-xl">
           <div className="flex flex-col space-y-2 text-sm font-semibold text-slate-700">
-            <Link
-              href="/dashboard"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-left px-3.5 py-2.5 rounded-xl bg-emerald-50 text-[#1b4332] font-bold flex items-center justify-between shadow-2xs"
-            >
-              <span>🌾 Live Farm Dashboard</span>
-              <span className="text-[10px] bg-[#1b4332] text-white px-2 py-0.5 rounded-full font-mono">PUNJAB DEMO</span>
-            </Link>
-
-            <Link
-              href="/closed-loop"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-left px-3.5 py-2.5 rounded-xl bg-[#f0f7f2] text-[#1b4332] font-bold flex items-center justify-between border border-[#2d6a4f]/20 shadow-2xs"
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>🔄 48h Follow-Up & Closed Loop</span>
-              </span>
-              <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-mono">ACTIVE</span>
-            </Link>
-
-            <Link
-              href="/plant-intelligence"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-left px-3.5 py-2.5 rounded-xl bg-emerald-50 text-[#1b4332] font-bold flex items-center justify-between border border-emerald-200 shadow-2xs"
-            >
-              <span className="flex items-center gap-1.5">
-                <span>🌿 Plant Health AI</span>
-              </span>
-              <span className="text-[10px] bg-[#1b4332] text-white px-2 py-0.5 rounded-full font-mono">5 MODELS</span>
-            </Link>
-
             <button
               type="button"
               onClick={() => handleNavClick("home")}
@@ -352,11 +299,11 @@ export const KrishyantraNavbar: React.FC = () => {
 
           <div className="pt-2">
             <Link
-              href="/dashboard"
+              href={isLoggedIn ? "/dashboard" : "/signup"}
               onClick={() => setMobileMenuOpen(false)}
               className="w-full py-3 rounded-full bg-[#1b4332] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md"
             >
-              <span>🌾 Go to Live Dashboard</span>
+              <span>{isLoggedIn ? "Go to Dashboard" : "Get Started Free"}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

@@ -514,29 +514,22 @@ export default function LandingPage() {
               {/* Primary & Secondary Hero CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
                 <Link
-                  href="/dashboard"
+                  href={isLoggedIn ? "/dashboard" : "/signup"}
                   className="px-7 py-3.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-sm sm:text-base font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2.5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-300" />
-                  <span>{isHindi ? "🌾 लाइव फार्म डैशबोर्ड खोलें" : "🌾 Explore Live Farm Dashboard"}</span>
+                  <span>{isLoggedIn ? (isHindi ? "डैशबोर्ड खोलें" : "Open My Dashboard") : (isHindi ? "शुरू करें — मुफ़्त" : "Get Started Free")}</span>
                   <ArrowRight className="w-4 h-4" />
-                </Link>
-
-                <Link
-                  href="/closed-loop"
-                  className="px-6 py-3.5 rounded-full bg-[#f0f7f2] hover:bg-emerald-100/80 border-2 border-[#2d6a4f]/30 hover:border-[#2d6a4f] text-[#1b4332] text-sm sm:text-base font-bold shadow-xs hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>{isHindi ? "🔄 48h फॉलो-अप लूप" : "🔄 48h Follow-Up Loop"}</span>
                 </Link>
 
                 <button
                   type="button"
                   onClick={() => setInstallModalOpen(true)}
-                  className="px-5 py-3.5 rounded-full bg-white hover:bg-[#e8f5e9]/40 border border-slate-200 hover:border-[#2d6a4f] text-slate-700 text-sm sm:text-base font-bold shadow-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-6 py-3.5 rounded-full bg-white hover:bg-[#e8f5e9]/40 border-2 border-[#2d6a4f]/25 hover:border-[#2d6a4f] text-[#1b4332] text-sm sm:text-base font-bold shadow-xs hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer"
                 >
-                  <Smartphone className="w-4 h-4 text-[#2d6a4f]" />
-                  <span>{isHindi ? "इंस्टॉल" : "Install"}</span>
+                  <div className="w-6 h-6 rounded-full bg-[#e8f5e9] text-[#2d6a4f] flex items-center justify-center">
+                    <Smartphone className="w-3.5 h-3.5" />
+                  </div>
+                  <span>{isHindi ? "वेबऐप इंस्टॉल करें" : "Install WebApp"}</span>
                 </button>
               </div>
 
@@ -1262,10 +1255,10 @@ export default function LandingPage() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/dashboard"
+              href={isLoggedIn ? "/dashboard" : "/signup"}
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#52b788] hover:bg-[#40916c] text-[#0d2319] hover:text-white text-sm sm:text-base font-black shadow-xl transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
-              <span>🌾 Explore Live Dashboard</span>
+              <span>{isLoggedIn ? (isHindi ? "डैशबोर्ड खोलें" : "Open My Dashboard") : (isHindi ? "शुरू करें — मुफ़्त" : "Get Started Free")}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
