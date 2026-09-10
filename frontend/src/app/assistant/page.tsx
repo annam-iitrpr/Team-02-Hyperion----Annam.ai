@@ -343,6 +343,17 @@ export default function AssistantPage() {
     });
   }, [buildWelcome]);
 
+  // ── Query Param Listener for routing from Diagnostics / Biotic reporter ──
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const prefillQuery = urlParams.get("q");
+      if (prefillQuery) {
+        setInput(prefillQuery);
+      }
+    }
+  }, []);
+
   // ── Voice Service Initialization ─────────────────────────────────────────
   useEffect(() => {
     const svc = new VoiceRecognitionService({

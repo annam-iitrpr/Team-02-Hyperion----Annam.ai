@@ -1761,6 +1761,27 @@ export default function PrescriptionCategoryPage() {
     setSelectedProductIdx(0);
   }, [activeFarm.id, normalizedCrop.key]);
 
+  // Support direct routing from Diagnostics Biotic Issue Reporter (?pest=...)
+  useEffect(() => {
+    if (typeof window !== "undefined" && productOptions.length > 0) {
+      const pestParam = new URLSearchParams(window.location.search).get("pest");
+      if (pestParam) {
+        const matchIdx = productOptions.findIndex((prod) => {
+          const nameLower = (prod.name || "").toLowerCase();
+          const targetLower = (prod.targetPests || []).join(" ").toLowerCase();
+          if (pestParam === "chewed_leaves" && (nameLower.includes("ampligo") || nameLower.includes("alika") || targetLower.includes("caterpillar") || targetLower.includes("borer"))) return true;
+          if (pestParam === "fungal_rust" && (nameLower.includes("ridomil") || nameLower.includes("amistar") || targetLower.includes("rust") || targetLower.includes("blight"))) return true;
+          if (pestParam === "weed_choke" && (nameLower.includes("fusiflex") || nameLower.includes("axial") || targetLower.includes("weed"))) return true;
+          if (pestParam === "viral_mosaic" && (nameLower.includes("chess") || nameLower.includes("alika") || targetLower.includes("whitefly"))) return true;
+          return false;
+        });
+        if (matchIdx >= 0) {
+          setSelectedProductIdx(matchIdx);
+        }
+      }
+    }
+  }, [productOptions]);
+
   const activeProduct = productOptions[selectedProductIdx] || productOptions[0];
 
   // Tank-Mix view tab: "safe" or "prohibited"

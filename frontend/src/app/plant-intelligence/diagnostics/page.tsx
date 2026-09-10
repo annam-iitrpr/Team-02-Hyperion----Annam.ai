@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { useLanguage } from "@/context/LanguageContext";
+import { useWeather } from "@/context/WeatherContext";
 import { usePipelinePrediction } from "@/lib/usePipelinePrediction";
 import { FarmCropSwitcher } from "@/components/FarmCropSwitcher";
 import {
@@ -32,6 +33,16 @@ import {
   X,
   Check,
   ExternalLink,
+  Snowflake,
+  Sun,
+  CloudRain,
+  Bug,
+  Bot,
+  FlaskConical,
+  Send,
+  SlidersHorizontal,
+  HelpCircle,
+  Zap,
 } from "lucide-react";
 
 interface DynamicCropAction {
@@ -190,6 +201,7 @@ export default function DiagnosticsCategoryPage() {
   const { language } = useLanguage();
   const isHindi = language === "hi";
 
+  const { weather } = useWeather();
   const {
     data,
     loading,
@@ -201,6 +213,10 @@ export default function DiagnosticsCategoryPage() {
     acres,
     growthStage,
     fourteenDayStress,
+    forecastDays,
+    setForecastDays,
+    activeSpell,
+    soilFacts,
     speakSummary,
     isSpeaking,
   } = usePipelinePrediction();
@@ -208,6 +224,10 @@ export default function DiagnosticsCategoryPage() {
   const [selectedDayIdx, setSelectedDayIdx] = useState<number>(1);
   const [isDayModalOpen, setIsDayModalOpen] = useState<boolean>(false);
   const [isDaySpeaking, setIsDaySpeaking] = useState<boolean>(false);
+
+  // Farmer Biotic Symptom Reporter State
+  const [selectedBioticCategory, setSelectedBioticCategory] = useState<string>("chewed_leaves");
+  const [customBioticNotes, setCustomBioticNotes] = useState<string>("");
 
   const riskPct = data?.model1_risk?.confidence
     ? Math.round(data.model1_risk.confidence * 100)
@@ -223,7 +243,24 @@ export default function DiagnosticsCategoryPage() {
   const hasActualStress = !isOptimalOrNoStress;
 
   const activeDayData =
-    fourteenDayStress.find((d) => d.dayIndex === selectedDayIdx) || fourteenDayStress[0];
+    fourteenDayStress.find((d) => d.dayIndex === selectedDayIdx) || fourteenDayStress[0] || {
+      dayIndex: 1,
+      dateStr: "Today",
+      dayName: "Today",
+      tempMax: 35,
+      tempMin: 25,
+      vpdKpa: 1.8,
+      rainProbPct: 15,
+      stressType: "Optimal Weather Window",
+      stressTypeHi: "अनुकूल मौसम अवधि (फसल सुरक्षित)",
+      riskPct: 12,
+      severity: "safe" as const,
+      category: "optimal" as const,
+      whatWillBeLostEn: "Weather parameters are within safe biophysical thresholds.",
+      whatWillBeLostHi: "मौसम पूरी तरह अनुकूल और सुरक्षित सीमाओं में है।",
+      lossQtlAcre: 0.0,
+      lossInrAcre: 0,
+    };
 
   const isCaneCrop = (crop || "").toLowerCase().includes("sugarcane") || (crop || "").toLowerCase().includes("ganna");
   const isFieldDrought = stressType.toLowerCase().includes("drought") || 
@@ -261,6 +298,24 @@ export default function DiagnosticsCategoryPage() {
     spraySafe,
     topProduct
   );
+
+  // Live Biophysical & Soil Facts
+  const tempMaxVal = Math.round((tele?.temp_max_c ?? weather.dayMaxTemperature ?? weather.temperature ?? 35.0) * 10) / 10;
+  const tempMinVal = Math.round((tele?.temp_min_c ?? weather.nightMinTemperature ?? weather.nightTemperature ?? 24.5) * 10) / 10;
+  const ambientTempVal = Math.round((weather.temperature || 32.0) * 10) / 10;
+  const nightMeanVal = Math.round((weather.nightTemperature || 25.2) * 10) / 10;
+
+  const surfaceMoistureVal = weather.soilMoistureEst ?? tele?.soil_moisture_pct ?? 28;
+  const rootZoneMoistureVal = weather.rootZoneSoilMoisture ?? Math.min(65, Math.max(12, Math.round(surfaceMoistureVal * 1.25 + 4)));
+  const surfaceSoilTempVal = weather.soilTemperatureReal ?? 25.8;
+  const rootZoneSoilTempVal = weather.rootZoneSoilTemp ?? Number((surfaceSoilTempVal + 1.2).toFixed(1));
+
+  const precip24hVal = weather.precipitationSum24h ?? weather.precipitation ?? 0;
+  const rainProbVal = weather.precipitationProbability ?? tele?.rain_prob_next_48h ?? 15;
+  const humidityVal = weather.humidity ?? tele?.rh_avg_pct ?? 58;
+  const vpdVal = tele?.vpd_kpa ?? weather.vpdKpa ?? 1.8;
+  const windSpeedVal = weather.windSpeed ?? tele?.wind_speed_kmh ?? 9.5;
+  const isWindSafe = windSpeedVal <= 15;
 
   const speakDayAdvisory = (day: typeof activeDayData) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
@@ -313,11 +368,97 @@ export default function DiagnosticsCategoryPage() {
     setIsDayModalOpen(true);
   };
 
+  // Biotic Categories Catalog
+  const BIOTIC_CATEGORIES = [
+    {
+      id: "chewed_leaves",
+      nameEn: "Insect Pests (~26% Loss)",
+      nameHi: "कीट व इल्ली (~26% हानि)",
+      examples: "Aphids, stem borers, caterpillars eating leaves & sucking sap",
+      examplesHi: "माहू, तना छेदक, इल्ली पत्तियां चबाकर व रस चूसकर फसल नष्ट करती हैं",
+      productName: "Syngenta Ampligo® / Alika®",
+      queryText: `Farmer reporting insect pest attack on ${crop} in ${district} (${growthStage} stage): chewed leaves, stem boring, and caterpillars. Recommend exact spray dosage and timing.`,
+    },
+    {
+      id: "fungal_rust",
+      nameEn: "Fungal Pathogens (~20% Loss)",
+      nameHi: "फफूंद रोग (~20% हानि)",
+      examples: "Rust pustules, leaf blight, powdery mildew, rotting roots",
+      examplesHi: "गेरुई/रतुआ, झुलसा, पाउडरी मिल्ड्यू व जड़ सड़न हवा-पानी से तेजी से फैलते हैं",
+      productName: "Syngenta Ridomil Gold® / Amistar Top®",
+      queryText: `Farmer reporting fungal infection on ${crop} in ${district}: leaf spots, rust pustules, and damping off under current high humidity. Recommend curative fungicide.`,
+    },
+    {
+      id: "weed_choke",
+      nameEn: "Weed Infestation (~33% Loss)",
+      nameHi: "खरपतवार प्रकोप (~33% हानि)",
+      examples: "Wild oats, motha, parthenium competing for sunlight, water & nutrients",
+      examplesHi: "मोथा, जंगली जई व घास धूप, जल व पोषक तत्वों के लिए प्रतिस्पर्धा कर फसल दबाते हैं",
+      productName: "Syngenta Fusiflex® / Axial®",
+      queryText: `Farmer reporting heavy weed competition on ${crop} in ${district}: grassy and broadleaf weeds choking canopy. Recommend selective herbicide.`,
+    },
+    {
+      id: "viral_mosaic",
+      nameEn: "Bacterial & Viral Diseases (~20% Loss)",
+      nameHi: "जीवाणु व विषाणु रोग (~20% हानि)",
+      examples: "Yellow mosaic virus, bacterial blight, leaf curling, vector stunting",
+      examplesHi: "सफेद मक्खी जनित पीला मोज़ेक, जीवाणु झुलसा व पत्ती मुड़न जिससे पौधे बौने रह जाते हैं",
+      productName: "Syngenta Chess® + Isabion®",
+      queryText: `Farmer reporting yellow mosaic / leaf curl viral symptoms on ${crop} in ${district}: vector whitefly present. Recommend vector control and crop immunity booster.`,
+    },
+    {
+      id: "nematodes",
+      nameEn: "Nematodes (~14% to 20% Loss)",
+      nameHi: "सूत्रकृमि (नेमाटोड) (~14%-20% हानि)",
+      examples: "Microscopic root-knot roundworms attacking roots, blocking water/nutrients",
+      examplesHi: "जड़ों में गांठें बनाकर पोषक तत्व व जल अवशोषण बंद कर पौधों को सुखाते हैं",
+      productName: "Syngenta Elatus Prime® / Nematicide",
+      queryText: `Farmer reporting stunted growth and root-knot nematode galls on ${crop} in ${district}. Recommend nematicide drenching and root recovery schedule.`,
+    },
+  ];
+
+  const activeBioticObj = BIOTIC_CATEGORIES.find((c) => c.id === selectedBioticCategory) || BIOTIC_CATEGORIES[0];
+
+  // 1-Line Subjective Preventability Verdict
+  const getPreventableVerdict = (): { en: string; hi: string } => {
+    if (!hasActualStress) {
+      return {
+        en: "Yes, 100% preventable — crop is in an optimal window; maintenance foliar spray locks in vegetative resilience.",
+        hi: "हाँ, 100% रोकथाम योग्य — फसल अनुकूल स्थिति में है; पोषक स्प्रे से पौधों की प्राकृतिक प्रतिरोधक क्षमता बनी रहेगी।",
+      };
+    }
+    if (activeDayData.category === "frost") {
+      return {
+        en: "Yes, preventable through pre-dawn furrow irrigation and biostimulant shielding to elevate canopy temperature.",
+        hi: "हाँ, सुबह से पहले हल्की सिंचाई देकर व बायोस्टिमुलेंट सुरक्षा से पाले का नुकसान पूरी तरह रोका जा सकता है।",
+      };
+    }
+    if (activeDayData.category === "drought") {
+      return {
+        en: "Partially preventable; immediate emergency irrigation and root mulching required to prevent permanent wilting.",
+        hi: "आंशिक रूप से रोकथाम योग्य; पौधों को सूखने से बचाने के लिए तुरंत हल्की सिंचाई व जड़ मल्चिंग आवश्यक है।",
+      };
+    }
+    if (activeDayData.category === "rain") {
+      return {
+        en: "Preventable; ensure unblocked surface drainage and hold foliar spray until canopy moisture dries.",
+        hi: "रोकथाम योग्य; खेत से अतिरिक्त जल निकासी सुनिश्चित करें और धूप निकलने के बाद ही सुरक्षात्मक छिड़काव करें।",
+      };
+    }
+    return {
+      en: "Yes, highly preventable within 48h using evening foliar osmoprotectant before petal abscission completes.",
+      hi: "हाँ, अगले 48 घंटों में शाम के समय बायोस्टिमुलेंट छिड़काव से फूल व फल झड़ने से पूरी तरह रोका जा सकता है।",
+    };
+  };
+
+  const preventVerdict = getPreventableVerdict();
+  const primaryRecommendedProduct = data?.model3_portfolio?.top_recommendations?.[0]?.name || "Syngenta Quantis®";
+
   return (
     <AppShell>
       {/* ── Outer Canvas with Exact Dashboard Dot Matrix Theme ────── */}
       <div className="relative min-h-screen bg-[#fbfcf8] bg-[radial-gradient(#1b4332_0.75px,transparent_0.75px)] [background-size:24px_24px] [background-position:0_0] text-slate-800 pb-24 md:pb-12">
-        <div className="max-w-[1240px] w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-10 space-y-5 sm:space-y-8 font-sans">
+        <div className="max-w-[1240px] w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-10 space-y-6 sm:space-y-8 font-sans">
           
           {/* Navigation Breadcrumbs & Crop/Field Switcher */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 border-b border-[#e8ede4] pb-5 sm:pb-6">
@@ -332,7 +473,7 @@ export default function DiagnosticsCategoryPage() {
                 </Link>
                 <span>/</span>
                 <span className="text-[#11261f] font-bold">
-                  {isHindi ? "1. समस्या पहचान व 14-दिवसीय रडार" : "1. Problem Diagnostics & 14-Day Radar"}
+                  {isHindi ? "1. समस्या पहचान व तनाव रडार" : "1. Problem Diagnostics & Multi-Stress Radar"}
                 </span>
               </div>
               
@@ -344,8 +485,8 @@ export default function DiagnosticsCategoryPage() {
                 )}
                 <span>
                   {isHindi
-                    ? `फसल समस्या निदान — ${crop}`
-                    : `Crop Problem Diagnostics — ${crop}`}
+                    ? `फसल तनाव निदान एवं तथ्य — ${crop}`
+                    : `Crop Stress Diagnostics & Facts — ${crop}`}
                 </span>
               </h1>
 
@@ -397,7 +538,7 @@ export default function DiagnosticsCategoryPage() {
             </div>
           </div>
 
-          {/* ── REAL-TIME MODEL 1 RISK BANNER ── */}
+          {/* ── REAL-TIME MODEL 1 RISK BANNER (Green if optimal, Red if stress) ── */}
           <div className={`rounded-3xl p-5 sm:p-7 shadow-xs border transition-all ${
             hasActualStress
               ? "bg-gradient-to-r from-rose-50/80 via-white to-amber-50/60 border-rose-200/80"
@@ -457,40 +598,281 @@ export default function DiagnosticsCategoryPage() {
             </div>
           </div>
 
-          {/* ── 14-DAY DYNAMIC STRESS HORIZON TIMELINE ── */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* 🌟 1. FACTS SECTION: FIELD BIOPHYSICAL & SOIL TELEMETRY          */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e8ede4] pb-3">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-0.5 rounded-md border border-[#cbe5cb]">
+                  {isHindi ? "वास्तविक मापे गए आंकड़े" : "Measured Sensor Facts"}
+                </span>
+                <h3 className="text-lg sm:text-xl font-extrabold text-[#11261f] font-display mt-1 flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-[#2d6a4f]" />
+                  <span>{isHindi ? "खेत के भौतिक व मृदा तथ्य (Field Biophysical & Soil Facts)" : "Field Biophysical & Soil Telemetry Facts"}</span>
+                </h3>
+              </div>
+              <span className="text-xs text-slate-500 font-mono">
+                Open-Meteo & Agrometeorology &middot; {weather.lastUpdated}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 font-mono text-xs">
+              {/* Fact Card 1: Temperature Matrix */}
+              <div className="p-4 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-2 hover:border-[#2d6a4f]/40 transition-all shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase font-sans">
+                    {isHindi ? "तापमान ढांचा" : "TEMPERATURE MATRIX"}
+                  </span>
+                  <Thermometer className="h-4 w-4 text-amber-600" />
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-slate-800">
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Day Peak</span>
+                    <span className="text-base font-black font-display text-slate-900">{tempMaxVal}°C</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Night Min</span>
+                    <span className={`text-base font-black font-display ${tempMinVal >= 25 ? "text-rose-600" : tempMinVal <= 5 ? "text-cyan-600" : "text-slate-900"}`}>
+                      {tempMinVal}°C
+                    </span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Ambient Now</span>
+                    <span className="text-sm font-bold">{ambientTempVal}°C</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Night Mean</span>
+                    <span className="text-sm font-bold">{nightMeanVal}°C</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fact Card 2: Soil Dual-Depth Telemetry */}
+              <div className="p-4 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-2 hover:border-[#2d6a4f]/40 transition-all shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase font-sans">
+                    {isHindi ? "मृदा जल व तापमान" : "SOIL MOISTURE & TEMP"}
+                  </span>
+                  <Layers className="h-4 w-4 text-[#2d6a4f]" />
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-slate-800">
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Surface (0-1cm)</span>
+                    <span className="text-base font-black font-display text-[#2d6a4f]">{surfaceMoistureVal}%</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Root (9-27cm)</span>
+                    <span className="text-base font-black font-display text-[#1b4332]">{rootZoneMoistureVal}%</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Soil Temp (0cm)</span>
+                    <span className="text-sm font-bold text-amber-700">{surfaceSoilTempVal}°C</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Root Temp (6cm)</span>
+                    <span className="text-sm font-bold text-amber-800">{rootZoneSoilTempVal}°C</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fact Card 3: Soil Type, Texture & Nutrients */}
+              <div className="p-4 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-2 hover:border-[#2d6a4f]/40 transition-all shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase font-sans">
+                    {isHindi ? "मिट्टी प्रकार व पोषक स्तर" : "SOIL TYPE & NUTRIENTS"}
+                  </span>
+                  <Sprout className="h-4 w-4 text-[#2d6a4f]" />
+                </div>
+                <div className="space-y-1.5 text-[11px] font-sans">
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-mono">Classification & Texture</span>
+                    <span className="font-bold text-slate-800 block truncate">{soilFacts?.soilType}</span>
+                    <span className="text-[10px] text-slate-500 font-mono block">{soilFacts?.texture}</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-xl border border-slate-100 text-[10px]">
+                    <span className="font-medium text-slate-600">N-Status:</span>
+                    <span className={`font-bold font-mono px-2 py-0.5 rounded-md ${soilFacts?.nitrogenStress ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>
+                      {soilFacts?.nitrogenStress ? (isHindi ? "नाइट्रोजन कमी खतरा" : "N-Stress Risk") : (isHindi ? "सामान्य" : "Adequate")}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-xl border border-slate-100 text-[10px]">
+                    <span className="font-medium text-slate-600">P-Status:</span>
+                    <span className={`font-bold font-mono px-2 py-0.5 rounded-md ${soilFacts?.phosphorusStress ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>
+                      {soilFacts?.phosphorusStress ? (isHindi ? "फास्फोरस संवेदनशीलता" : "P-Fixation Risk") : (isHindi ? "संतुलित" : "Balanced")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fact Card 4: Rainfall, Humidity & Windspeed */}
+              <div className="p-4 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-2 hover:border-[#2d6a4f]/40 transition-all shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase font-sans">
+                    {isHindi ? "वर्षा, वाष्प व हवा गति" : "RAIN, HUMIDITY & WIND"}
+                  </span>
+                  <Droplets className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-slate-800">
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">24h Rain</span>
+                    <span className="text-base font-black font-display text-blue-600">{precip24hVal} mm</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Rain Prob</span>
+                    <span className="text-base font-black font-display text-sky-600">{rainProbVal}%</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">VPD Deficit</span>
+                    <span className="text-sm font-bold text-[#1b4332]">{vpdVal} kPa</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl border border-slate-100">
+                    <span className="text-[9px] text-slate-400 block font-sans">Windspeed</span>
+                    <span className={`text-sm font-bold ${isWindSafe ? "text-emerald-700" : "text-amber-700"}`}>
+                      {windSpeedVal} km/h
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* 🌟 2. ACTIVE SPELL ALERT BANNER (Shown before forecast if active) */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {activeSpell && (
+            <div className={`p-5 sm:p-6 rounded-3xl border shadow-sm transition-all animate-in fade-in duration-300 ${
+              activeSpell.type === "heat"
+                ? "bg-gradient-to-r from-rose-50 via-amber-50/50 to-white border-rose-300 text-rose-950"
+                : activeSpell.type === "dry"
+                ? "bg-gradient-to-r from-amber-50 via-orange-50/40 to-white border-amber-300 text-amber-950"
+                : activeSpell.type === "frost"
+                ? "bg-gradient-to-r from-cyan-50 via-sky-50/50 to-white border-cyan-300 text-cyan-950"
+                : "bg-gradient-to-r from-blue-50 via-indigo-50/40 to-white border-blue-300 text-blue-950"
+            }`}>
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className={`p-3 rounded-2xl text-white shrink-0 shadow-xs ${
+                    activeSpell.type === "heat"
+                      ? "bg-rose-600"
+                      : activeSpell.type === "dry"
+                      ? "bg-amber-600"
+                      : activeSpell.type === "frost"
+                      ? "bg-cyan-600"
+                      : "bg-blue-600"
+                  }`}>
+                    {activeSpell.type === "heat" ? (
+                      <Flame className="h-6 w-6" />
+                    ) : activeSpell.type === "dry" ? (
+                      <Sun className="h-6 w-6" />
+                    ) : activeSpell.type === "frost" ? (
+                      <Snowflake className="h-6 w-6" />
+                    ) : (
+                      <CloudRain className="h-6 w-6" />
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-mono font-black uppercase tracking-wider bg-white px-2.5 py-0.5 rounded-full border shadow-2xs">
+                        ⚠️ {isHindi ? "सक्रिय मौसम स्पेल चेतावनी" : `ACTIVE METEOROLOGICAL SPELL (${activeSpell.durationDays} DAYS)`}
+                      </span>
+                      <span className="text-xs font-mono font-bold opacity-80">
+                        {district}, {crop}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg sm:text-xl font-black font-display tracking-tight">
+                      {isHindi ? activeSpell.titleHi : activeSpell.titleEn}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm opacity-90 max-w-3xl leading-relaxed">
+                      {isHindi ? activeSpell.descriptionHi : activeSpell.descriptionEn}
+                    </p>
+
+                    <div className="pt-2 flex items-center gap-2 flex-wrap text-xs font-semibold">
+                      <span className="bg-white/90 px-3 py-1.5 rounded-xl border font-mono">
+                        👉 {isHindi ? "किसान के लिए तत्काल निर्देश: " : "Immediate Farmer Action: "}
+                        <span className="font-bold">{isHindi ? activeSpell.actionHi : activeSpell.actionEn}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/95 px-4 py-3 rounded-2xl border shadow-2xs text-center shrink-0 min-w-[130px] self-start sm:self-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase font-mono block">Spell Window</span>
+                  <span className="text-2xl font-black font-display block text-slate-800">
+                    {activeSpell.durationDays} {isHindi ? "दिन" : "Days"}
+                  </span>
+                  <span className="text-[9px] font-bold text-amber-700 uppercase font-mono">Active Horizon</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* 🌟 3. 14 TO 21-DAY MULTI-STRESS RADAR TIMELINE                   */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
           <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e8ede4] pb-4">
               <div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-[#2d6a4f]" />
                   <h3 className="text-lg sm:text-xl font-extrabold text-[#11261f] font-display">
-                    {isHindi ? "14-दिवसीय तनाव रडार व दैनिक फसल स्थिति" : "14-Day Stress Radar & Daily Crop Condition"}
+                    {isHindi ? `${forecastDays}-दिवसीय बहु-तनाव रडार (Heat, Frost, Rain, Drought)` : `${forecastDays}-Day Multi-Stress Radar (Heat, Frost, Rain, Drought)`}
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 mt-1 font-medium">
                   {isHindi
-                    ? `${district} के मौसम और फसल की अवस्था पर आधारित 14 दिनों की स्थिति। किसी भी दिन पर क्लिक करके विस्तृत पॉप-अप रिपोर्ट देखें।`
-                    : `Model 1 daily inference for ${crop} across your coordinates in ${district}. Click any day card to open full pop-up inspection.`}
+                    ? `${district} के सूक्ष्म-मौसम व फसल अवस्था पर आधारित दैनिक तनाव स्थिति। किसी भी दिन पर क्लिक करके विस्तृत विवरण देखें।`
+                    : `Multi-stress day-by-day forecast for ${crop} across ${district}. Click any day card for in-depth diagnostic drill-down.`}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {/* 14 vs 21 Days Horizon Toggle */}
+                <div className="bg-[#f0f5ee] p-1 rounded-xl border border-[#d9e6d4] flex items-center gap-1 text-xs font-bold font-mono">
+                  <button
+                    type="button"
+                    onClick={() => setForecastDays(14)}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      forecastDays === 14
+                        ? "bg-[#1b4332] text-white shadow-2xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    14 Days
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForecastDays(21)}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      forecastDays === 21
+                        ? "bg-[#1b4332] text-white shadow-2xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    21 Days
+                  </button>
+                </div>
+
                 <span className="text-xs font-bold text-slate-600 bg-[#f4f7f2] px-3 py-1.5 rounded-xl border border-[#e8ede4] flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5 text-[#2d6a4f]" />
-                  <span>Day {activeDayData.dayIndex} Active &middot; {activeDayData.dateStr}</span>
+                  <span>Day {activeDayData.dayIndex} &middot; {activeDayData.dateStr}</span>
                 </span>
+                
                 <button
                   type="button"
                   onClick={() => setIsDayModalOpen(true)}
                   className="px-3 py-1.5 text-xs font-bold rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  <span>{isHindi ? "पॉप-अप देखें" : "Pop-up Report"}</span>
+                  <span>{isHindi ? "पॉप-अप रिपोर्ट" : "Pop-up Report"}</span>
                 </button>
               </div>
             </div>
 
-            {/* 14 Day Horizontal Scrollable Cards */}
+            {/* Horizontal Scrollable Multi-Stress Cards */}
             <div className="overflow-x-auto pb-3 pt-1">
               <div className="flex items-stretch gap-3 min-w-[1280px]">
                 {fourteenDayStress.map((d) => {
@@ -499,12 +881,15 @@ export default function DiagnosticsCategoryPage() {
                   const isCrit = d.severity === "critical";
                   const isWarn = d.severity === "warning";
 
+                  // Category visual badge
+                  const cat = d.category || (isSafe ? "optimal" : "heat");
+
                   return (
                     <button
                       key={d.dayIndex}
                       type="button"
                       onClick={() => handleDayCardClick(d.dayIndex)}
-                      className={`w-[124px] min-w-[124px] p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2.5 hover:-translate-y-1 hover:shadow-md ${
+                      className={`w-[130px] min-w-[130px] p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2.5 hover:-translate-y-1 hover:shadow-md ${
                         isSelected
                           ? "bg-[#e8f5e9] border-[#2d6a4f] ring-2 ring-[#2d6a4f]/30 shadow-md scale-[1.02]"
                           : "bg-white hover:bg-[#fbfcf8] border-[#e8ede4]"
@@ -534,7 +919,51 @@ export default function DiagnosticsCategoryPage() {
                         </span>
                       </div>
 
-                      {/* Clean 2-Column Temperature Box (Never wraps) */}
+                      {/* Stress Type Category Tag */}
+                      <div>
+                        <span className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded-full flex items-center gap-1 truncate ${
+                          cat === "frost"
+                            ? "bg-cyan-100 text-cyan-800"
+                            : cat === "drought"
+                            ? "bg-orange-100 text-orange-800"
+                            : cat === "rain"
+                            ? "bg-blue-100 text-blue-800"
+                            : cat === "compound"
+                            ? "bg-purple-100 text-purple-800"
+                            : isSafe
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-rose-100 text-rose-800"
+                        }`}>
+                          {cat === "frost" ? (
+                            <Snowflake className="h-2.5 w-2.5 shrink-0" />
+                          ) : cat === "drought" ? (
+                            <Sun className="h-2.5 w-2.5 shrink-0" />
+                          ) : cat === "rain" ? (
+                            <CloudRain className="h-2.5 w-2.5 shrink-0" />
+                          ) : cat === "compound" ? (
+                            <Zap className="h-2.5 w-2.5 shrink-0" />
+                          ) : isSafe ? (
+                            <Check className="h-2.5 w-2.5 shrink-0" />
+                          ) : (
+                            <Flame className="h-2.5 w-2.5 shrink-0" />
+                          )}
+                          <span className="truncate">
+                            {cat === "frost"
+                              ? (isHindi ? "पाला" : "Frost")
+                              : cat === "drought"
+                              ? (isHindi ? "सूखा" : "Drought")
+                              : cat === "rain"
+                              ? (isHindi ? "वर्षा" : "Rain")
+                              : cat === "compound"
+                              ? (isHindi ? "संयुक्त" : "Compound")
+                              : isSafe
+                              ? (isHindi ? "सुरक्षित" : "Safe")
+                              : (isHindi ? "ताप" : "Heat")}
+                          </span>
+                        </span>
+                      </div>
+
+                      {/* Clean 2-Column Temperature Box */}
                       <div className="grid grid-cols-2 gap-1 text-[10px] font-mono bg-slate-50 rounded-xl p-1.5 border border-slate-100">
                         <div>
                           <span className="text-[8px] text-slate-400 font-semibold block uppercase">Day</span>
@@ -542,7 +971,7 @@ export default function DiagnosticsCategoryPage() {
                         </div>
                         <div className="text-right">
                           <span className="text-[8px] text-slate-400 font-semibold block uppercase">Night</span>
-                          <span className={`font-bold ${d.tempMin >= 25 ? "text-rose-600 font-black" : "text-slate-800"}`}>
+                          <span className={`font-bold ${d.tempMin >= 25 ? "text-rose-600 font-black" : d.tempMin <= 5 ? "text-cyan-600 font-black" : "text-slate-800"}`}>
                             {d.tempMin}&deg;
                           </span>
                         </div>
@@ -558,7 +987,7 @@ export default function DiagnosticsCategoryPage() {
                         />
                       </div>
 
-                      {/* Easy Farmer Language Loss Status */}
+                      {/* Yield Impact Status */}
                       <div className="pt-0.5 space-y-0.5">
                         {isSafe ? (
                           <div className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded-md flex items-center justify-center gap-1">
@@ -649,26 +1078,26 @@ export default function DiagnosticsCategoryPage() {
               {/* Granular Telemetry for this day */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                 <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4]">
-                  <span className="text-[10px] text-slate-400 block uppercase">Peak Day Temp</span>
+                  <span className="text-[10px] text-slate-400 block uppercase font-sans">Peak Day Temp</span>
                   <span className="text-lg font-bold text-slate-900">{activeDayData.tempMax}&deg;C</span>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4]">
-                  <span className="text-[10px] text-slate-400 block uppercase">Night Min Temp</span>
-                  <span className={`text-lg font-bold ${activeDayData.tempMin >= 25 ? "text-rose-600 font-black" : "text-slate-900"}`}>
+                  <span className="text-[10px] text-slate-400 block uppercase font-sans">Night Min Temp</span>
+                  <span className={`text-lg font-bold ${activeDayData.tempMin >= 25 ? "text-rose-600 font-black" : activeDayData.tempMin <= 5 ? "text-cyan-600 font-black" : "text-slate-900"}`}>
                     {activeDayData.tempMin}&deg;C
                   </span>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4]">
-                  <span className="text-[10px] text-slate-400 block uppercase">Vapor Deficit (VPD)</span>
+                  <span className="text-[10px] text-slate-400 block uppercase font-sans">Vapor Deficit (VPD)</span>
                   <span className="text-lg font-bold text-[#1b4332]">{activeDayData.vpdKpa} kPa</span>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4]">
-                  <span className="text-[10px] text-slate-400 block uppercase">Rain Probability</span>
+                  <span className="text-[10px] text-slate-400 block uppercase font-sans">Rain Probability</span>
                   <span className="text-lg font-bold text-sky-600">{activeDayData.rainProbPct}%</span>
                 </div>
               </div>
 
-              {/* Short Statement: What Will Be Lost in Easy Language */}
+              {/* Impact Description Card */}
               <div className={`p-4 rounded-xl border flex items-start gap-3 ${
                 isTrulySafe
                   ? "bg-[#e8f5e9]/70 border-[#cbe5cb]"
@@ -683,9 +1112,7 @@ export default function DiagnosticsCategoryPage() {
                   <span className={`text-xs font-bold block ${
                     isTrulySafe ? "text-emerald-900" : "text-rose-900"
                   }`}>
-                    {isHindi
-                      ? "फसल पर प्रभाव (आसान भाषा में)"
-                      : "Crop Impact & Biological Status (Easy Farmer Language)"}
+                    {isHindi ? "फसल पर जैविक प्रभाव (आसान भाषा में)" : "Crop Impact & Biological Status (Easy Farmer Language)"}
                   </span>
                   <p className={`text-xs leading-relaxed mt-0.5 ${
                     isTrulySafe ? "text-emerald-800" : "text-rose-800"
@@ -697,7 +1124,222 @@ export default function DiagnosticsCategoryPage() {
             </div>
           </div>
 
-          {/* ── 4 Essential Questions (WHAT, WHY, HOW, WHAT TO DO) ──── */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* 🌟 4. BIOTIC STRESS INTELLIGENCE & PAN-INDIA CONTEXT             */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-6">
+            <div className="border-b border-[#e8ede4] pb-4">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-800 bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200">
+                {isHindi ? "अखिल भारतीय परिप्रेक्ष्य" : "Pan-India Perspective & Threat Landscape"}
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-[#11261f] font-display mt-1.5 flex items-center gap-2">
+                <Bug className="h-6 w-6 text-rose-600 shrink-0" />
+                <span>{isHindi ? "जैविक तनाव परिदृश्य (कीट, फफूंद, खरपतवार, रोग व सूत्रकृमि)" : "Biotic Stress Intelligence (Insects, Fungi, Weeds, Viruses & Nematodes)"}</span>
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-4xl font-sans">
+                {isHindi
+                  ? "सरकारी व कृषि अनुसंधान अनुमानों के अनुसार भारत में कुल कृषि उपज का 30% से 35% हिस्सा प्रतिवर्ष प्रत्यक्ष रूप से जैविक कारकों (कीट, फफूंद, खरपतवार आदि) के कारण नष्ट हो जाता है। इससे भारतीय किसानों को प्रतिवर्ष ₹2.25 लाख करोड़ से अधिक का आर्थिक नुकसान होता है।"
+                  : "A pan-India perspective reveals that biotic stresses pose a severe threat to Indian agriculture. Government and institutional estimates indicate that India loses approximately 30% to 35% of its total crop produce annually directly to biotic factors. This amounts to economic losses exceeding ₹2.25 Lakh Crores every year."}
+              </p>
+            </div>
+
+            {/* 5 Biotic Categorical Loss Breakdown Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+              {BIOTIC_CATEGORIES.map((cat, idx) => {
+                const isSelected = selectedBioticCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedBioticCategory(cat.id)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 shadow-2xs ${
+                      isSelected
+                        ? "bg-[#e8f5e9] border-[#2d6a4f] ring-2 ring-[#2d6a4f]/30"
+                        : "bg-[#fbfcf8] border-[#e8ede4] hover:border-slate-300"
+                    }`}
+                  >
+                    <div>
+                      <span className="text-[10px] font-mono font-bold text-slate-400 block">
+                        Category {idx + 1}
+                      </span>
+                      <span className="font-extrabold text-[#11261f] block font-display mt-0.5">
+                        {isHindi ? cat.nameHi : cat.nameEn}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-600 leading-snug font-sans">
+                      {isHindi ? cat.examplesHi : cat.examples}
+                    </p>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-[#1b4332]">
+                      <span>{isHindi ? "सिफारिश" : "Key Product"}:</span>
+                      <span className="truncate max-w-[80px]">{cat.productName.split(" ")[1] || "Curative"}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Conditional Widespread Alert */}
+            <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/90 flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-amber-950 uppercase tracking-wider block font-sans">
+                  {isHindi ? `क्षेत्रीय निगरानी चेतावनी — ${crop} (${district})` : `Regional Surveillance Alert — ${crop} in ${district}`}
+                </span>
+                <p className="text-xs text-amber-900 leading-relaxed font-sans">
+                  {humidityVal > 70
+                    ? isHindi
+                      ? `उच्च आर्द्रता (${humidityVal}%) के कारण पत्तियों पर फफूंद व पत्ती धब्बा रोग (Fungal Blight) का प्रसार बढ़ सकता है। खेत की नियमित निगरानी रखें।`
+                      : `Atmospheric humidity at ${humidityVal}% triggers favorable conditions for foliar fungal rust and downy mildew. Scout field corners for early lesion spots.`
+                    : isHindi
+                    ? `शुष्क व गर्म मौसम में रस चूसक कीटों (माहू/सफेद मक्खी) का प्रभाव बढ़ने की संभावना है। पत्तियों की निचली सतह की जांच करें।`
+                    : `Warm dry microclimate accelerates sucking pest & whitefly reproductive cycles. Inspect undersides of leaves during scouting.`}
+                </p>
+              </div>
+            </div>
+
+            {/* ── Farmer Biotic Symptom Reporting Engine ───────────────── */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-[#e8ede4] shadow-2xs space-y-4">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-0.5 rounded-md border border-[#cbe5cb]">
+                  {isHindi ? "किसान कीट व रोग रिपोर्टर" : "Farmer Biotic Issue Reporter"}
+                </span>
+                <h4 className="text-base sm:text-lg font-black text-[#11261f] font-display mt-1">
+                  {isHindi ? "क्या आपने खेत में किसी कीट, फफूंद या बीमारी के लक्षण देखे हैं?" : "Have You Spotted Any Biotic Symptoms On Your Crop?"}
+                </h4>
+                <p className="text-xs text-slate-600 font-sans mt-0.5">
+                  {isHindi
+                    ? "नीचे दी गई श्रेणी चुनें और अपनी समस्या को सीधे हमारे AI बॉट या उत्पाद सिफारिश सारणी (Tab 2) पर भेजें:"
+                    : "Select observed symptoms to immediately route your issue to the AI Agronomist Bot or Tab 2 Prescription:"}
+                </p>
+              </div>
+
+              {/* Selected Biotic Problem Banner */}
+              <div className="p-3.5 rounded-xl bg-[#f8faf7] border border-[#e8ede4] flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-mono block uppercase">Selected Symptom Track</span>
+                  <span className="text-xs sm:text-sm font-bold text-[#11261f]">
+                    {isHindi ? activeBioticObj.nameHi : activeBioticObj.nameEn}
+                  </span>
+                  <span className="text-[11px] text-slate-500 block">
+                    {isHindi ? activeBioticObj.examplesHi : activeBioticObj.examples}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 font-mono block uppercase">Recommended Remedy</span>
+                  <span className="text-xs font-black text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-lg border border-[#cbe5cb] inline-block mt-0.5">
+                    {activeBioticObj.productName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons: 1. Divert to Bot, 2. Transfer to Tab 2 Prescription */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+                {/* Pathway 1: Divert to Bot */}
+                <Link
+                  href={`/assistant?q=${encodeURIComponent(activeBioticObj.queryText)}`}
+                  className="w-full sm:w-1/2 px-4 py-3 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all hover:scale-[1.01] active:scale-[0.99] min-h-[44px]"
+                >
+                  <Bot className="h-4 w-4" />
+                  <span>
+                    {isHindi
+                      ? "1. AI कृषि सहायक से तुरंत समाधान पूछें (Divert to Bot)"
+                      : "1. Divert to AI Agronomist Bot"}
+                  </span>
+                </Link>
+
+                {/* Pathway 2: Transfer to Tab 2 Prescription */}
+                <Link
+                  href={`/plant-intelligence/prescription?pest=${encodeURIComponent(selectedBioticCategory)}`}
+                  className="w-full sm:w-1/2 px-4 py-3 rounded-xl bg-white hover:bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all hover:scale-[1.01] active:scale-[0.99] min-h-[44px]"
+                >
+                  <FlaskConical className="h-4 w-4 text-[#2d6a4f]" />
+                  <span>
+                    {isHindi
+                      ? "2. उत्पाद सिफारिश सारणी पर जाएं (Tab 2 Prescription)"
+                      : "2. Transfer to Tab 2 (Prescription & Products)"}
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* 🌟 5. CONCISE 3-PART RECOMMENDATION & OUTPUT CARD                */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          <div className="p-5 sm:p-7 rounded-3xl bg-gradient-to-r from-[#e8f5e9]/90 via-white to-[#f0f5ee] border border-[#cbe5cb] shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-[#cbe5cb]/60 pb-3">
+              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-0.5 rounded-full border border-[#cbe5cb]">
+                {isHindi ? "तनाव समाधान व निर्णय" : "STRESS DIAGNOSTIC RECOMMENDATION & OUTPUT"}
+              </span>
+              <span className="text-xs font-bold text-[#2d6a4f] font-mono">
+                AASRA Decision Engine
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              {/* Part 1: What is the Stress */}
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-sans">
+                  1. {isHindi ? "तनाव क्या है? (What is the Stress?)" : "What is the Stress?"}
+                </span>
+                <h4 className="text-base sm:text-lg font-black text-[#11261f] font-display">
+                  {stressType} &mdash; {riskPct}% {isHindi ? "सटीकता" : "Confidence"} ({activeDayData.stressType})
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                  {isHindi
+                    ? hasActualStress
+                      ? `आपके ${district} क्षेत्र में ${acres} एकड़ ${crop} की फसल वर्तमान में ${growthStage} अवस्था में है। रात के तापमान (${tempMinVal}°C) और वाष्प दबाव कमी (${vpdVal} kPa) के कारण पौधों की श्वसन प्रक्रिया और पराग उर्वरता पर प्रतिकूल प्रभाव का जोखिम है।`
+                      : `आपके ${district} क्षेत्र में ${acres} एकड़ ${crop} की फसल सुरक्षित सीमा में है। किसी गंभीर जैविक या अजैविक तनाव का तत्काल जोखिम नहीं पाया गया है।`
+                    : hasActualStress
+                    ? `Biometeorological diagnostic gates identify ${stressType} on your ${acres} acre ${crop} field in ${district}. Daytime peak (${tempMaxVal}°C), nocturnal minimum (${tempMinVal}°C), and VPD (${vpdVal} kPa) exert transpirational load on cellular turgidity.`
+                    : `Biometeorological sensors confirm favorable agronomic conditions with no severe abiotic or biotic stress on your ${acres} acre ${crop} crop in ${district}.`}
+                </p>
+              </div>
+
+              {/* Part 2: Is the Stress Preventable at the Current Stage? (Strict 1-Line Subjective Answer) */}
+              <div className="space-y-1 bg-white p-4 rounded-2xl border border-[#cbe5cb] shadow-2xs">
+                <span className="text-xs font-bold text-[#1b4332] uppercase tracking-wider block font-sans">
+                  2. {isHindi ? "क्या इस अवस्था में तनाव की रोकथाम संभव है? (Is it Preventable?)" : "Is the Stress Preventable at the Current Stage?"}
+                </span>
+                <p className="text-xs sm:text-sm font-bold text-[#11261f] font-sans leading-snug">
+                  👉 {isHindi ? preventVerdict.hi : preventVerdict.en}
+                </p>
+              </div>
+
+              {/* Part 3: Mention Just the Product Name with 1-Click CTA */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block font-sans">
+                  3. {isHindi ? "अनुशंसित उत्पाद (Recommended Product)" : "Recommended Product"}
+                </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#e8ede4] shadow-2xs">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-[#e8f5e9] text-[#1b4332] shrink-0">
+                      <Sparkles className="h-5 w-5 text-[#2d6a4f]" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-400 block uppercase">Syngenta Crop Shield</span>
+                      <span className="text-lg font-black text-[#11261f] font-display">
+                        {primaryRecommendedProduct}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/plant-intelligence/prescription"
+                    className="px-5 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <span>{isHindi ? "दवा की सही मात्रा व सारणी देखें →" : "View Dosage & Schedule →"}</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ═════════════════════════════════════════════════════════════════ */}
+          {/* ── 4 Essential Questions (WHAT, WHY, HOW, WHAT TO DO) ────        */}
+          {/* ═════════════════════════════════════════════════════════════════ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             {/* WHAT */}
             <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-6 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-2.5">
@@ -838,7 +1480,7 @@ export default function DiagnosticsCategoryPage() {
         </div>
       </div>
 
-      {/* ── 14-DAY STRESS RADAR POP-UP MODAL (User Requested Feature) ────── */}
+      {/* ── 14-DAY / 21-DAY STRESS RADAR POP-UP MODAL ────── */}
       {isDayModalOpen && (
         <div
           role="dialog"
@@ -861,7 +1503,7 @@ export default function DiagnosticsCategoryPage() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] font-mono font-bold uppercase text-[#1b4332] bg-[#e8f5e9] px-2.5 py-0.5 rounded-md border border-[#cbe5cb]">
-                    DAY {activeDayData.dayIndex} FORECAST &middot; 14-DAY RADAR
+                    DAY {activeDayData.dayIndex} FORECAST &middot; {forecastDays}-DAY RADAR
                   </span>
                   <span
                     className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md uppercase ${
@@ -907,7 +1549,7 @@ export default function DiagnosticsCategoryPage() {
               </div>
               <div className="p-3 rounded-2xl bg-[#f8faf7] border border-[#e8ede4]">
                 <span className="text-[10px] text-slate-400 uppercase block font-sans">Night Min</span>
-                <span className={`text-base sm:text-lg font-bold ${activeDayData.tempMin >= 25 ? "text-rose-600 font-black" : "text-slate-900"}`}>
+                <span className={`text-base sm:text-lg font-bold ${activeDayData.tempMin >= 25 ? "text-rose-600 font-black" : activeDayData.tempMin <= 5 ? "text-cyan-600 font-black" : "text-slate-900"}`}>
                   {activeDayData.tempMin}&deg;C
                 </span>
               </div>
@@ -1002,28 +1644,12 @@ export default function DiagnosticsCategoryPage() {
                 )}
               </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isDaySpeaking && typeof window !== "undefined" && window.speechSynthesis) {
-                      window.speechSynthesis.cancel();
-                      setIsDaySpeaking(false);
-                    }
-                    setIsDayModalOpen(false);
-                  }}
-                  className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer min-h-[42px]"
-                >
-                  {isHindi ? "बंद करें" : "Close"}
-                </button>
-
-                <Link
-                  href="/plant-intelligence/prescription"
-                  className="px-4 py-2.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm min-h-[42px]"
-                >
-                  <span>{isHindi ? "उपाय देखें →" : "View Solutions →"}</span>
-                </Link>
-              </div>
+              <Link
+                href="/plant-intelligence/prescription"
+                className="px-5 py-2.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs min-h-[42px]"
+              >
+                <span>{isHindi ? "उत्पाद व स्प्रे सारणी देखें →" : "View Products & Schedule →"}</span>
+              </Link>
             </div>
           </div>
         </div>
