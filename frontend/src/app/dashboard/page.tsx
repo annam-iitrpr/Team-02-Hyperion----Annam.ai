@@ -15,9 +15,7 @@ import { useFarm } from "@/context/FarmContext";
 import { calculateDeterministicROI } from "@/lib/calculations/roiEngine";
 import { findCropMandiRate } from "@/lib/mandiEngine";
 import { resolveDistrictCoordinatesAsync } from "@/lib/districtCoords";
-import {
-  Sparkles, ArrowRight, Sun, RefreshCw, Edit3, Sprout, CheckCircle2, Mic, TrendingUp, MapPin
-} from "lucide-react";
+import { Sun, RefreshCw, Edit3, Sprout, MapPin } from "lucide-react";
 
 interface CropEconomicProfile {
   baseYieldQtlPerAcre: number;
@@ -453,99 +451,9 @@ export default function DashboardPage() {
         <SyngentaMandiOffers
           district={currentDistrict}
           crop={currentCrop}
-          acres={currentAcres}
-          weather={weather}
         />
 
-        {/* 🌟 4. Clean Connected Farm Workflows Ribbon (Simple words, Krishyantra Theme) */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#e8ede4] shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-xl bg-[#e8f5e9] flex items-center justify-center border border-[#cbe5cb]">
-                <Sparkles className="h-4 w-4 text-[#2d6a4f]" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-[#11261f] font-display">
-                  {language === "hi" ? "विशिष्ट कृषि उपकरण (Connected Tools)" : "Specialized Farm Tools & Workflows"}
-                </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  {language === "hi" ? "फसल सुरक्षा, AI सलाह, आर्थिक लाभ एवं इतिहास" : "Crop protection, intelligent voice assistance, ROI and field logs"}
-                </p>
-              </div>
-            </div>
-            <span className="hidden sm:inline-flex text-xs font-semibold text-[#2d6a4f] bg-[#e8f5e9] px-2.5 py-0.5 rounded-full border border-[#cbe5cb]">
-              {language === "hi" ? "4 सक्रिय मॉड्यूल" : "4 Active Modules"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs font-bold">
-            <Link
-              href="/plant-intelligence"
-              className="p-4 rounded-2xl bg-[#f4fbf7] hover:bg-[#eaf7ef] border border-[#cbe5cb] text-[#11261f] transition-all flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-8 w-8 rounded-xl bg-white flex items-center justify-center border border-[#cbe5cb]/60 shadow-2xs">
-                  <Sprout className="h-4 w-4 text-[#2d6a4f] group-hover:scale-110 transition-transform" />
-                </div>
-                <ArrowRight className="h-3.5 w-3.5 text-[#2d6a4f]/70 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-              <div>
-                <span className="block font-black text-sm text-[#11261f]">{language === "hi" ? "पौधा स्वास्थ्य AI" : "Plant Health Radar"}</span>
-                <span className="text-[11px] text-[#2d6a4f] font-semibold">{language === "hi" ? "14-दिन तनाव रडार" : "14-Day Stress Warning"}</span>
-              </div>
-            </Link>
-
-            <Link
-              href="/assistant"
-              className="p-4 rounded-2xl bg-[#fefaf0] hover:bg-[#fdf3da] border border-[#f4e4b5] text-[#11261f] transition-all flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-8 w-8 rounded-xl bg-white flex items-center justify-center border border-[#f4e4b5]/80 shadow-2xs">
-                  <Mic className="h-4 w-4 text-[#b45309] group-hover:scale-110 transition-transform" />
-                </div>
-                <ArrowRight className="h-3.5 w-3.5 text-[#b45309]/70 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-              <div>
-                <span className="block font-black text-sm text-[#11261f]">{language === "hi" ? "AI कृषि सलाह" : "Voice AI Assistant"}</span>
-                <span className="text-[11px] text-[#b45309] font-semibold">{language === "hi" ? "बोलकर या फोटो भेजकर" : "Multilingual Voice & Leaf"}</span>
-              </div>
-            </Link>
-
-            <Link
-              href="/impact"
-              className="p-4 rounded-2xl bg-[#f0f9ff] hover:bg-[#e0f2fe] border border-[#bae6fd] text-[#11261f] transition-all flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-8 w-8 rounded-xl bg-white flex items-center justify-center border border-[#bae6fd]/80 shadow-2xs">
-                  <TrendingUp className="h-4 w-4 text-[#0284c7] group-hover:scale-110 transition-transform" />
-                </div>
-                <ArrowRight className="h-3.5 w-3.5 text-[#0284c7]/70 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-              <div>
-                <span className="block font-black text-sm text-[#11261f]">{language === "hi" ? "ROBI प्रभाव" : "ROBI Causal Impact"}</span>
-                <span className="text-[11px] text-[#0284c7] font-semibold">{language === "hi" ? "खर्च बनाम मुनाफा व उपज" : "Economic ROI Matrix"}</span>
-              </div>
-            </Link>
-
-            <Link
-              href="/journal"
-              className="p-4 rounded-2xl bg-[#fafaf7] hover:bg-[#f1f3ed] border border-[#e8ede4] text-[#11261f] transition-all flex flex-col justify-between gap-3 group shadow-2xs hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-8 w-8 rounded-xl bg-white flex items-center justify-center border border-[#e8ede4] shadow-2xs">
-                  <CheckCircle2 className="h-4 w-4 text-[#2d6a4f] group-hover:scale-110 transition-transform" />
-                </div>
-                <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-              <div>
-                <span className="block font-black text-sm text-[#11261f]">{language === "hi" ? "फार्म स्प्रे डायरी" : "Farm Journal"}</span>
-                <span className="text-[11px] text-slate-600 font-semibold">{language === "hi" ? "स्प्रे रिकॉर्ड व इतिहास" : "Intervention Timeline"}</span>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* 🌟 6. Verified Syngenta Authorized Dealer Locator */}
+        {/* 🌟 4. Verified Syngenta Authorized Dealer Locator */}
         <SyngentaDealerLocator
           district={currentDistrict}
           farmerName={profile.fullName || (language === "hi" ? "किसान भाई" : "Farm Owner")}
