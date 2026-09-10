@@ -1,6 +1,6 @@
 {
   "version": "2.0.0-firebase",
-  "lastUpdated": "2026-09-10T16:00:42.185Z",
+  "lastUpdated": "2026-09-10T16:15:45.923Z",
   "settings": {
     "featureFlags": {
       "fieldMapping": true,
@@ -16,24 +16,23 @@
   },
   "farmers": [
     {
-      "id": "farmer-9720413710",
-      "fullName": "Sameer Mishra",
-      "mobileNumber": "9720413710",
+      "cropVariety": "Kufri Jyoti",
+      "district": "Kasganj",
       "email": "sameer@syngenta-aasra.in",
-      "language": "en",
-      "state": "Punjab",
-      "district": "Rupnagar",
-      "village": "Chamkaur Sahib",
-      "fieldAreaAcres": 5,
-      "fieldAreaHa": 2.02,
-      "primaryCrop": "Wheat",
-      "cropVariety": "PBW-826 (High Yield Punjab Wheat)",
-      "sowingDate": "2025-11-15",
-      "soilType": "Alluvial Fertile Loam (Punjab Plains)",
-      "irrigationType": "Canal + Electric Tube Well",
+      "fieldAreaAcres": 3.5,
+      "fullName": "Sameer Mishra",
       "hasKisanCreditCard": true,
+      "id": "farmer-002",
+      "irrigationType": "Tube Well Sprinkler",
+      "language": "hi",
+      "mobileNumber": "9720413710",
       "pmKisanBeneficiary": true,
-      "updatedAt": "2026-09-10T16:00:42.185Z"
+      "primaryCrop": "Potato",
+      "soilType": "Alluvial Sandy Loam",
+      "sowingDate": "2026-07-15",
+      "state": "Uttar Pradesh",
+      "updatedAt": "2026-09-10T10:45:15.431Z",
+      "village": "Bilram"
     },
     {
       "cropVariety": "Sharbati C-306",
@@ -87,6 +86,60 @@
       "sowingDate": "2026-06-15",
       "state": "Punjab",
       "updatedAt": "2026-09-10T15:55:38.650Z",
+      "village": "Village Area"
+    },
+    {
+      "cropVariety": "Sharbati C-306",
+      "district": "Rupnagar",
+      "email": "",
+      "farmingExperience": "5-10 Years",
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
+      "fieldAreaAcres": 1.22,
+      "fieldAreaHa": 0.49,
+      "fieldName": "Wheat Main Field",
+      "fullName": "as",
+      "gpsLocation": {
+        "lat": 30.968575021744023,
+        "lon": 76.47293340748492
+      },
+      "growthStage": "Flowering & Pod Formation",
+      "hasKisanCreditCard": true,
+      "id": "kisan-456789-1789055889046",
+      "irrigationType": "Borewell + Rainfed",
+      "landOwnership": "Owner",
+      "language": "en",
+      "mobileNumber": "7123456789",
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "pmKisanBeneficiary": true,
+      "polygon": [
+        [
+          30.97149185081629,
+          76.46905077597391
+        ],
+        [
+          30.9714274567046,
+          76.46992900019104
+        ],
+        [
+          30.970921501458577,
+          76.46984336715677
+        ],
+        [
+          30.97087550539414,
+          76.4690613207871
+        ]
+      ],
+      "preferredCommunication": "Voice + WhatsApp",
+      "primaryCrop": "Wheat",
+      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "sowingDate": "2026-06-15",
+      "state": "Punjab",
+      "updatedAt": "2026-09-10T15:58:09.909Z",
       "village": "Village Area"
     },
     {
@@ -252,6 +305,60 @@
       "village": "Village Area"
     },
     {
+      "cropVariety": "Sharbati C-306",
+      "district": "Rupnagar",
+      "email": "",
+      "farmingExperience": "5-10 Years",
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
+      "fieldAreaAcres": 7.24,
+      "fieldAreaHa": 2.93,
+      "fieldName": "Wheat Main Field",
+      "fullName": "sdf",
+      "gpsLocation": {
+        "lat": 30.96877806131085,
+        "lon": 76.4707663401314
+      },
+      "growthStage": "Flowering & Pod Formation",
+      "hasKisanCreditCard": true,
+      "id": "kisan-567234-1789056063828",
+      "irrigationType": "Borewell + Rainfed",
+      "landOwnership": "Owner",
+      "language": "en",
+      "mobileNumber": "9234567234",
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "pmKisanBeneficiary": true,
+      "polygon": [
+        [
+          30.970783513198807,
+          76.47006869316102
+        ],
+        [
+          30.97087550539414,
+          76.47217078167448
+        ],
+        [
+          30.96953241054169,
+          76.4721173555954
+        ],
+        [
+          30.969642802612125,
+          76.46977863291029
+        ]
+      ],
+      "preferredCommunication": "Voice + WhatsApp",
+      "primaryCrop": "Wheat",
+      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "sowingDate": "2026-06-15",
+      "state": "Punjab",
+      "updatedAt": "2026-09-10T16:01:04.673Z",
+      "village": "Village Area"
+    },
+    {
       "cropVariety": "Bollgard II",
       "district": "Rupnagar",
       "email": "",
@@ -306,33 +413,30 @@
       "village": "Village Area"
     },
     {
-      "cropVariety": "Sharbati C-306",
-      "district": "Rupnagar",
+      "id": "farmer-7222949347",
+      "fullName": "Rishabh",
+      "mobileNumber": "7222949347",
       "email": "",
-      "farmingExperience": "1-3 Yrs",
-      "fertilizersUsed": [
-        "DAP",
-        "Urea"
-      ],
-      "fieldAreaAcres": 7.43,
-      "fieldAreaHa": 3.01,
+      "language": "hi",
+      "state": "Madhya Pradesh",
+      "district": "Indore",
+      "tehsil": "Sehore",
+      "village": "Sanwer",
       "fieldName": "Wheat Main Field",
-      "fullName": "ishaan sen",
+      "fieldAreaAcres": 4,
+      "fieldAreaHa": 3.01,
+      "landOwnership": "Owner",
+      "farmingExperience": "1-3 Yrs",
+      "primaryCrop": "Soybean",
+      "cropVariety": "JS-335",
+      "sowingDate": "2025-11-15",
+      "growthStage": "Germination & Seedling",
+      "soilType": "Black Cotton Soil",
+      "irrigationType": "Canal + Drip",
       "gpsLocation": {
         "lat": 30.970801911644976,
         "lon": 76.46962377194076
       },
-      "growthStage": "Germination & Seedling",
-      "hasKisanCreditCard": true,
-      "id": "kisan-949347-1789046727509",
-      "irrigationType": "Borewell + Rainfed",
-      "landOwnership": "Owner",
-      "language": "en",
-      "mobileNumber": "7222949347",
-      "pestHistory": [
-        "Heat Stress Flower Drop"
-      ],
-      "pmKisanBeneficiary": true,
       "polygon": [
         [
           30.97231057216355,
@@ -351,14 +455,17 @@
           76.46844778594392
         ]
       ],
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
+      "hasKisanCreditCard": true,
+      "pmKisanBeneficiary": true,
       "preferredCommunication": "Voice + WhatsApp",
-      "primaryCrop": "Wheat",
-      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "sowingDate": "2026-06-15",
-      "state": "Punjab",
-      "tehsil": "Sehore",
-      "updatedAt": "2026-09-10T13:25:29.594Z",
-      "village": "Village Area"
+      "updatedAt": "2026-09-10T16:15:45.923Z"
     }
   ],
   "fields": [

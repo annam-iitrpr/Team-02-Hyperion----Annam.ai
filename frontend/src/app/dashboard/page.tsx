@@ -15,6 +15,7 @@ import { useFarm } from "@/context/FarmContext";
 import { calculateDeterministicROI } from "@/lib/calculations/roiEngine";
 import { findCropMandiRate } from "@/lib/mandiEngine";
 import { resolveDistrictCoordinatesAsync } from "@/lib/districtCoords";
+import { ClosedLoopDashboardCard } from "@/components/ClosedLoopDashboardCard";
 import { Sun, RefreshCw, Edit3, Sprout, MapPin } from "lucide-react";
 
 interface CropEconomicProfile {
@@ -438,6 +439,14 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* 🌟 1.5. Model 4 · Closed-Loop Pharmacovigilance & 48h WhatsApp Verification */}
+        <ClosedLoopDashboardCard
+          district={currentDistrict}
+          crop={currentCrop}
+          acres={currentAcres}
+          farmerName={profile.fullName}
+        />
 
         {/* 🌟 2. Detailed 4-Card 2x2 Agro-Science Telemetry Grid (Screenshot 1 bottom) */}
         <FieldAgroTelemetryGrid

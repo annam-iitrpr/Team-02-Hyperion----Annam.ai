@@ -328,6 +328,18 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                     <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 font-medium text-xs text-slate-700 space-y-1">
 
                       <Link
+                        href="/closed-loop"
+                        onClick={() => setMoreDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                      >
+                        <Activity className="h-4 w-4 text-[#2d6a4f]" />
+                        <div>
+                          <span className="font-bold block">Closed-Loop Verification</span>
+                          <span className="text-[10px] text-slate-500">48h Remission & WhatsApp Sync</span>
+                        </div>
+                      </Link>
+
+                      <Link
                         href="/impact"
                         onClick={() => setMoreDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
@@ -336,6 +348,18 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                         <div>
                           <span className="font-bold block">ROBI Causal Impact</span>
                           <span className="text-[10px] text-slate-500">Yield Attribution Proof</span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/what-if"
+                        onClick={() => setMoreDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                      >
+                        <Sparkles className="h-4 w-4 text-purple-600" />
+                        <div>
+                          <span className="font-bold block">What-If Simulator</span>
+                          <span className="text-[10px] text-slate-500">Counterfactual Stress Modeling</span>
                         </div>
                       </Link>
 

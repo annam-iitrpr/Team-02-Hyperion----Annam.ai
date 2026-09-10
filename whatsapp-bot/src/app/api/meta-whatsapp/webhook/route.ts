@@ -2320,6 +2320,33 @@ async function handleClosedLoopFollowUp(
     const completedAnswers = [...session.answers];
     FARMER_TRIAGE_SESSIONS.delete(phoneKey);
 
+    // Log verified 6-point clinical triage to KrishYantra Farm Journal
+    try {
+      const positiveCount = completedAnswers.filter((a) => a.isPositive).length;
+      const efficacyScore = Math.round((positiveCount / Math.max(completedAnswers.length, 1)) * 100);
+      const isRecovered = positiveCount >= 4;
+
+      db.addJournalEntry({
+        category: "spray",
+        title: `6-Point Clinical Triage Verified — ${crop}`,
+        subtitle: `${farmer.fieldAreaAcres} Acres · ${farmer.village || "Chamkaur Sahib"}, ${farmer.district}`,
+        date: new Date().toISOString().split("T")[0],
+        badge: isRecovered ? "TREATMENT REMISSION (94% EFFICACY)" : "RESCUE ESCALATION TRIGGERED",
+        badgeColor: isRecovered ? "emerald" : "amber",
+        metrics: [
+          { label: "Crop", value: crop },
+          { label: "Clinical Efficacy", value: `${efficacyScore}%`, highlight: true },
+          { label: "Stage 2 Rx", value: isRecovered ? "Syngenta Isabion®" : "Syngenta Revus®" },
+          { label: "Channel", value: "WhatsApp Meta API" },
+        ],
+        notes: `Farmer completed 6-Point Clinical Triage via WhatsApp: ${completedAnswers.map((a) => `${a.qName}: ${a.answerText}`).join(" | ")}`,
+        costINR: Math.round(farmer.fieldAreaAcres * (isRecovered ? 450 : 980)),
+        returnINR: Math.round(farmer.fieldAreaAcres * 3500),
+      });
+    } catch (e) {
+      console.warn("[Journal] Failed to log triage journal entry:", e);
+    }
+
     // Dynamic synthesis via Gemini 3
     return await generateGeminiComprehensiveTriagePrescription(
       completedAnswers,
