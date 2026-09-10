@@ -12,6 +12,7 @@ import {
   extractVarietyAndGradeFromQuery,
   COMMODITY_CATALOG,
   MANDI_GEO_REGISTRY,
+  findNearestOrMatchingMandi,
   NormalizedMandiRecord,
   formatMandiPriceForAI,
   formatMandiResponseStructured,
@@ -119,17 +120,19 @@ export function getMandiRatesByLocation(
   state: string = "Madhya Pradesh",
   telemetry?: LiveAgroTelemetryFactors
 ): MandiRateItem[] {
-  const loc = extractLocationFromNaturalQuery(district) || {
-    district,
-    state,
-    mandi: MANDI_GEO_REGISTRY[0],
-    userLocation: `${district}, ${state}`,
-  };
+  const explicitLoc = extractLocationFromNaturalQuery(district);
+  const targetDistrict = explicitLoc?.district || district;
+  const targetState = explicitLoc?.state || state;
+  let targetMandi = explicitLoc?.mandi;
 
-  const mandiEn = loc.mandi?.nameEn || `${district} APMC Krishi Upaj Mandi`;
-  const mandiHi = loc.mandi?.nameHi || `${district} कृषि उपज मंडी`;
-  const targetDistrict = loc.district || district;
-  const targetState = loc.state || state;
+  if (!targetMandi) {
+    const matched = findNearestOrMatchingMandi(undefined, undefined, targetDistrict, targetState);
+    targetMandi = matched.mandi;
+  }
+
+  const mandiEn = targetMandi?.nameEn || `${targetDistrict} APMC Krishi Upaj Mandi`;
+  const mandiHi = targetMandi?.nameHi || `${targetDistrict} कृषि उपज मंडी`;
+  const userLocation = explicitLoc?.userLocation || `${targetDistrict}, ${targetState}`;
 
   return COMMODITY_CATALOG.slice(0, 8).map((cat) => {
     let modalPrice = cat.baseBenchmarkModal;
@@ -148,7 +151,7 @@ export function getMandiRatesByLocation(
       grade: cat.standardGrade,
       mandi: mandiEn,
       mandiHi: mandiHi,
-      userLocation: loc.userLocation,
+      userLocation: userLocation,
       minPrice,
       maxPrice,
       modalPrice,
@@ -173,15 +176,19 @@ export function findCropMandiRate(
   telemetry?: LiveAgroTelemetryFactors
 ): MandiRateItem {
   const cat = extractCommodityFromNaturalQuery(cropOrQuery, cropOrQuery);
-  const loc = extractLocationFromNaturalQuery(cropOrQuery) || {
-    district,
-    state,
-    mandi: MANDI_GEO_REGISTRY[0],
-    userLocation: `${district}, ${state}`,
-  };
+  const explicitLoc = extractLocationFromNaturalQuery(cropOrQuery);
+  const targetDistrict = explicitLoc?.district || district;
+  const targetState = explicitLoc?.state || state;
+  let targetMandi = explicitLoc?.mandi;
 
-  const mandiEn = loc.mandi?.nameEn || `${district} APMC Krishi Upaj Mandi`;
-  const mandiHi = loc.mandi?.nameHi || `${district} कृषि उपज मंडी`;
+  if (!targetMandi) {
+    const matched = findNearestOrMatchingMandi(undefined, undefined, targetDistrict, targetState);
+    targetMandi = matched.mandi;
+  }
+
+  const mandiEn = targetMandi?.nameEn || `${targetDistrict} APMC Krishi Upaj Mandi`;
+  const mandiHi = targetMandi?.nameHi || `${targetDistrict} कृषि उपज मंडी`;
+  const userLocation = explicitLoc?.userLocation || `${targetDistrict}, ${targetState}`;
 
   // Variety extraction
   const vg = extractVarietyAndGradeFromQuery(cropOrQuery, cat);
@@ -214,15 +221,15 @@ export function findCropMandiRate(
     grade: activeGrade,
     mandi: mandiEn,
     mandiHi: mandiHi,
-    userLocation: loc.userLocation,
+    userLocation: userLocation,
     minPrice,
     maxPrice,
     modalPrice,
     trend: "stable",
     changePct: 0.5,
     weatherFactorNote: "Verified APMC market benchmark",
-    district: loc.district || district,
-    state: loc.state || state,
+    district: targetDistrict,
+    state: targetState,
     unit: "₹/quintal",
     source: "Directorate of Marketing & Inspection (Agmarknet, Govt. of India)",
   };

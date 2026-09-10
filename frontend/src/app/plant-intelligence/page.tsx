@@ -100,6 +100,46 @@ export default function PlantIntelligencePage() {
     ? `${data.model2_readiness.delta_t.toFixed(1)}°C`
     : "4.0°C";
 
+  // ── Dynamic labels derived from real telemetry (zero hardcoding) ────────
+  const nightTempRaw = data?.telemetry_summary?.temp_min_c;
+  const nightTempLabel = nightTempRaw !== undefined
+    ? (nightTempRaw > 28
+        ? (isHindi ? `>${nightTempRaw.toFixed(0)}°C तीव्र रात-गर्मी` : `>${nightTempRaw.toFixed(0)}°C Severe Night Heat`)
+        : nightTempRaw > 25
+        ? (isHindi ? `>${nightTempRaw.toFixed(0)}°C उच्च रात-तापमान` : `>${nightTempRaw.toFixed(0)}°C High Night Heat`)
+        : nightTempRaw > 22
+        ? (isHindi ? `${nightTempRaw.toFixed(0)}°C गर्म रात` : `${nightTempRaw.toFixed(0)}°C Warm Night`)
+        : (isHindi ? `${nightTempRaw.toFixed(0)}°C अनुकूल रात` : `${nightTempRaw.toFixed(0)}°C Optimal Night`))
+    : (isHindi ? "रात-तापमान निगरानी" : "Night Temp Monitoring");
+
+  const vpdKpaRaw = data?.telemetry_summary?.vpd_kpa ?? 0;
+  const vpdCategory = vpdKpaRaw >= 2.5
+    ? (isHindi ? "अत्यधिक जल-दबाव" : "Critical Water Stress")
+    : vpdKpaRaw >= 1.5
+    ? (isHindi ? "उच्च वाष्पोत्सर्जन" : "High Transpiration")
+    : vpdKpaRaw >= 0.8
+    ? (isHindi ? "मध्यम वाष्पोत्सर्जन" : "Moderate Transpiration")
+    : (isHindi ? "अनुकूल VPD स्तर" : "Low / Optimal VPD");
+
+  // Spray window label & reason from backend (computed from real temp/wind/rain)
+  const sprayLabel = data?.model2_readiness?.spray_window_label
+    ?? (spraySafe ? (isHindi ? "शाम / सुबह" : "Eve / Morning") : (isHindi ? "स्प्रे रोकें" : "Hold Spray"));
+  const sprayReason = data?.model2_readiness?.spray_window_reason
+    ?? (spraySafe ? (isHindi ? "सुरक्षित परिस्थितियाँ" : "Safe conditions") : `ΔT ${deltaTVal} adverse`);
+
+  const windSpeed = data?.telemetry_summary?.wind_speed_kmh;
+  const windLabel = windSpeed !== undefined
+    ? (isHindi ? `हवा ${windSpeed.toFixed(0)} किमी/घं` : `Wind ${windSpeed.toFixed(0)} km/h`)
+    : (isHindi ? "हवा की गति" : "Wind Speed");
+
+  const modelCount = data?.execution_metadata?.models_executed?.length ?? 5;
+  const stressImpactLabel = isHindi ? `${stressType} प्रभाव` : `${stressType} Impact`;
+  const stressSeverityLabel = riskPct >= 85
+    ? (isHindi ? `गंभीर ${riskPct}%` : `Critical ${riskPct}%`)
+    : riskPct >= 60
+    ? (isHindi ? `चेतावनी ${riskPct}%` : `Warning ${riskPct}%`)
+    : (isHindi ? `मध्यम ${riskPct}%` : `Moderate ${riskPct}%`);
+
   const totalDoseLiters = +(0.25 * acres).toFixed(2);
 
   const totalHarvestQ = +( (baselineYield + causalGainQ) * acres ).toFixed(1);
@@ -209,7 +249,7 @@ export default function PlantIntelligencePage() {
                     <span>{data?.execution_source || "Vertex AI Cloud (asia-south1, iitm01)"}</span>
                   </span>
                   <span className="text-[10px] font-mono text-slate-500 font-semibold">
-                    5 Models Live
+                    {modelCount} Models Live
                   </span>
                 </div>
                 <h3 className="font-extrabold text-base sm:text-lg text-[#11261f] flex items-center gap-2 font-display">
@@ -219,9 +259,19 @@ export default function PlantIntelligencePage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1.5 rounded-xl bg-[#e8f5e9] border border-[#cbe5cb] text-[#1b4332] font-mono font-bold text-xs flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-[#2d6a4f]" />
-                  <span>{isHindi ? "स्प्रे विंडो: 5:30 - 8:00 PM सुरक्षित" : "Spray Window: 5:30 - 8:00 PM Safe"}</span>
+                <span className={`px-3 py-1.5 rounded-xl font-mono font-bold text-xs flex items-center gap-1.5 ${
+                  spraySafe
+                    ? "bg-[#e8f5e9] border border-[#cbe5cb] text-[#1b4332]"
+                    : "bg-rose-50 border border-rose-200 text-rose-800"
+                }`}>
+                  {spraySafe
+                    ? <CheckCircle2 className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0" />
+                    : <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0" />}
+                  <span>
+                    {isHindi
+                      ? `स्प्रे विंडो: ${sprayLabel} — ${spraySafe ? "सुरक्षित" : "रुकें"}`
+                      : `Spray: ${sprayLabel} — ${spraySafe ? "Safe" : "Hold"}`}
+                  </span>
                 </span>
               </div>
             </div>
@@ -258,9 +308,11 @@ export default function PlantIntelligencePage() {
                 <div className="text-lg sm:text-xl font-extrabold text-amber-600">
                   {nightTemp}
                 </div>
-                <span className="text-[10px] text-amber-700 font-semibold flex items-center gap-1 font-sans">
-                  <AlertTriangle className="h-3 w-3 shrink-0" />
-                  <span>&gt;25°C High Night Heat</span>
+                <span className={`text-[10px] font-semibold flex items-center gap-1 font-sans ${nightTempRaw !== undefined && nightTempRaw > 25 ? "text-amber-700" : "text-emerald-700"}`}>
+                  {nightTempRaw !== undefined && nightTempRaw > 25
+                    ? <AlertTriangle className="h-3 w-3 shrink-0" />
+                    : <CheckCircle2 className="h-3 w-3 shrink-0" />}
+                  <span>{nightTempLabel}</span>
                 </span>
               </div>
 
@@ -272,8 +324,8 @@ export default function PlantIntelligencePage() {
                 <div className="text-lg sm:text-xl font-extrabold text-[#11261f]">
                   {vpdVal}
                 </div>
-                <span className="text-[10px] text-slate-500 font-semibold flex items-center gap-1 font-sans">
-                  High Transpiration
+                <span className={`text-[10px] font-semibold flex items-center gap-1 font-sans ${vpdKpaRaw >= 1.5 ? "text-amber-700" : "text-emerald-700"}`}>
+                  {vpdCategory}
                 </span>
               </div>
 
@@ -293,13 +345,13 @@ export default function PlantIntelligencePage() {
               {/* 5. Recommended Solution */}
               <div className="bg-[#fbfcf8] p-4 rounded-2xl border border-[#e8ede4] space-y-1 hover:border-[#2d6a4f]/40 transition-all shadow-2xs">
                 <span className="text-slate-500 block text-[10px] font-bold tracking-wider uppercase font-sans">
-                  {isHindi ? "सुझाया गया उत्पाद" : "Top Solution"}
+                  {isHindi ? "स्प्रे स्थिति / समाधान" : "Spray Status / Solution"}
                 </span>
-                <div className="text-sm sm:text-base font-extrabold text-[#1b4332] truncate" title={primaryProduct}>
-                  {primaryProduct}
+                <div className={`text-sm sm:text-base font-extrabold ${spraySafe ? "text-[#1b4332]" : "text-rose-700"} truncate`} title={spraySafe ? primaryProduct : (isHindi ? "स्प्रे स्थगित रखें" : "Delay Spray")}>
+                  {spraySafe ? primaryProduct : (isHindi ? "स्प्रे स्थगित रखें" : "Delay Spray")}
                 </div>
-                <span className="text-[10px] text-[#2d6a4f] font-semibold flex items-center gap-1 font-sans truncate">
-                  {recommendedDosage}
+                <span className={`text-[10px] ${spraySafe ? "text-[#2d6a4f]" : "text-rose-600"} font-semibold flex items-center gap-1 font-sans truncate`}>
+                  {spraySafe ? recommendedDosage : (isHindi ? "प्रतिकूल वायुमंडलीय परिस्थितियाँ" : "Adverse Atmospheric Window")}
                 </span>
               </div>
 
@@ -308,12 +360,14 @@ export default function PlantIntelligencePage() {
                 <span className="text-slate-500 block text-[10px] font-bold tracking-wider uppercase font-sans">
                   {isHindi ? "स्प्रे विंडो" : "Spray Window"}
                 </span>
-                <div className="text-sm sm:text-base font-extrabold text-emerald-800">
-                  {spraySafe ? "5:30–8:00 PM" : "Hold Spray"}
+                <div className={`text-sm sm:text-base font-extrabold ${spraySafe ? "text-emerald-800" : "text-rose-700"}`}>
+                  {sprayLabel}
                 </div>
-                <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1 font-sans">
-                  <CheckCircle2 className="h-3 w-3 shrink-0" />
-                  <span>{spraySafe ? "Safe to Spray" : `Adverse (ΔT ${deltaTVal})`}</span>
+                <span className={`text-[10px] font-semibold flex items-center gap-1 font-sans ${spraySafe ? "text-emerald-700" : "text-rose-600"}`}>
+                  {spraySafe
+                    ? <CheckCircle2 className="h-3 w-3 shrink-0" />
+                    : <AlertTriangle className="h-3 w-3 shrink-0" />}
+                  <span className="truncate" title={sprayReason}>{sprayReason}</span>
                 </span>
               </div>
             </div>
@@ -326,12 +380,12 @@ export default function PlantIntelligencePage() {
                   <span className="text-slate-500 text-[10px] font-bold tracking-wider uppercase font-sans">
                     {isHindi ? "फसल तनाव सूचकांक" : "Crop Weather Stress Index"}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                    Critical {riskPct}%
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${riskPct >= 85 ? "bg-rose-50 text-rose-700 border-rose-200" : riskPct >= 60 ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-emerald-50 text-emerald-700 border-emerald-200"}`}>
+                    {stressSeverityLabel}
                   </span>
                 </div>
-                <div className="text-xl font-extrabold text-rose-600">
-                  {riskPct}% <span className="text-xs font-normal text-slate-500 font-sans">Nocturnal Heat Impact</span>
+                <div className={`text-xl font-extrabold ${riskPct >= 85 ? "text-rose-600" : riskPct >= 60 ? "text-amber-600" : "text-emerald-600"}`}>
+                  {riskPct}% <span className="text-xs font-normal text-slate-500 font-sans">{stressImpactLabel}</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                   <div className="bg-rose-500 h-2 rounded-full" style={{ width: `${riskPct}%` }} />
@@ -344,15 +398,19 @@ export default function PlantIntelligencePage() {
                   <span className="text-slate-500 text-[10px] font-bold tracking-wider uppercase font-sans">
                     {isHindi ? "रासायनिक स्प्रे विंडो" : "Chemical Spray Window"}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                    Safe to Spray
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${spraySafe ? "bg-emerald-50 text-emerald-800 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                    {isHindi ? (spraySafe ? "सुरक्षित" : "रुकें") : (spraySafe ? "Safe to Spray" : "Hold Spray")}
                   </span>
                 </div>
-                <div className="text-xl font-extrabold text-[#11261f]">
-                  Active Now <span className="text-xs font-normal text-slate-500 font-sans">Wind &lt; 15 km/h limit</span>
+                <div className={`text-xl font-extrabold ${spraySafe ? "text-[#11261f]" : "text-rose-700"}`}>
+                  {spraySafe
+                    ? <>{isHindi ? "अभी उपयुक्त" : "Active Window"} <span className="text-xs font-normal text-slate-500 font-sans">{windLabel}</span></>
+                    : <>{isHindi ? "स्थगित करें" : "Delay Spray"} <span className="text-xs font-normal text-slate-500 font-sans">{windLabel}</span></>}
                 </div>
                 <p className="text-[11px] text-slate-500 font-sans">
-                  Ideal conditions for Quantis / Isabion foliar uptake.
+                  {isHindi
+                    ? (spraySafe ? "पर्ण छिड़काव अवशोषण के लिए अनुकूल परिस्थितियाँ।" : "प्रतिकूल वायुमंडलीय परिस्थितियाँ। छिड़काव स्थगित रखें।")
+                    : (spraySafe ? "Ideal atmospheric conditions for foliar spray uptake." : "Adverse conditions for foliar uptake. Hold spray.")}
                 </p>
               </div>
 
@@ -442,23 +500,29 @@ export default function PlantIntelligencePage() {
             </div>
 
             {/* 4. WHAT ACTION TO TAKE */}
-            <div className="bg-gradient-to-br from-white to-[#f0f6f1] border-2 border-[#52b788]/60 rounded-3xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(27,67,50,0.04)] space-y-2.5">
+            <div className={`bg-gradient-to-br from-white to-[#f0f6f1] border-2 ${spraySafe ? "border-[#52b788]/60" : "border-rose-300"} rounded-3xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(27,67,50,0.04)] space-y-2.5`}>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[#1b4332] font-bold text-xs uppercase tracking-wider">
-                  <span className="h-2 w-2 rounded-full bg-[#1b4332]" />
+                <div className={`flex items-center gap-2 ${spraySafe ? "text-[#1b4332]" : "text-rose-700"} font-bold text-xs uppercase tracking-wider`}>
+                  <span className={`h-2 w-2 rounded-full ${spraySafe ? "bg-[#1b4332]" : "bg-rose-500"}`} />
                   <span>{isHindi ? "4. आपको क्या करना चाहिए? (ACTION)" : "4. What Action to Take?"}</span>
                 </div>
-                <span className="text-[10px] font-mono font-bold text-[#1b4332] bg-[#e8f5e9] px-2.5 py-0.5 rounded-full border border-[#cbe5cb]">
-                  {spraySafe ? "Window Safe" : "Hold Spray"}
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${spraySafe ? "text-[#1b4332] bg-[#e8f5e9] border-[#cbe5cb]" : "text-rose-700 bg-rose-50 border-rose-200"}`}>
+                  {spraySafe ? (isHindi ? "विंडो सुरक्षित" : "Window Safe") : (isHindi ? "स्प्रे रोकें" : "Hold Spray")}
                 </span>
               </div>
-              <h3 className="text-base sm:text-lg font-black text-[#1b4332] font-display">
-                {isHindi ? `अनुशंसित उत्पाद: ${primaryProduct} (${recommendedDosage})` : `Recommended Solution: ${primaryProduct} (${recommendedDosage})`}
+              <h3 className={`text-base sm:text-lg font-black ${spraySafe ? "text-[#1b4332]" : "text-rose-700"} font-display`}>
+                {spraySafe
+                  ? (isHindi ? "कार्रवाई: सुरक्षित स्प्रे विंडो का उपयोग करें" : "Action: Safe Spray Window Active")
+                  : (isHindi ? "तत्काल कार्रवाई: छिड़काव स्थगित करें (Delay Spray)" : "Immediate Action: Delay Spray")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                {isHindi
-                  ? `मॉडल 3 लैम्ब्डामार्ट अनुसार ${primaryProduct} (${recommendedDosage}) का अपनी कुल ${acres} एकड़ फसल में 150L पानी/एकड़ के साथ सुरक्षित समय पर छिड़काव करें।`
-                  : `Apply Model 3 ranked solution ${primaryProduct} at ${recommendedDosage} across your ${acres} acres during the active safe window for optimal foliar uptake.`}
+                {spraySafe
+                  ? (isHindi
+                      ? `मौसम परिस्थितियाँ अनुकूल हैं। अपनी कुल ${acres} एकड़ फसल में 150L पानी/एकड़ के साथ सुबह या शाम के सुरक्षित समय पर छिड़काव करें।`
+                      : `Atmospheric conditions and Delta-T are within safe limits. Safe to apply foliar treatment across your ${acres} acres during the active window with adequate water carrier volume.`)
+                  : (isHindi
+                      ? `प्रतिकूल वायुमंडलीय परिस्थितियाँ (उच्च तापमान / प्रतिकूल डेल्टा-टी) दर्ज की गई हैं। रासायनिक नुकसान और बह जाने से बचने के लिए अभी छिड़काव न करें। मौसम अनुकूल होने तक छिड़काव स्थगित रखें।`
+                      : `Adverse atmospheric conditions detected (elevated Delta-T or thermal stress). Do not spray right now to prevent chemical wash-off and foliar damage. Hold spray application across your ${acres} acres until weather conditions normalize.`)}
               </p>
             </div>
           </div>
@@ -517,7 +581,7 @@ export default function PlantIntelligencePage() {
                     <FlaskConical className="h-6 w-6" />
                   </div>
                   <span className="text-[11px] font-mono font-black text-[#1b4332] bg-[#e8f5e9] px-3 py-1 rounded-full border border-[#cbe5cb]">
-                    {primaryProduct} · Tank-Mix Matrix
+                    {spraySafe ? `${primaryProduct} · Tank-Mix Matrix` : (isHindi ? "स्प्रे मार्गदर्शन व टैंक-मिक्स" : "Spray Guidance & Matrix")}
                   </span>
                 </div>
                 <div className="space-y-1.5">

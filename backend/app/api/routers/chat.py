@@ -20,6 +20,8 @@ from app.services.mandi_service import (
     format_mandi_response_structured,
     extract_commodity,
     extract_location,
+    resolve_nearest_mandi,
+    resolve_district_coordinates,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,7 +38,7 @@ LANGUAGE_NAMES = {
   "kn": "Kannada (ಕನ್ನಡ)",
   "ml": "Malayalam (മലയാളം)",
   "bn": "Bengali (বাংলা)",
-  "or": "Odia (ଓଡ଼ିଆ)",
+  "or": "Odia (ଓଡ଼ਿଆ)",
   "as": "Assamese (অসমীया)",
   "en": "English",
 }
@@ -168,13 +170,13 @@ MULTI_CROP_ADVISORY_MATRIX = {
 
 class ChatRequest(BaseModel):
     message: str = ""
-    lat: Optional[float] = 23.2599
-    lon: Optional[float] = 77.4126
+    lat: Optional[float] = None
+    lon: Optional[float] = None
     crop: str = "wheat"
     variety: Optional[str] = ""
     language: str = "hi"
-    district: Optional[str] = "Bhopal"
-    state: Optional[str] = "Madhya Pradesh"
+    district: Optional[str] = None
+    state: Optional[str] = None
     field_acres: Optional[float] = 5.0
     conversation_history: Optional[List[Dict[str, Any]]] = None
     audio_base64: Optional[str] = None
@@ -243,51 +245,154 @@ async def _try_google_ai(prompt: str, audio_base64: Optional[str] = None, audio_
 async def chat_advisory(req: ChatRequest):
     """
     Multi-Crop, Hyper-Local Precision AI Agricultural Advisory endpoint.
+    Uses real-time user location, Open-Meteo telemetry, and APMC Mandi market intelligence.
     """
+    # Dynamic Location Resolution Hierarchy:
+    # 1. Message extraction (e.g. user says "Karnal mein gehu ka bhav")
     extracted_loc = extract_location(req.message)
-    active_district = extracted_loc["district"] if extracted_loc else (req.district or "Bhopal")
-    active_state = extracted_loc["state"] if extracted_loc else (req.state or "Madhya Pradesh")
-    active_lat = extracted_loc["lat"] if extracted_loc else (req.lat or 23.2599)
-    active_lon = extracted_loc["lon"] if extracted_loc else (req.lon or 77.4126)
-    active_user_location = extracted_loc.get("user_location") if extracted_loc else f"{active_district}, {active_state}"
+
+    if extracted_loc:
+        active_district = extracted_loc["district"]
+        active_state = extracted_loc["state"]
+        active_lat = float(extracted_loc["lat"])
+        active_lon = float(extracted_loc["lon"])
+        active_user_location = extracted_loc.get("user_location", f"{active_district}, {active_state}")
+    elif req.lat is not None and req.lon is not None and 6.0 <= float(req.lat) <= 38.0 and 68.0 <= float(req.lon) <= 98.0:
+        # 2. Browser / Device GPS coordinates
+        active_lat = float(req.lat)
+        active_lon = float(req.lon)
+        nearest_mandi, dist = resolve_nearest_mandi(active_lat, active_lon)
+        if req.district and req.district.strip() and req.district.strip().lower() != "bhopal":
+            active_district = req.district.strip()
+            active_state = req.state.strip() if req.state else nearest_mandi["state"]
+        else:
+            active_district = nearest_mandi["district"]
+            active_state = nearest_mandi["state"]
+        active_user_location = f"{active_district}, {active_state}"
+    elif req.district and req.district.strip():
+        # 3. User passed district name without GPS — resolve via MANDI_REGISTRY first
+        dist_coords = resolve_district_coordinates(req.district, req.state or "")
+        if dist_coords:
+            active_district = dist_coords["district"]
+            active_state = dist_coords["state"]
+            active_lat = float(dist_coords["lat"])
+            active_lon = float(dist_coords["lon"])
+            active_user_location = f"{active_district}, {active_state}"
+        else:
+            # Geocode the district name dynamically via Open-Meteo geocoding API
+            geo_district = None
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as geo_client:
+                    geo_resp = await geo_client.get(
+                        "https://geocoding-api.open-meteo.com/v1/search",
+                        params={"name": req.district.strip(), "count": 1, "language": "en", "format": "json"}
+                    )
+                    if geo_resp.status_code == 200:
+                        geo_results = geo_resp.json().get("results", [])
+                        if geo_results:
+                            geo_district = geo_results[0]
+            except Exception as _geo_err:
+                logger.warning(f"Geocoding fallback failed for '{req.district}': {_geo_err}")
+
+            if geo_district:
+                active_lat = float(geo_district["latitude"])
+                active_lon = float(geo_district["longitude"])
+                active_district = geo_district.get("admin2") or geo_district.get("name") or req.district.strip()
+                active_state = geo_district.get("admin1") or req.state or ""
+                active_user_location = f"{active_district}, {active_state}".strip(", ")
+            else:
+                # Could not geocode; keep user-supplied strings but coordinates unknown
+                active_district = req.district.strip()
+                active_state = req.state.strip() if req.state else ""
+                active_user_location = f"{active_district}, {active_state}".strip(", ")
+                # Use nearest mandi to at least get a valid lat/lon in the same state
+                nearest_mandi, _ = resolve_nearest_mandi(None, None, req.district, req.state or "")
+                active_lat = float(nearest_mandi["lat"])
+                active_lon = float(nearest_mandi["lon"])
+    else:
+        # 4. Absolute default — no location info at all
+        # Attempt user IP-based reverse geocoding is not feasible server-side without an IP;
+        # use the nearest mandi centroid as a neutral fallback rather than hardcoded city.
+        nearest_mandi, _ = resolve_nearest_mandi(None, None, "", "")
+        active_district = nearest_mandi["district"]
+        active_state = nearest_mandi["state"]
+        active_lat = float(nearest_mandi["lat"])
+        active_lon = float(nearest_mandi["lon"])
+        active_user_location = f"{active_district}, {active_state}"
 
     # Extract target crop from query or request
     extracted_crop_info = extract_commodity(req.message)
     effective_crop_id = extracted_crop_info["id"] if extracted_crop_info else req.crop.lower().strip()
     crop_profile = MULTI_CROP_ADVISORY_MATRIX.get(effective_crop_id, MULTI_CROP_ADVISORY_MATRIX["wheat"])
+    treatments_text = "\n".join(f"  * {t}" for t in crop_profile.get("treatments", []))
 
-    # Fetch live weather telemetry
-    temp = 25.0
-    humidity = 65
-    precip = 0
-    wind = 10.0
-    night_temp = 21.0
+    # Fetch live real-time weather telemetry from Open-Meteo for active coordinates
+    temp = 28.0
+    humidity = 65.0
+    precip = 0.0
+    wind = 8.0
+    night_temp = 20.0
+    soil_temp = 24.0
+    soil_moisture = 0.22
 
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with httpx.AsyncClient(timeout=6.0) as client:
             ow_url = (
                 f"https://api.open-meteo.com/v1/forecast"
                 f"?latitude={active_lat}&longitude={active_lon}"
-                f"&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m"
-                f"&hourly=temperature_2m&timezone=Asia%2FKolkata&forecast_days=2"
+                f"&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m"
+                f"&hourly=temperature_2m,relative_humidity_2m,soil_temperature_0cm,soil_moisture_0_to_1cm"
+                f"&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max"
+                f"&timezone=auto&forecast_days=2"
             )
             ow_res = await client.get(ow_url)
             if ow_res.status_code == 200:
                 ow_data = ow_res.json()
                 c = ow_data.get("current", {})
-                temp = c.get("temperature_2m", temp)
-                humidity = c.get("relative_humidity_2m", humidity)
-                precip = c.get("precipitation", precip)
-                wind = c.get("wind_speed_10m", wind)
+                temp = float(c.get("temperature_2m", temp))
+                humidity = float(c.get("relative_humidity_2m", humidity))
+                precip = float(c.get("precipitation", precip))
+                wind = float(c.get("wind_speed_10m", wind))
+
+                # Dynamically calculate nocturnal minimum from hourly telemetry (20:00 to 06:00)
+                hourly = ow_data.get("hourly", {})
+                h_times = hourly.get("time", [])
+                h_temps = hourly.get("temperature_2m", [])
+                h_soil_temps = hourly.get("soil_temperature_0cm", [])
+                h_soil_m = hourly.get("soil_moisture_0_to_1cm", [])
+
+                night_readings = [
+                    float(t) for t_str, t in zip(h_times, h_temps)
+                    if t is not None and (int(t_str[11:13]) in [20, 21, 22, 23, 0, 1, 2, 3, 4, 5])
+                ]
+                if night_readings:
+                    night_temp = round(min(night_readings), 1)
+                else:
+                    daily_min = ow_data.get("daily", {}).get("temperature_2m_min", [])
+                    if daily_min and daily_min[0] is not None:
+                        night_temp = round(float(daily_min[0]), 1)
+
+                valid_soil_t = [float(s) for s in h_soil_temps if s is not None]
+                if valid_soil_t:
+                    soil_temp = round(valid_soil_t[0], 1)
+
+                valid_soil_m = [float(m) for m in h_soil_m if m is not None]
+                if valid_soil_m:
+                    soil_moisture = round(valid_soil_m[0], 3)
+
     except Exception as e:
-        logger.warning(f"Weather fetch error: {e}")
+        logger.warning(f"Weather fetch error for ({active_lat}, {active_lon}): {e}")
 
     is_night_heat_stress = night_temp > crop_profile["opt_night"]
-    is_safe_spray = wind < 15.0 and temp < 33.0
+    is_safe_spray = wind < 15.0 and temp < 33.0 and precip < 1.0
 
     telemetry_dict = {
         "temp": temp,
         "night_temp": night_temp,
+        "soil_temp": soil_temp,
+        "soil_moisture": soil_moisture,
+        "humidity": humidity,
+        "rainfall": precip,
         "is_night_heat_stress": is_night_heat_stress,
         "wind_speed": wind,
         "is_safe_spray": is_safe_spray,
@@ -333,7 +438,7 @@ Target UI Language: {lang_name}
 ACCURATE MULTI-CROP & HYPER-LOCAL GROUND TRUTH:
 - Target Crop: {crop_profile['name']} [Season: {crop_profile.get('season', 'Kharif')}]
 - Queried Target Location: {active_user_location} (Lat: {active_lat}, Lon: {active_lon})
-- Live Weather for {active_district}: Temp {temp}°C, Night Temp {night_temp}°C, Humidity {humidity}%, Wind {wind} km/h, Rain {precip} mm
+- Live Weather for {active_district}: Temp {temp}°C, Night Temp {night_temp}°C, Soil Temp {soil_temp}°C, Soil Moisture {soil_moisture}, Humidity {humidity}%, Wind {wind} km/h, Rain {precip} mm
 - Spray Safety Window: {'Safe window active (Wind < 15 km/h)' if is_safe_spray else f'Unfavorable (Wind {wind} km/h, Temp {temp}°C)'}
 {mandi_summary}
 - Agronomic Stress Buster: {crop_profile.get('stress_buster', 'Syngenta Quantis® @ 250-400 ml/acre')}
@@ -379,7 +484,11 @@ Provide ONLY the final response text without JSON or markdown codeblocks."""
         "source": f"AASRA | {provider_used} + Open-Meteo + APMC Mandi",
         "mandi_record": mandi_record,
         "crop": effective_crop_id,
-        "location_used": activeDistrict,
+        "location_used": active_user_location,
+        "district": active_district,
+        "state": active_state,
+        "coordinates": {"lat": active_lat, "lon": active_lon},
+        "telemetry": telemetry_dict,
     }
 
 

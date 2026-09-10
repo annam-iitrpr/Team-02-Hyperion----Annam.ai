@@ -33,6 +33,7 @@ import {
   Globe,
   Check,
   FileText,
+  FlaskConical,
   X,
   Smartphone,
   Download,
@@ -741,162 +742,335 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 5. SEE KRISHYANTRA IN ACTION (Product Experience Walkthrough) ── */}
-      <section id="product-experience" className="py-16 sm:py-24 bg-white border-b border-[#e5e7eb]">
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      {/* ── 5. SEE KRISHYANTRA IN ACTION (Stripe-Grade Product Experience Walkthrough) ── */}
+      <section id="product-experience" className="py-20 sm:py-28 bg-[#f6f9fc] border-b border-[#e3e8ee] relative overflow-hidden">
+        {/* Subtle Background Pattern Accent */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#1b4332_1px,transparent_1px)] [background-size:24px_24px]" />
+
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
           
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#111827]">
-              See Krishyantra in Action
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#e8f5e9] text-[#1b4332] text-xs font-bold font-mono tracking-wider uppercase border border-[#cbe5cb] shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{isHindi ? "5-चरणीय स्वायत्त निर्णय चक्र" : "5-Stage Autonomous Decision Cycle"}</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#0d253d] font-display">
+              {isHindi ? "देखें कृषियंत्र कैसे काम करता है" : "See Krishyantra in Action"}
             </h2>
-            <p className="text-base text-slate-600">
-              Real insights for real farming decisions.
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              {isHindi
+                ? "स्मार्टफोन कैमरे से लेकर रोग पहचान, मौसम-अनुकूल स्प्रे और सुरक्षित पैदावार तक।"
+                : "From camera capture to multi-model AI diagnosis, live weather-gated spraying, and protected harvest profit."}
             </p>
           </div>
 
-          {/* 5 Journey Cards (Target Exact Design) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* 5 Journey Cards (Stripe Precision Architecture) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4.5 items-stretch">
             
             {/* Step 1: Upload Photo */}
-            <div className="rounded-2xl bg-white border border-[#e5e7eb] p-4 shadow-xs space-y-3">
-              <span className="text-xs font-black text-[#111827] block">
-                1. Upload Photo
-              </span>
-              <div className="relative h-40 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
-                <Image
-                  src="/images/soybean_r2_flowering.png"
-                  alt="Soybean crop leaf analysis"
-                  fill
-                  className="object-cover"
-                />
-                {/* Viewfinder Target */}
-                <div className="absolute inset-3 border-2 border-dashed border-emerald-400 rounded-lg pointer-events-none" />
+            <div className="rounded-3xl bg-white border border-[#e3e8ee] p-5 shadow-xs hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4 group">
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-md border border-[#cbe5cb]">
+                    STEP 01
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100/80 text-emerald-700 flex items-center justify-center group-hover:bg-[#1b4332] group-hover:text-white transition-colors">
+                    <Camera className="w-4 h-4" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black text-[#0d253d] font-display group-hover:text-[#1b4332] transition-colors">
+                    {isHindi ? "1. फोटो अपलोड करें" : "1. Upload Photo"}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    {isHindi ? "अपने फोन कैमरे से सीधे पत्ती या फसल की फोटो लें।" : "Instant canopy capture directly from your smartphone camera."}
+                  </p>
+                </div>
+
+                <div className="relative h-36 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center">
+                  <Image
+                    src="/images/soybean_r2_flowering.png"
+                    alt="Soybean crop leaf analysis"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {/* Premium Precision Brackets */}
+                  <div className="absolute inset-2.5 border border-white/50 rounded-xl pointer-events-none">
+                    <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-emerald-400" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-emerald-400" />
+                    <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-emerald-400" />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-emerald-400" />
+                  </div>
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#0d253d]/80 backdrop-blur-xs text-white text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border border-white/20 whitespace-nowrap">
+                    48MP AI Scan Ready
+                  </div>
+                </div>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">
-                Take photo directly from your phone camera.
-              </p>
+
+              <div className="space-y-1.5 text-xs text-slate-700 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "फोन कैमरे से आसान कैप्चर" : "Direct phone camera capture"}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "व्हाट्सएप व वेब पर सुलभ" : "Works on WhatsApp & Web"}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "शून्य सेंसर लागत" : "Zero hardware sensors needed"}</span>
+                </div>
+              </div>
             </div>
 
             {/* Step 2: Get Diagnosis */}
-            <div className="rounded-2xl bg-white border border-[#e5e7eb] p-4 shadow-xs space-y-3">
-              <span className="text-xs font-black text-[#111827] block">
-                2. Get Diagnosis
-              </span>
-              <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
-                  <span>🍃</span>
-                  <span>Leaf spot detected</span>
+            <div className="rounded-3xl bg-white border border-[#e3e8ee] p-5 shadow-xs hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4 group">
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-md border border-[#cbe5cb]">
+                    STEP 02
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100/80 text-emerald-700 flex items-center justify-center group-hover:bg-[#1b4332] group-hover:text-white transition-colors">
+                    <Cpu className="w-4 h-4" />
+                  </div>
                 </div>
-                <span className="text-[10px] font-mono text-slate-500 block">
-                  Model verification ready
-                </span>
+
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black text-[#0d253d] font-display group-hover:text-[#1b4332] transition-colors">
+                    {isHindi ? "2. एआई रोग निदान" : "2. AI Diagnosis"}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    {isHindi ? "मल्टी-मॉडल विज़न द्वारा रोग व तनाव का तत्काल विश्लेषण।" : "Multi-spectral computer vision verification with agronomic radar."}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#0d253d] flex items-center gap-1.5">
+                      <Leaf className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>{isHindi ? "पत्ती धब्बा रोग" : "Leaf Spot Detected"}</span>
+                    </span>
+                    <span className="text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-200">
+                      98.4% CONF
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-600 leading-tight">
+                    {isHindi
+                      ? "सर्कॉस्पोरा फंगल तनाव — 14-दिवसीय मौसम रडार द्वारा सत्यापित।"
+                      : "Cercospora fungal stress verified with 14-day local weather radar."}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1.5 text-xs text-slate-700">
-                <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>What this means</span>
+
+              <div className="space-y-1.5 text-xs text-slate-700 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "सटीक वैज्ञानिक कारण स्पष्ट" : "Root pathogen identified"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Why it happened</span>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "फसल विकास अवस्था मैपिंग" : "Crop growth stage mapped"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>What to do next</span>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "बचाव प्रोटोकॉल तैयार" : "Immediate action plan ready"}</span>
                 </div>
               </div>
             </div>
 
             {/* Step 3: Check Spray Window */}
-            <div className="rounded-2xl bg-white border border-[#e5e7eb] p-4 shadow-xs space-y-3">
-              <span className="text-xs font-black text-[#111827] block">
-                3. Check Spray Window
-              </span>
-              <div className="p-2.5 rounded-xl bg-[#e8f5e9] border border-[#cbe5cb] text-center">
-                <span className="text-[11px] font-bold text-[#1b4332] block">
-                  ✔ Best time to spray:
-                </span>
-                <span className="text-xs font-black text-[#2d6a4f] block">
-                  7:00 AM - 9:00 AM
-                </span>
+            <div className="rounded-3xl bg-white border border-[#e3e8ee] p-5 shadow-xs hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4 group">
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-md border border-[#cbe5cb]">
+                    STEP 03
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100/80 text-emerald-700 flex items-center justify-center group-hover:bg-[#1b4332] group-hover:text-white transition-colors">
+                    <CloudSun className="w-4 h-4" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black text-[#0d253d] font-display group-hover:text-[#1b4332] transition-colors">
+                    {isHindi ? "3. सुरक्षित स्प्रे विंडो" : "3. Spray Window"}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    {isHindi ? "बायोफिजिकल मौसम गेटिंग (मॉडल 2) अनुसार छिड़काव समय।" : "Live biophysical weather gating (Model 2) for zero wash-off."}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-[#f8faf7] border border-[#cbe5cb] space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      {isHindi ? "अनुकूल समय" : "SAFE WINDOW"}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-[#0d253d]">
+                      7:00 – 9:00 AM
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1 text-[10px] text-slate-600 font-mono">
+                    <div className="p-1 rounded-lg bg-white border border-slate-200 text-center">
+                      <span className="block text-slate-400 text-[8px]">TEMP</span>
+                      <span className="font-bold text-slate-800">24-28°C</span>
+                    </div>
+                    <div className="p-1 rounded-lg bg-white border border-slate-200 text-center">
+                      <span className="block text-slate-400 text-[8px]">WIND</span>
+                      <span className="font-bold text-slate-800">&lt;15 km/h</span>
+                    </div>
+                    <div className="p-1 rounded-lg bg-white border border-slate-200 text-center">
+                      <span className="block text-slate-400 text-[8px]">RAIN</span>
+                      <span className="font-bold text-emerald-700">0% Dry</span>
+                    </div>
+                  </div>
+
+                  <div className="py-1 px-2 rounded-xl bg-emerald-600 text-white text-[10px] font-bold text-center flex items-center justify-center gap-1 shadow-2xs">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-200" />
+                    <span>{isHindi ? "सुरक्षित छिड़काव · 100% अवशोषण" : "Safe to Spray · 100% Absorbed"}</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1.5 text-xs text-slate-700 font-medium">
-                <div className="flex items-center gap-1.5">
-                  <Thermometer className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span>Temp: 24-28°C</span>
+
+              <div className="space-y-1.5 text-xs text-slate-700 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "दवा बहने/उड़ने से रोकथाम" : "Zero chemical wash-off"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Wind className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                  <span>Wind: &lt; 15 km/h</span>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "सुरक्षित Delta-T तापमान" : "Safe Delta-T for absorption"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <CloudSun className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span>No rain expected</span>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "72 घंटे की मौसम निगरानी" : "72h weather recovery watch"}</span>
                 </div>
-              </div>
-              <div className="pt-1">
-                <span className="w-full inline-flex items-center justify-center py-1.5 rounded-lg bg-[#e8f5e9] text-[#1b4332] text-xs font-bold">
-                  ✔ Safe to spray
-                </span>
               </div>
             </div>
 
             {/* Step 4: Product & Dosage */}
-            <div className="rounded-2xl bg-white border border-[#e5e7eb] p-4 shadow-xs space-y-3">
-              <span className="text-xs font-black text-[#111827] block">
-                4. Product & Dosage
-              </span>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold">
-                  🧪
+            <div className="rounded-3xl bg-white border border-[#e3e8ee] p-5 shadow-xs hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4 group">
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-md border border-[#cbe5cb]">
+                    STEP 04
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100/80 text-emerald-700 flex items-center justify-center group-hover:bg-[#1b4332] group-hover:text-white transition-colors">
+                    <FlaskConical className="w-4 h-4" />
+                  </div>
                 </div>
-                <div>
-                  <span className="text-xs font-bold text-slate-900 block">Quantis®</span>
-                  <span className="text-[10px] text-slate-500">Biostimulant</span>
+
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black text-[#0d253d] font-display group-hover:text-[#1b4332] transition-colors">
+                    {isHindi ? "4. सही उत्पाद व खुराक" : "4. Product & Dosage"}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    {isHindi ? "सिंजेंटा प्रमाणित जैविक इनपुट और प्रति पंप सटीक पानी।" : "Targeted biological input and exact pump water calculation."}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-[#1b4332] text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                      <FlaskConical className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#0d253d] block font-display">Quantis®</span>
+                      <span className="text-[10px] text-emerald-700 font-semibold">{isHindi ? "सिंजेंटा बायोस्टिमुलेंट" : "Syngenta Biostimulant"}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-[11px] text-slate-700 font-medium">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Dosage:</span>
+                      <strong className="text-slate-900 font-mono">300 ml / acre</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Dilution:</span>
+                      <strong className="text-slate-900 font-mono">200 L water</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Timing:</span>
+                      <strong className="text-emerald-800">Morning Calm</strong>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => handleActionClick("/plant-intelligence/prescription", e)}
+                    className="w-full py-1.5 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-[11px] font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>{isHindi ? "पूरी पर्ची देखें" : "View Full Prescription"}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
-              <div className="space-y-1 text-xs text-slate-700">
-                <div>Dosage: <strong>300 ml/acre</strong></div>
-                <div>Mix with: <strong>200 L water</strong></div>
-                <div>Application: <strong>Foliar spray</strong></div>
-                <div>Best time: <strong>Morning</strong></div>
+
+              <div className="space-y-1.5 text-xs text-slate-700 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "CIB&RC प्रमाणित उत्पाद" : "CIB&RC certified biostimulant"}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "प्रति पंप पानी का सटीक हिसाब" : "Exact pump water dilution"}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "अनावश्यक रसायन खर्च से मुक्ति" : "Zero wasted chemical spend"}</span>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={(e) => handleActionClick("/plant-intelligence", e)}
-                className="w-full inline-flex items-center justify-center py-1.5 rounded-lg border border-slate-300 hover:border-[#2d6a4f] text-xs font-bold text-[#1b4332] transition-colors cursor-pointer"
-              >
-                View Full Guide
-              </button>
             </div>
 
             {/* Step 5: Expected Impact */}
-            <div className="rounded-2xl bg-white border border-[#e5e7eb] p-4 shadow-xs space-y-3">
-              <span className="text-xs font-black text-[#111827] block">
-                5. Expected Impact
-              </span>
-              <div className="p-2.5 rounded-xl bg-[#eef7ee] border border-[#cbe5cb] space-y-1">
-                <div className="flex items-center justify-between text-xs font-bold text-[#1b4332]">
-                  <span>Yield Benefit:</span>
-                  <span className="font-black text-[#2d6a4f] font-mono">+2.8 q/ac</span>
+            <div className="rounded-3xl bg-white border border-[#e3e8ee] p-5 shadow-xs hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4 group">
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] bg-[#e8f5e9] px-2.5 py-1 rounded-md border border-[#cbe5cb]">
+                    STEP 05
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100/80 text-emerald-700 flex items-center justify-center group-hover:bg-[#1b4332] group-hover:text-white transition-colors">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs font-bold text-emerald-800">
-                  <span>Est. Value:</span>
-                  <span className="font-black font-mono">₹4,200/ac</span>
+
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black text-[#0d253d] font-display group-hover:text-[#1b4332] transition-colors">
+                    {isHindi ? "5. पैदावार व आर्थिक लाभ" : "5. Expected Impact"}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    {isHindi ? "मॉडल 6 कॉज़ल डबल मशीन लर्निंग द्वारा प्रमाणित लाभ।" : "Model 6 Causal Double ML validation and profit assurance."}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-50 to-[#e8f5e9] border border-emerald-300 space-y-2 shadow-2xs">
+                  <div className="flex items-baseline justify-between text-xs">
+                    <span className="font-bold text-slate-600">{isHindi ? "बचाई गई उपज:" : "Protected Yield:"}</span>
+                    <span className="font-mono font-black text-emerald-700 text-sm">+2.8 qtl/ac</span>
+                  </div>
+                  <div className="flex items-baseline justify-between text-xs">
+                    <span className="font-bold text-slate-600">{isHindi ? "शुद्ध किसान लाभ:" : "Net Farmer Value:"}</span>
+                    <span className="font-mono font-black text-[#1b4332] text-sm">+₹4,200/ac</span>
+                  </div>
+                  <div className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/90 py-1 px-2 rounded-md text-center border border-emerald-200">
+                    12.9x Return on Investment (ROBI)
+                  </div>
                 </div>
               </div>
-              <div className="space-y-1.5 text-xs text-slate-700">
-                <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Why this works</span>
+
+              <div className="space-y-1.5 text-xs text-slate-700 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "माइक्रोसॉफ्ट EconML कॉज़ल प्रमाण" : "Microsoft EconML causal proof"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>What to expect</span>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "फूल व फली झड़ने से सुरक्षा" : "Prevents flower & pod abortion"}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Track your results</span>
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{isHindi ? "स्थानीय APMC मंडी भाव से जुड़ा" : "Linked to local APMC Mandi"}</span>
                 </div>
               </div>
             </div>

@@ -170,8 +170,8 @@ export default function RecoveryCategoryPage() {
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-[#0d253d] font-display">
                   {hasApplied
-                    ? (isHindi ? `क्वांटिस छिड़काव दर्ज हुआ (${appliedDate})` : `Quantis® Applied & Confirmed (${appliedDate})`)
-                    : (isHindi ? "क्वांटिस छिड़काव की पुष्टि बाकी है" : "Quantis® Application Pending Confirmation")}
+                    ? (isHindi ? `उपचार छिड़काव दर्ज हुआ (${appliedDate})` : `Treatment Applied & Confirmed (${appliedDate})`)
+                    : (isHindi ? "उपचार छिड़काव की पुष्टि बाकी है" : "Treatment Application Pending Confirmation")}
                 </h2>
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function RecoveryCategoryPage() {
                   <span>
                     {saving
                       ? (isHindi ? "सहेज रहे हैं..." : "Saving...")
-                      : (isHindi ? "✓ मैंने छिड़काव कर दिया है (पुष्टि करें)" : "✓ Confirm I Have Sprayed Quantis")}
+                      : (isHindi ? "✓ मैंने छिड़काव कर दिया है (पुष्टि करें)" : "✓ Confirm Treatment Applied")}
                   </span>
                 </button>
               )}

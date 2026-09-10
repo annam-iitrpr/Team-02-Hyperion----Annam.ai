@@ -195,13 +195,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <button
                   type="button"
                   onClick={() => setFarmDropdownOpen((v) => !v)}
-                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl bg-[#f8faf6] hover:bg-[#edf2ea] text-[#11261f] transition-all text-xs font-bold shadow-2xs cursor-pointer border border-[#e8ede4]"
+                  className="flex items-center gap-1.5 sm:gap-2 h-9 px-2.5 sm:px-3 rounded-xl bg-[#f8faf6] hover:bg-[#edf2ea] text-[#11261f] transition-all text-xs font-bold shadow-2xs cursor-pointer border border-[#e8ede4]"
                   title="Switch Active Farm or Field"
                 >
                   <MapPin className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0" />
-                  <div className="text-left leading-tight max-w-[86px] sm:max-w-[170px] truncate">
-                    <span className="block text-[10.5px] sm:text-[11px] font-extrabold text-[#11261f] truncate">{activeFarm.name}</span>
-                    <span className="block text-[8.5px] sm:text-[9px] text-slate-500 font-mono truncate">{activeFarm.primaryCrop} · {activeFarm.areaAcres} ac</span>
+                  <div className="flex items-center gap-1.5 text-left max-w-[100px] sm:max-w-[180px] truncate">
+                    <span className="text-xs font-extrabold text-[#11261f] truncate">{activeFarm.name}</span>
+                    <span className="text-[10px] text-slate-500 font-mono truncate hidden md:inline">({activeFarm.primaryCrop})</span>
                   </div>
                   <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform shrink-0 ${farmDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -258,15 +258,15 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </div>
 
           {/* Primary Clean Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1.5 text-xs font-bold text-slate-700">
+          <nav className="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-700">
             {loggedIn ? (
               <>
                 <Link
                   href="/dashboard"
-                  className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
+                  className={`flex items-center gap-2 h-9 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/dashboard"
                       ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
                   }`}
                 >
                   <LayoutDashboard className="h-4 w-4 text-[#2d6a4f]" />
@@ -275,10 +275,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
                 <Link
                   href="/plant-intelligence"
-                  className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
+                  className={`flex items-center gap-2 h-9 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/plant-intelligence"
                       ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
                   }`}
                 >
                   <Sprout className="h-4 w-4 text-emerald-600" />
@@ -287,10 +287,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
                 <Link
                   href="/fields"
-                  className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
+                  className={`flex items-center gap-2 h-9 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/fields"
                       ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
                   }`}
                 >
                   <Layers className="h-4 w-4 text-[#2d6a4f]" />
@@ -299,10 +299,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
                 <Link
                   href="/assistant"
-                  className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
+                  className={`flex items-center gap-2 h-9 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/assistant"
                       ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
                   }`}
                 >
                   <Mic className="h-4 w-4 text-amber-500" />
@@ -314,10 +314,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <button
                     type="button"
                     onClick={() => setMoreDropdownOpen((v) => !v)}
-                    className={`flex items-center gap-1.5 py-2 px-3.5 rounded-xl whitespace-nowrap transition-all cursor-pointer text-xs font-bold ${
+                    className={`flex items-center gap-1.5 h-9 px-3 rounded-xl whitespace-nowrap transition-all cursor-pointer text-xs font-bold ${
                       isSecondaryActive
                         ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] font-extrabold"
-                        : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
+                        : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
                     }`}
                   >
                     <span>{language === "hi" ? "अधिक उपकरण" : "More Tools"}</span>
@@ -416,7 +416,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen((v) => !v)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 cursor-pointer shrink-0 shadow-2xs"
                 translate="no"
               >
                 <Globe className="h-3.5 w-3.5 text-blue-600 shrink-0" />
@@ -452,16 +452,16 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen((v) => !v)}
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#e8f5e9] hover:bg-[#d8edd9] border border-[#cbe5cb] text-[#1b4332] transition-all cursor-pointer shadow-2xs"
+                  className="flex items-center gap-2 h-9 px-2.5 sm:px-3 rounded-xl bg-[#e8f5e9] hover:bg-[#d8edd9] border border-[#cbe5cb] text-[#1b4332] transition-all cursor-pointer shadow-2xs"
                 >
-                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[#1b4332] to-[#2d6a4f] text-white flex items-center justify-center text-xs font-bold">
+                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[#1b4332] to-[#2d6a4f] text-white flex items-center justify-center text-xs font-bold shrink-0">
                     {displayName[0] || "K"}
                   </div>
-                  <div className="hidden sm:block text-left">
-                    <span className="text-xs font-bold text-[#11261f] block truncate max-w-[120px]">{displayName}</span>
-                    <span className="text-[10px] text-slate-500 block truncate max-w-[120px]">{displayLocation}</span>
+                  <div className="hidden sm:flex items-center gap-1.5 text-left text-xs">
+                    <span className="font-bold text-[#11261f] truncate max-w-[100px]">{displayName}</span>
+                    <span className="text-[10px] text-slate-500 font-medium truncate max-w-[90px] hidden xl:inline">· {displayLocation.split(',')[0]}</span>
                   </div>
-                  <ChevronDown className="h-3 w-3 text-slate-500 hidden sm:block" />
+                  <ChevronDown className="h-3 w-3 text-slate-500 hidden sm:block shrink-0" />
                 </button>
 
                 {profileDropdownOpen && (

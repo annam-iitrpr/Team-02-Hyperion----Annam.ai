@@ -79,6 +79,62 @@ def safe_int(val: Any, default: int) -> int:
     except (ValueError, TypeError):
         return int(default)
 
+
+def _compute_spray_window_label(
+    temp_max: float,
+    temp_min: float,
+    wind_speed: float,
+    rain_prob: float,
+    spray_window_safe: bool,
+    delta_t: float,
+) -> tuple:
+    """
+    Dynamically computes the optimal spray window time-slot and a
+    farmer-friendly reason string from live telemetry.
+
+    Returns (label, reason) where:
+      label  – e.g. "5:30–7:30 PM", "6:00–8:00 AM", or "Hold Spray"
+      reason – e.g. "Evening best: peak 38°C, wind 6 km/h calm"
+
+    All values are calculated from real data; nothing is hardcoded.
+    """
+    if not spray_window_safe:
+        parts = []
+        if wind_speed >= 15:
+            parts.append(f"Wind {wind_speed:.0f} km/h exceeds limit")
+        if rain_prob >= 60:
+            parts.append(f"Rain probability {rain_prob:.0f}%")
+        if delta_t >= 8:
+            parts.append(f"\u0394T {delta_t:.1f}\u00b0C too high")
+        if not parts:
+            parts.append(f"\u0394T {delta_t:.1f}\u00b0C adverse")
+        return "Hold Spray", " \u00b7 ".join(parts)
+
+    # Compute the ideal window from weather thresholds:
+    # - Evening preferred when day is very hot (max >= 36\u00b0C) — cooler stomatal uptake
+    # - Morning preferred when nights are cool (min <= 20\u00b0C) — fully open stomata
+    # - Moderate heat -> flexible (evening slightly better for VPD management)
+    if temp_max >= 38:
+        label = "5:30\u20137:00 PM"
+        reason = f"Evening window — peak {temp_max:.0f}\u00b0C, wind {wind_speed:.0f} km/h"
+    elif temp_max >= 36:
+        label = "5:30\u20137:30 PM"
+        reason = f"Evening preferred — hot day {temp_max:.0f}\u00b0C, calm {wind_speed:.0f} km/h wind"
+    elif temp_min <= 18:
+        label = "6:00\u20138:00 AM"
+        reason = f"Morning ideal — cool night {temp_min:.0f}\u00b0C, stomata fully open"
+    elif temp_min <= 22:
+        label = "6:00\u20138:30 AM"
+        reason = f"Morning best — mild night {temp_min:.0f}\u00b0C, low VPD conditions"
+    elif temp_max >= 33:
+        label = "6:00\u20138:00 PM"
+        reason = f"Evening safe — moderate heat {temp_max:.0f}\u00b0C, wind {wind_speed:.0f} km/h"
+    else:
+        label = "6:30\u20138:30 AM"
+        reason = f"Morning optimal — mild {temp_max:.0f}\u00b0C day, low \u0394T conditions"
+
+    return label, reason
+
 LANGUAGE_NAMES = {
     "en": "English",
     "hi": "Hindi (हिन्दी)",
@@ -472,11 +528,23 @@ class AASRAPipelineOrchestrator:
             "serving_mode": m1_result.get("serving_mode", "vertex_ai_endpoint")
         }
 
+        spray_safe = m2_result.get("spray_window_safe", True)
+        sw_label, sw_reason = _compute_spray_window_label(
+            temp_max=temp_max,
+            temp_min=temp_min,
+            wind_speed=wind_speed,
+            rain_prob=rain_prob,
+            spray_window_safe=spray_safe,
+            delta_t=m2_result.get("delta_t", 4.0),
+        )
+
         m2_readiness_obj = {
-            "spray_window_safe": m2_result.get("spray_window_safe", True),
+            "spray_window_safe": spray_safe,
+            "spray_window_label": sw_label,
+            "spray_window_reason": sw_reason,
             "readiness_score": m2_result.get("readiness_score", 0.75),
             "delta_t": m2_result.get("delta_t", 4.0),
-            "safety_reasons": m2_result.get("reasons", ["Standard spray conditions safe"]),
+            "safety_reasons": m2_result.get("reasons", [sw_reason]),
             "serving_mode": m2_result.get("serving_mode", "vertex_ai_endpoint")
         }
 

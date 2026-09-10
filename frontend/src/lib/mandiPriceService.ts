@@ -820,7 +820,8 @@ export function findNearestOrMatchingMandi(
   }
 
   // 4. Default to Central APMC Benchmark (Bhopal Karond)
-  return { mandi: MANDI_GEO_REGISTRY[0] };
+  const defaultMandi = MANDI_GEO_REGISTRY.find((m) => m.id === "mp_bhopal_karond") || MANDI_GEO_REGISTRY[0];
+  return { mandi: defaultMandi };
 }
 
 /**
