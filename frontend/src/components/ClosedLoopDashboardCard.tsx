@@ -376,11 +376,11 @@ export function ClosedLoopDashboardCard({
           {/* Quick Action CTAs */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <Link
-              href="/closed-loop"
+              href="/plant-intelligence/recovery"
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#1b4332] hover:bg-[#143326] rounded-xl shadow-2xs transition-all cursor-pointer min-h-[38px]"
             >
               <Stethoscope className="h-3.5 w-3.5" />
-              <span>{isHi ? "पूरा सिमुलेटर खोलें" : "Open Full Simulator"}</span>
+              <span>{isHi ? "रिकवरी ट्रैकर खोलें" : "Open Recovery Tracker"}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
 

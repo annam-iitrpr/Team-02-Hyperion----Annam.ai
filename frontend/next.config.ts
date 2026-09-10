@@ -33,6 +33,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/closed-loop",
+        destination: "/dashboard",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

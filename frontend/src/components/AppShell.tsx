@@ -321,19 +321,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <span>{t.navAdvisory || "Ask AI"}</span>
                 </Link>
 
-                <Link
-                  href="/closed-loop"
-                  className={`flex items-center gap-1.5 h-9 px-3 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
-                    pathname === "/closed-loop"
-                      ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
-                  }`}
-                >
-                  <Activity className="h-3.5 w-3.5 text-[#2d6a4f]" />
-                  <span>{language === "hi" ? "48h फॉलो-अप" : "Closed-Loop (48h)"}</span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                </Link>
-
                 {/* Clean Dropdown for Secondary Tools */}
                 <div className="relative shrink-0" ref={moreDropdownRef}>
                   <button
@@ -351,18 +338,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
                   {moreDropdownOpen && (
                     <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 font-medium text-xs text-slate-700 space-y-1">
-
-                      <Link
-                        href="/closed-loop"
-                        onClick={() => setMoreDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
-                      >
-                        <Activity className="h-4 w-4 text-[#2d6a4f]" />
-                        <div>
-                          <span className="font-bold block">Closed-Loop Verification</span>
-                          <span className="text-[10px] text-slate-500">48h Remission & WhatsApp Sync</span>
-                        </div>
-                      </Link>
 
                       <Link
                         href="/impact"
@@ -431,18 +406,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <span>{language === "hi" ? "डैशबोर्ड" : "Farm Dashboard"}</span>
                 </Link>
 
-                <Link
-                  href="/closed-loop"
-                  className={`py-2 px-3 rounded-xl transition-all text-sm font-bold flex items-center gap-1.5 ${
-                    pathname === "/closed-loop"
-                      ? "bg-[#e8f5e9] text-[#1b4332] font-extrabold border border-[#cbe5cb]"
-                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100"
-                  }`}
-                >
-                  <Activity className="h-4 w-4 text-[#2d6a4f]" />
-                  <span>{language === "hi" ? "48h फॉलो-अप" : "Closed-Loop (48h)"}</span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                </Link>
 
                 <Link
                   href="/how-it-works"
@@ -802,16 +765,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               {pathname === "/dashboard" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
-            <Link
-              href="/closed-loop"
-              className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/closed-loop" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <Activity className="h-4 w-4 text-[#2d6a4f]" />
-              <span>{language === "hi" ? "48h फॉलो-अप" : "48h Loop"}</span>
-              {pathname === "/closed-loop" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
-            </Link>
 
             <Link
               href="/assistant"

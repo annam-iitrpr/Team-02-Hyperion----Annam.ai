@@ -1194,7 +1194,7 @@ export default function PlantIntelligencePage() {
                 </Link>
 
                 <Link
-                  href="/closed-loop"
+                  href="/plant-intelligence/recovery"
                   className="p-4 rounded-2xl bg-white border border-[#e5e7eb] hover:border-purple-300 shadow-2xs hover:shadow-md transition-all flex items-center justify-between group"
                 >
                   <div className="space-y-0.5">
