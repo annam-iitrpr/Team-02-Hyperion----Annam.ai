@@ -1089,75 +1089,8 @@ export default function SignupPage() {
               />
             </div>
 
-              {/* Farm Size Acreage Controller (Synchronized with Map) */}
-              <div className="p-5 rounded-2xl bg-[#f8faf7] border border-[#e2e8df] space-y-3">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs font-bold text-[#0d253d]">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#2d6a4f]" />
-                    <span>Total Farm Acreage (खेत का कुल क्षेत्रफल / रकबा):</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-slate-500">
-                      ({(acres * 0.4047).toFixed(2)} Hectares)
-                    </span>
-                    <div className="flex items-center bg-white border border-[#2d6a4f] rounded-xl px-3 py-1 shadow-2xs">
-                      <input
-                        type="number"
-                        min="0.1"
-                        max="500"
-                        step="0.1"
-                        value={acres}
-                        onChange={(e) => setAcres(Number(e.target.value))}
-                        className="w-16 font-mono text-sm font-black text-[#1b4332] focus:outline-none text-right mr-1"
-                      />
-                      <span className="font-mono text-xs font-bold text-[#1c2e24]">Acres</span>
-                    </div>
-                  </div>
-                </div>
-
-                <input
-                  type="range"
-                  min="0.5"
-                  max={Math.max(50, Math.ceil(acres + 10))}
-                  step="0.1"
-                  value={acres}
-                  onChange={(e) => setAcres(Number(e.target.value))}
-                  className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#2d6a4f]"
-                />
-
-                <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-                  <span>0.5 Acre</span>
-                  <span>25 Acres</span>
-                  <span>{Math.max(50, Math.ceil(acres + 10))} Acres</span>
-                </div>
-              </div>
-
               {/* Soil & Irrigation */}
               <div className="space-y-3">
-                {detectedSoil && (
-                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[#f8faf7] border border-[#e2e8df] text-[#11261f] text-xs shadow-2xs">
-                    <CheckCircle2 className="h-4 w-4 text-[#2d6a4f] shrink-0" />
-                    <div className="flex-1 flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-[11px] uppercase tracking-wider text-slate-500 font-mono">
-                        {isHindi ? "पहचानी गई मिट्टी:" : "Auto-Detected Soil:"}
-                      </span>
-                      <span className="font-bold text-[#11261f]">
-                        {detectedSoil.detectedSoilType}
-                      </span>
-                      {detectedSoil.typicalPh && (
-                        <span className="text-[10px] bg-[#e8ede4] text-[#2d6a4f] px-2 py-0.5 rounded-md font-mono font-bold">
-                          pH {detectedSoil.typicalPh}
-                        </span>
-                      )}
-                      {detectedSoil.texture && (
-                        <span className="text-[10px] text-slate-500 font-medium">
-                          • {detectedSoil.texture}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">

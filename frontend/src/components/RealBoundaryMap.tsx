@@ -609,49 +609,44 @@ export function RealBoundaryMap({
         </div>
       </div>
 
-      {/* ── Interactive Corner Management Bar (Individual Point Removal) ──── */}
+      {/* ── Interactive Corner Management Bar (Redesigned Sleek Toolbar) ──── */}
       {points.length > 0 && (
-        <div className="p-3 bg-white border border-[#e3e8ee] rounded-2xl shadow-2xs flex flex-wrap items-center justify-between gap-2.5 text-xs">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-extrabold text-[#0d253d] flex items-center gap-1.5">
+        <div className="px-3.5 py-2.5 bg-[#fbfcf8] border border-[#e8ede4] rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-x-auto py-0.5">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#2d6a4f]" />
-              Active Corners ({points.length}):
+              Active Corners ({points.length})
             </span>
-            <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex items-center gap-1.5 shrink-0">
               {points.map((pt, idx) => (
                 <div
                   key={`corner-chip-${idx}-${pt[0]}-${pt[1]}`}
-                  className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl bg-[#e8f5e9] border border-emerald-200 text-[#1b4332] font-mono text-xs font-bold transition-all hover:bg-rose-50 hover:border-rose-300"
+                  className="group inline-flex items-center gap-1.5 pl-2 pr-1.5 py-0.5 rounded-lg bg-white border border-[#e2e8df] text-[#1b4332] font-mono text-[11px] font-bold shadow-2xs hover:border-rose-300 hover:bg-rose-50/50 transition-all"
                 >
                   <span>P{idx + 1}</span>
                   <button
                     type="button"
-                    title={`Delete Corner P${idx + 1} (गलती से लगा कोना P${idx + 1} हटाएं)`}
+                    title={`Delete Corner P${idx + 1}`}
                     onClick={() => handleRemovePoint(idx)}
-                    className="p-1 hover:bg-rose-500 hover:text-white rounded-md text-slate-500 transition-colors cursor-pointer"
+                    className="p-0.5 rounded text-slate-400 group-hover:text-rose-600 hover:bg-rose-100 transition-colors cursor-pointer"
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-3 w-3" />
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-500 hidden sm:inline">
-              💡 Tap any pin on map or click [✕] to remove
-            </span>
-            <button
-              type="button"
-              disabled={points.length === 0}
-              onClick={handleUndoLastPoint}
-              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40"
-              title="Remove the last added point"
-            >
-              <Undo2 className="h-3.5 w-3.5" />
-              <span>Undo Last</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            disabled={points.length === 0}
+            onClick={handleUndoLastPoint}
+            className="shrink-0 px-2.5 py-1 rounded-lg bg-white border border-[#e2e8df] hover:border-slate-300 text-slate-700 hover:text-[#1b4332] text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer disabled:opacity-40"
+            title="Remove the last added corner point"
+          >
+            <Undo2 className="h-3.5 w-3.5 text-slate-500" />
+            <span>Undo Last</span>
+          </button>
         </div>
       )}
     </div>
