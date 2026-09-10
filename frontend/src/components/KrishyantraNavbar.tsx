@@ -101,6 +101,13 @@ export const KrishyantraNavbar: React.FC = () => {
             <span>🔄 48h Follow-Up</span>
           </Link>
 
+          <Link
+            href="/plant-intelligence"
+            className="relative py-2 text-[#1b4332] font-bold hover:text-[#2d6a4f] flex items-center gap-1.5 transition-colors"
+          >
+            <span>🌿 Plant Health AI</span>
+          </Link>
+
           <button
             type="button"
             onClick={() => handleNavClick("features")}
@@ -263,6 +270,17 @@ export const KrishyantraNavbar: React.FC = () => {
                 <span>🔄 48h Follow-Up & Closed Loop</span>
               </span>
               <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-mono">ACTIVE</span>
+            </Link>
+
+            <Link
+              href="/plant-intelligence"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-left px-3.5 py-2.5 rounded-xl bg-emerald-50 text-[#1b4332] font-bold flex items-center justify-between border border-emerald-200 shadow-2xs"
+            >
+              <span className="flex items-center gap-1.5">
+                <span>🌿 Plant Health AI</span>
+              </span>
+              <span className="text-[10px] bg-[#1b4332] text-white px-2 py-0.5 rounded-full font-mono">5 MODELS</span>
             </Link>
 
             <button
