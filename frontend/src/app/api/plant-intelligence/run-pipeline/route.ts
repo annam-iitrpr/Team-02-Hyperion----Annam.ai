@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRecommendations, FarmerInput } from "@/lib/recommendationEngine";
 import { getAllProducts } from "@/lib/syngentaProductsDB";
+import { executeGoogleGeminiPrompt, LANGUAGE_NAMES } from "@/lib/geminiEngine";
 
 const REGIONS_DATA: Record<string, { name: string; lat: number; lon: number; soil_type: string; soil_buffer: number; salinity_index: number; crops: string[]; dominant_stresses: string[] }> = {
   punjab: {
@@ -144,6 +145,7 @@ export async function POST(request: NextRequest) {
   const regionKey = body.region || "bhopal";
   const symptoms = body.symptoms || "None";
   const soilMoisture = body.soil_moisture || "Optimal";
+  const language = body.language || "en";
 
   const fallbackRegion = REGIONS_DATA[regionKey] || REGIONS_DATA["bhopal"];
   const lat = body.lat != null ? Number(body.lat) : (REGIONS_DATA[regionKey]?.lat ?? 23.2599);
@@ -426,6 +428,31 @@ export async function POST(request: NextRequest) {
     robi: topRec.expectedBenefit.robi,
   } : { productCost: 1250, applicationCost: 400, totalCostPerAcre: 1650, totalCostForField: 8250, expectedYieldGain: "2 q/acre", mandiPrice: 4800, expectedRevenue: 9600, robi: 5.8 };
 
+  let liveGeminiExplanation = topRec?.farmerExplanation || "";
+  let geminiModelUsed = "gemini-2.5-flash";
+  let geminiEngineUsed = "Google Cloud Vertex AI (asia-south1)";
+
+  if (recommendationResult.geminiPrompt) {
+    try {
+      const targetLangName = LANGUAGE_NAMES[language] || "English";
+      const livePrompt = `${recommendationResult.geminiPrompt}\n\nCRITICAL LANGUAGE INSTRUCTION: Answer directly in ${targetLangName}. Write a warm, practical, 2-3 sentence agricultural advisory for the farmer explaining why this product protects their crop and investment. Do not use chemical jargon.`;
+      const geminiRes = await executeGoogleGeminiPrompt(
+        livePrompt,
+        "You are AASRA, senior agricultural AI specialist for Syngenta India."
+      );
+      if (geminiRes && geminiRes.data) {
+        liveGeminiExplanation =
+          typeof geminiRes.data === "string"
+            ? geminiRes.data
+            : (geminiRes.data.text || geminiRes.data.explanation || JSON.stringify(geminiRes.data));
+        geminiModelUsed = geminiRes.model || "gemini-2.5-flash";
+        geminiEngineUsed = geminiRes.engine || "Google Cloud Vertex AI";
+      }
+    } catch (gErr) {
+      console.warn("[Plant Intelligence Gemini live explanation fallback]:", gErr);
+    }
+  }
+
   return NextResponse.json({
     data_source: dailyData ? "LIVE_OPEN_METEO" : "CALIBRATED_FALLBACK",
     weather_api: "Open-Meteo (api.open-meteo.com) — Live GPS Telemetry",
@@ -481,14 +508,17 @@ export async function POST(request: NextRequest) {
     cropfit: primaryProduct ? {
       product: primaryProduct,
       secondary_crop_protection: secondaryProd,
-      rationale: topRec?.farmerExplanation || `Recommendation engine analysis for ${crop} at ${stage} in ${locationName}.`,
+      rationale: liveGeminiExplanation || topRec?.farmerExplanation || `Recommendation engine analysis for ${crop} at ${stage} in ${locationName}.`,
       confidence: Math.min(96, Math.round(topRec?.score || 80)),
       top_candidates: topCandidates,
     } : null,
     // Stress profile from the 3-layer engine
     stress_profile: recommendationResult.stressProfile,
-    // Gemini prompt for LLM explanation layer
+    // Gemini explanation layer
     gemini_explanation_prompt: recommendationResult.geminiPrompt,
+    gemini_live_explanation: liveGeminiExplanation,
+    gemini_model: geminiModelUsed,
+    gemini_engine: geminiEngineUsed,
     forecast,
     economicROI,
     // Full 50-product catalog

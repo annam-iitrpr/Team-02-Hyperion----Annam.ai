@@ -293,6 +293,8 @@ function executeResilientAgronomicPipeline(body: Record<string, any>, weather: R
 
   const isStressActive = m1StressClass > 0 && !/optimal|no severe stress|none|safe/i.test(m1StressType);
 
+  const targetLang = (body.language || body.lang || "en").toLowerCase();
+
   const statementEn = isSpraySafe
     ? isStressActive
       ? `Biophysical models indicate favorable spray conditions (Delta-T: ${deltaT}°C, Wind: ${windSpeed} km/h). Applying ${topRecommendations[0].name} now triggers heat shock protein synthesis to safeguard against ${m1StressType}. Counterfactual causal gain: +${causalGainTau} Q/Acre with projected net return of ₹${netProfit.toLocaleString("en-IN")}.`
@@ -304,6 +306,82 @@ function executeResilientAgronomicPipeline(body: Record<string, any>, weather: R
       ? `बायोफिजिकल मॉडल अनुकूल छिड़काव की पुष्टि करते हैं (डेल्टा-टी: ${deltaT}°C, हवा: ${windSpeed} किमी/घंटा)। ${m1StressType} से बचाव के लिए ${topRecommendations[0].name} का तुरंत छिड़काव करें। अनुमानित अतिरिक्त उपज: +${causalGainTau} क्विंटल/एकड़, शुद्ध लाभ: ₹${netProfit.toLocaleString("en-IN")}।`
       : `बायोफिजिकल मॉडल अनुकूल छिड़काव की पुष्टि करते हैं (डेल्टा-टी: ${deltaT}°C, हवा: ${windSpeed} किमी/घंटा) एवं फसल सुरक्षित अवस्था में है। ${topRecommendations[0].name} फसल की हरियाली व शक्ति को बनाए रखने में सहायक है। अनुमानित अतिरिक्त उपज: +${causalGainTau} क्विंटल/एकड़, शुद्ध लाभ: ₹${netProfit.toLocaleString("en-IN")}।`
     : `वर्तमान में छिड़काव रोका गया है: ${safetyReasons[0]}। ठंडे समय या कल सुबह दोबारा जांचें। सुरक्षित छिड़काव से अनुमानित बचत: ₹${revenueSavedPerAcre.toLocaleString("en-IN")} प्रति एकड़।`;
+
+  const statementMr = isSpraySafe
+    ? isStressActive
+      ? `बायोफिजिकल मॉडेल फवारणीसाठी अनुकूल परिस्थिती दर्शवतात (Delta-T: ${deltaT}°C, वारा: ${windSpeed} किमी/तास). ${topRecommendations[0].name} चा वापर पिकाचे ${m1StressType} पासून संरक्षण करतो. अपेक्षित नफा: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `फवारणीसाठी अनुकूल हवामान (Delta-T: ${deltaT}°C, वारा: ${windSpeed} किमी/तास). ${topRecommendations[0].name} पिकाची निरोगी वाढ राखण्यास मदत करते. अपेक्षित नफा: ₹${netProfit.toLocaleString("en-IN")}.`
+    : `सध्या फवारणी रोखली आहे: ${safetyReasons[0]}. थंड वेळेत पुन्हा तपासा. अंदाजे बचत: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/एकर.`;
+
+  const statementPa = isSpraySafe
+    ? isStressActive
+      ? `ਬਾਇਓਫਿਜ਼ੀਕਲ ਮਾਡਲ ਛਿੜਕਾਅ ਲਈ ਅਨੁਕੂਲ ਹਾਲਾਤ ਦਰਸਾਉਂਦੇ ਹਨ (Delta-T: ${deltaT}°C, ਹਵਾ: ${windSpeed} ਕਿਮੀ/ਘੰਟਾ)। ${topRecommendations[0].name} ਦੀ ਵਰਤੋਂ ${m1StressType} ਤੋਂ ਬਚਾਉਂਦੀ ਹੈ। ਅਨੁਮਾਨਿਤ ਲਾਭ: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `ਛਿੜਕਾਅ ਲਈ ਸੁਰੱਖਿਅਤ ਮੌਸਮ ਹੈ (Delta-T: ${deltaT}°C, ਹਵਾ: ${windSpeed} ਕਿਮੀ/ਘੰਟਾ)। ${topRecommendations[0].name} ਫਸਲ ਦੀ ਸਿਹਤ ਅਤੇ ਝਾੜ ਨੂੰ ਵਧਾਉਂਦਾ ਹੈ।`
+    : `ਇਸ ਸਮੇਂ ਛਿੜਕਾਅ ਰੋਕਿਆ ਗਿਆ ਹੈ: ${safetyReasons[0]}. ਸ਼ਾਮ ਨੂੰ ਮੁੜ ਜਾਂਚ ਕਰੋ। ਅਨੁਮਾਨਿਤ ਬਚਤ: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/ਏਕੜ।`;
+
+  const statementGu = isSpraySafe
+    ? isStressActive
+      ? `બાયોફિઝિકલ મોડેલ સ્પ્રે માટે અનુકૂળ હવામાન દર્શાવે છે (Delta-T: ${deltaT}°C, પવન: ${windSpeed} કિમી/કલાક). ${m1StressType} સામે રક્ષણ માટે ${topRecommendations[0].name} નો ઉપયોગ કરો. અંદાજિત નફો: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `સ્પ્રે માટે અનુકૂળ હવામાન છે (Delta-T: ${deltaT}°C, પવન: ${windSpeed} કિમી/કલાક). ${topRecommendations[0].name} પાકની તંદુરસ્ત વૃદ્ધિ જાળવી રાખે છે.`
+    : `હાલમાં સ્પ્રે મુલતવી રાખો: ${safetyReasons[0]}. ઠંડા સમયે ફરી તપાસ કરો. અંદાજિત બચત: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/એકર.`;
+
+  const statementTe = isSpraySafe
+    ? isStressActive
+      ? `బయోఫిజికల్ నమూనాలు పిచికారీకి అనుకూల వాతావరణాన్ని నిర్ధారిస్తాయి (Delta-T: ${deltaT}°C, గాలి: ${windSpeed} కిమీ/గం). ${m1StressType} నివారణకు ${topRecommendations[0].name} ఉపయోగించండి. అంచనా నికర లాభం: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `పిచికారీకి సురక్షితమైన వాతావరణం (Delta-T: ${deltaT}°C, గాలి: ${windSpeed} కిమీ/గం). ${topRecommendations[0].name} పంట దిగుబడిని కాపాడుతుంది.`
+    : `ప్రస్తుతం పిచికారీ వాయిదా వేయండి: ${safetyReasons[0]}. సాయంత్రం వేళల్లో మళ్లీ పరిశీలించండి. అంచనా ఆదా: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/ఎకరా.`;
+
+  const statementTa = isSpraySafe
+    ? isStressActive
+      ? `தெளிப்புக்கு சாதகமான வானிலை நிலவுகிறது (Delta-T: ${deltaT}°C, காற்று: ${windSpeed} கிமீ/மணி). ${m1StressType} பாதிப்பிலிருந்து பாதுகாக்க ${topRecommendations[0].name} தெளிக்கவும். எதிர்பார்க்கப்படும் லாபம்: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `தெளிப்புக்கு பாதுகாப்பான சூழல் (Delta-T: ${deltaT}°C, காற்று: ${windSpeed} கிமீ/மணி). ${topRecommendations[0].name} பயிரின் செழிப்பான வளர்ச்சிக்கு உதவுகிறது.`
+    : `தற்போது தெளிப்பு ஒத்திவைக்கப்படுகிறது: ${safetyReasons[0]}. மாலை வேளையில் மீண்டும் சரிபார்க்கவும். சேமிப்பு: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/ஏக்கர்.`;
+
+  const statementKn = isSpraySafe
+    ? isStressActive
+      ? `ಸಿಂಪಡಣೆಗೆ ಅನುಕೂಲಕರ ಹವಾಮಾನ ದೃಢಪಟ್ಟಿದೆ (Delta-T: ${deltaT}°C, ಗಾಳಿ: ${windSpeed} ಕಿಮೀ/ಗಂ). ${m1StressType} ಇಂದ ರಕ್ಷಿಸಲು ${topRecommendations[0].name} ಬಳಸಿ. ನಿರೀಕ್ಷಿತ ನಿವ್ವಳ ಲಾಭ: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `ಸಿಂಪಡಣೆಗೆ ಸೂಕ್ತ ಹವಾಮಾನ (Delta-T: ${deltaT}°C, ಗಾಳಿ: ${windSpeed} ಕಿಮೀ/ಗಂ). ${topRecommendations[0].name} ಬೆಳೆಯ ಬೆಳವಣಿಗೆಗೆ ಸಹಕಾರಿ.`
+    : `ಪ್ರಸ್ತುತ ಸಿಂಪಡಣೆ ತಡೆಹಿಡಿಯಲಾಗಿದೆ: ${safetyReasons[0]}. ತಂಪಾದ ಸಮಯದಲ್ಲಿ ಮರುಪರಿಶೀಲಿಸಿ. ಉಳಿತಾಯ: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/ಎಕರೆ.`;
+
+  const statementMl = isSpraySafe
+    ? isStressActive
+      ? `സ്പ്രേ ചെയ്യാൻ അനുയോജ്യമായ കാലാവസ്ഥ (Delta-T: ${deltaT}°C, കാറ്റ്: ${windSpeed} കിമീ/മ). ${m1StressType} തടയാൻ ${topRecommendations[0].name} ഉപയോഗിക്കുക. പ്രതീക്ഷിക്കുന്ന ലാഭം: ₹${netProfit.toLocaleString("en-IN")}.`
+      : `സ്പ്രേ ചെയ്യാൻ അനുകൂലമായ കാലാവസ്ഥ (Delta-T: ${deltaT}°C, കാറ്റ്: ${windSpeed} കിമീ/മ). ${topRecommendations[0].name} വിളയുടെ വളർച്ച നിലനിർത്തുന്നു.`
+    : `ഇപ്പോൾ സ്പ്രേ ചെയ്യുന്നത് മാറ്റിവയ്ക്കുക: ${safetyReasons[0]}. തണുപ്പുള്ള സമയത്ത് വീണ്ടും പരിശോധിക്കുക. ലാഭം: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/ഏക്കർ.`;
+
+  const statementBn = isSpraySafe
+    ? isStressActive
+      ? `বায়োফিজিক্যাল মডেল স্প্রে করার অনুকূল পরিস্থিতি নির্দেশ করছে (Delta-T: ${deltaT}°C, বাতাস: ${windSpeed} কিমি/ঘণ্টা)। ${m1StressType} থেকে ফসল রক্ষায় ${topRecommendations[0].name} প্রয়োগ করুন। আনুমানিক লাভ: ₹${netProfit.toLocaleString("en-IN")}।`
+      : `স্প্রে করার জন্য অনুকূল আবহাওয়া (Delta-T: ${deltaT}°C, বাতাস: ${windSpeed} কিমি/ঘণ্টা)। ${topRecommendations[0].name} ফসলের স্বাস্থ্য ও ফলন বজায় রাখে।`
+    : `আপাতত স্প্রে স্থগিত রাখুন: ${safetyReasons[0]}। আবহাওয়া অনুকূল হলে পুনরায় দেখুন। সঞ্চয়: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/একর।`;
+
+  const statementOr = isSpraySafe
+    ? isStressActive
+      ? `ସ୍ପ୍ରେ ପାଇଁ ଅନୁକୂଳ ପାଗ ରହିଛି (Delta-T: ${deltaT}°C, ପବନ: ${windSpeed} କିମି/ଘଣ୍ଟା)। ${m1StressType} ରୁ ଫସଲ ରକ୍ଷା ପାଇଁ ${topRecommendations[0].name} ପ୍ରୟୋଗ କରନ୍ତୁ। ଆନୁମାନିକ ଲାଭ: ₹${netProfit.toLocaleString("en-IN")}।`
+      : `ସ୍ପ୍ରେ ପାଇଁ ସୁରକ୍ଷିତ ପାଗ (Delta-T: ${deltaT}°C, ପବନ: ${windSpeed} କିମି/ଘଣ୍ଟା)। ${topRecommendations[0].name} ଫସଲର ବୃଦ୍ଧି ବଜାୟ ରଖିବାରେ ସାହାଯ୍ୟ କରେ।`
+    : `ବର୍ତ୍ତମାନ ସ୍ପ୍ରେ ସ୍ଥଗିତ ରଖନ୍ତୁ: ${safetyReasons[0]}। ଥଣ୍ଡା ସମୟରେ ପୁନର୍ବାର ଯାଞ୍ଚ କରନ୍ତୁ। ସଞ୍ଚୟ: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/ଏକର।`;
+
+  const statementAs = isSpraySafe
+    ? isStressActive
+      ? `স্প্ৰে কৰাৰ অনুকূল পৰিৱেশ দেখা গৈছে (Delta-T: ${deltaT}°C, বতাহ: ${windSpeed} কিমি/ঘণ্টা)। ${m1StressType} ৰ পৰা ৰক্ষা পাবলৈ ${topRecommendations[0].name} ব্যৱহাৰ কৰক। আনুমানিক লাভ: ₹${netProfit.toLocaleString("en-IN")}।`
+      : `স্প্ৰে কৰাৰ বাবে সুৰক্ষিত বতৰ (Delta-T: ${deltaT}°C, বতাহ: ${windSpeed} কিমি/ঘণ্টা)। ${topRecommendations[0].name} শস্যৰ বৃদ্ধি আৰু উৎপাদনত সহায় কৰে।`
+    : `বৰ্তমান স্প্ৰে স্থগিত ৰাখক: ${safetyReasons[0]}। বতৰ অনুকূল হ’লে পুনৰ পৰীক্ষা কৰক। সঞ্চয়: ₹${revenueSavedPerAcre.toLocaleString("en-IN")}/বিঘা।`;
+
+  const localizedStatements: Record<string, string> = {
+    en: statementEn,
+    hi: statementHi,
+    mr: statementMr,
+    pa: statementPa,
+    gu: statementGu,
+    te: statementTe,
+    ta: statementTa,
+    kn: statementKn,
+    ml: statementMl,
+    bn: statementBn,
+    or: statementOr,
+    as: statementAs,
+  };
+  const activeStatement = localizedStatements[targetLang] || statementEn;
 
   // ─────────────────────────────────────────────────────────────
   // Unified Payload with Dual-Schema Compatibility
@@ -406,9 +484,20 @@ function executeResilientAgronomicPipeline(body: Record<string, any>, weather: R
 
     gemini_statement: {
       headline,
-      statement: statementEn,
-      statement_hi: statementHi,
+      statement: activeStatement,
       statement_en: statementEn,
+      statement_hi: statementHi,
+      statement_mr: statementMr,
+      statement_pa: statementPa,
+      statement_gu: statementGu,
+      statement_te: statementTe,
+      statement_ta: statementTa,
+      statement_kn: statementKn,
+      statement_ml: statementMl,
+      statement_bn: statementBn,
+      statement_or: statementOr,
+      statement_as: statementAs,
+      target_language: targetLang,
       spray_verdict_badge: isSpraySafe ? "SPRAY PERMITTED" : "SPRAY GATED",
       timing_guidance: isSpraySafe ? "Immediate morning window (06:00 - 09:30 AM)" : "Hold application until Delta-T < 8°C",
       product_summary: `${topRecommendations[0].name} (${topRecommendations[0].recommended_dosage})`,

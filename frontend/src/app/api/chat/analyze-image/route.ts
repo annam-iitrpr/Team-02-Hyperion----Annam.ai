@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GOOGLE_AI_KEYS } from "@/lib/geminiEngine";
+import { executeGoogleGeminiVisionPrompt } from "@/lib/geminiEngine";
 
 const LANGUAGE_NAMES: Record<string, string> = {
   hi: "Hindi (हिन्दी)",
@@ -44,10 +44,9 @@ export async function POST(req: NextRequest) {
       mimeType = file.type || "image/jpeg";
     }
 
-    const keys = Array.from(new Set(GOOGLE_AI_KEYS));
     let visionDiagnosis: any = null;
 
-    if (keys.length > 0 && base64Image) {
+    if (base64Image) {
       const userContext = question ? `Farmer's Spoken Question: "${question}"` : "Farmer requested general leaf health and disease analysis.";
       const visionPrompt = `You are AASRA (आसरा) Multimodal Vision AI for Syngenta Biologicals, specialized in Indian plant pathology and foliar stress diagnosis.
 Examine this crop leaf photo for ${crop} in ${district}, ${state}.
@@ -72,54 +71,11 @@ CRITICAL INSTRUCTIONS:
   ]
 }`;
 
-      for (const key of keys) {
-        for (const model of GEMINI_VISION_MODELS) {
-          try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-            const res = await fetch(url, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      { text: visionPrompt },
-                      {
-                        inlineData: {
-                          mimeType: mimeType,
-                          data: base64Image,
-                        },
-                      },
-                    ],
-                  },
-                ],
-                generationConfig: {
-                  temperature: 0.2,
-                  responseMimeType: "application/json",
-                },
-              }),
-              signal: AbortSignal.timeout(10000),
-            });
-
-            if (res.ok) {
-              const data = await res.json();
-              const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (text) {
-                try {
-                  visionDiagnosis = JSON.parse(text);
-                  visionDiagnosis.model_used = model;
-                  break;
-                } catch {
-                  visionDiagnosis = { diagnosis: text, model_used: model };
-                  break;
-                }
-              }
-            }
-          } catch (err) {
-            console.warn(`[Gemini Vision] ${model} attempt failed:`, err);
-          }
-        }
-        if (visionDiagnosis) break;
+      const res = await executeGoogleGeminiVisionPrompt(visionPrompt, base64Image, mimeType);
+      if (res && res.data) {
+        visionDiagnosis = res.data;
+        visionDiagnosis.model_used = res.model || "gemini-2.5-flash";
+        visionDiagnosis.engine = res.engine || "Vertex AI";
       }
     }
 

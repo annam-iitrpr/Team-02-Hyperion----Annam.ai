@@ -251,7 +251,7 @@ export const DynamicHeroHeadline: React.FC = () => {
     setIsLoggedIn(isUserLoggedIn());
   }, []);
 
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const headline1 = isHindi ? "डेटा से समझदारी," : "Data-Driven Decisions,";
   const headline2 = isHindi ? "समझदारी से" : "Engineered for";

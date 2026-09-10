@@ -385,7 +385,7 @@ const ALL_AASRA_MODULES: FullModuleGuide[] = [
 
 export default function HowItWorksPage() {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
   // Selected Module for Detailed Deep-Dive

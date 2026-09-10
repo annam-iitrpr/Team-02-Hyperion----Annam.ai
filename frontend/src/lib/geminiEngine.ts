@@ -1,9 +1,12 @@
 /**
- * Google AI Studio (Gemini 2.5 Flash / Flash Lite / Vision) & Syngenta CE Hub Engine
- * - Multi-key automatic failover across 4 high-quota Google AI keys
+ * Google AI Studio (Gemini 2.5 Flash / Flash Lite / Vision) & Google Cloud Vertex AI Engine
+ * - Primary: Google Cloud Vertex AI (asia-south1, iitm01) running Gemini 2.5 Flash
+ * - Multi-key automatic failover across high-quota Google AI Studio keys
  * - Live Syngenta CE Hub GDD & Disease Risk grounding
  * - Live Open-Meteo hourly agro-climatic telemetry
  */
+
+import crypto from "crypto";
 
 function decodeB64(val: string): string {
   try {
@@ -30,6 +33,21 @@ export const GOOGLE_AI_KEYS: string[] = [
   ...BACKUP_GOOGLE_KEYS,
 ].filter((k) => !!k && k.trim().length > 10);
 
+export const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  hi: "Hindi (हिन्दी)",
+  mr: "Marathi (मराठी)",
+  pa: "Punjabi (ਪੰਜਾਬੀ)",
+  gu: "Gujarati (ગુજરાતી)",
+  te: "Telugu (తెలుగు)",
+  ta: "Tamil (தமிழ்)",
+  kn: "Kannada (ಕನ್ನಡ)",
+  ml: "Malayalam (മലയാളം)",
+  bn: "Bengali (বাংলা)",
+  or: "Odia (ଓଡ଼ିଆ)",
+  as: "Assamese (অসমীয়া)",
+};
+
 export const CE_HUB_API_KEY =
   process.env.CEHUB_API_KEY || decodeB64("YjU0MjhkZjEtYWJiNy00ZjUyLThhMTMtZGRhZWQ2N2RjYjk4");
 export const CE_HUB_BASE_URL = "https://services.cehub.syngenta-ais.com";
@@ -43,6 +61,80 @@ export interface LiveTelemetryContext {
   cehubGddAccumulated: number;
   cehubDiseaseModel: string;
   source: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Google Cloud Vertex AI Auth Token Provider (Service Account)
+// ─────────────────────────────────────────────────────────────────────────────
+interface ServiceAccountConfig {
+  client_email: string;
+  private_key: string;
+  project_id: string;
+}
+
+let cachedVertexToken: { token: string; expiresAt: number } | null = null;
+
+function getServiceAccount(): ServiceAccountConfig | null {
+  const raw = process.env.GCP_SERVICE_ACCOUNT_JSON;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed.client_email && parsed.private_key) return parsed;
+    } catch {}
+  }
+  return null;
+}
+
+async function getGoogleCloudAccessToken(): Promise<string | null> {
+  const sa = getServiceAccount();
+  if (!sa) return null;
+
+  if (cachedVertexToken && Date.now() < cachedVertexToken.expiresAt - 180000) {
+    return cachedVertexToken.token;
+  }
+
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
+    const claimSet = Buffer.from(
+      JSON.stringify({
+        iss: sa.client_email,
+        scope: "https://www.googleapis.com/auth/cloud-platform",
+        aud: "https://oauth2.googleapis.com/token",
+        exp: now + 3600,
+        iat: now,
+      })
+    ).toString("base64url");
+
+    const sign = crypto.createSign("RSA-SHA256");
+    sign.update(`${header}.${claimSet}`);
+    const signature = sign.sign(sa.private_key, "base64url");
+    const jwt = `${header}.${claimSet}.${signature}`;
+
+    const res = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        assertion: jwt,
+      }),
+      signal: AbortSignal.timeout(6000),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.access_token) {
+        cachedVertexToken = {
+          token: data.access_token,
+          expiresAt: Date.now() + (data.expires_in || 3600) * 1000,
+        };
+        return data.access_token;
+      }
+    }
+  } catch (e) {
+    console.warn("[Gemini Vertex Token] Token exchange warning:", e);
+  }
+  return null;
 }
 
 /**
@@ -196,14 +288,74 @@ export async function fetchLiveAgronomicTelemetry(
 }
 
 /**
- * Execute prompt on Google Gemini 2.5 Flash with multi-key rotation and JSON enforcement
+ * Execute prompt on Google Gemini 2.5 Flash with Vertex AI Primary & Multi-Key Studio Fallback
  */
 export async function executeGoogleGeminiPrompt(prompt: string, systemInstruction?: string): Promise<any | null> {
-  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash", "gemini-2.0-flash-lite"];
+  // 1. Primary: Google Cloud Vertex AI (asia-south1, iitm01) with Gemini 2.5 Flash
+  const sa = getServiceAccount();
+  const vertexToken = await getGoogleCloudAccessToken();
+  if (vertexToken && sa) {
+    const project = sa.project_id || process.env.VERTEX_AI_PROJECT_ID || "iitm01";
+    const region = process.env.VERTEX_AI_REGION || "asia-south1";
+    const url = `https://${region}-aiplatform.googleapis.com/v1/projects/${project}/locations/${region}/publishers/google/models/gemini-2.5-flash:generateContent`;
+
+    try {
+      const reqBody: any = {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.15,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 2048,
+          responseMimeType: "application/json",
+        },
+      };
+
+      if (systemInstruction) {
+        reqBody.systemInstruction = {
+          parts: [{ text: systemInstruction }],
+        };
+      }
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${vertexToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reqBody),
+        signal: AbortSignal.timeout(12000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          const parsed = extractAndParseJson(rawText);
+          if (parsed && typeof parsed === "object") {
+            return {
+              data: parsed,
+              model: "gemini-2.5-flash",
+              engine: "Google Cloud Vertex AI (asia-south1, iitm01)",
+              keyUsed: "vertex-sa",
+            };
+          }
+        }
+      } else {
+        const errText = await res.text();
+        console.warn(`[Gemini Engine] Vertex AI status ${res.status}:`, errText.slice(0, 160));
+      }
+    } catch (vErr) {
+      console.warn("[Gemini Engine] Vertex AI query fallback:", vErr);
+    }
+  }
+
+  // 2. Secondary: Google AI Studio Multi-Key Failover
+  const studioModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-3.5-flash"];
   const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
 
   for (const key of uniqueKeys) {
-    for (const model of models) {
+    for (const model of studioModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const reqBody: any = {
@@ -227,7 +379,7 @@ export async function executeGoogleGeminiPrompt(prompt: string, systemInstructio
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reqBody),
-          signal: AbortSignal.timeout(25000),
+          signal: AbortSignal.timeout(12000),
         });
 
         if (res.ok) {
@@ -236,12 +388,17 @@ export async function executeGoogleGeminiPrompt(prompt: string, systemInstructio
           if (rawText) {
             const parsed = extractAndParseJson(rawText);
             if (parsed && typeof parsed === "object") {
-              return { data: parsed, model, keyUsed: key.slice(0, 10) + "..." };
+              return {
+                data: parsed,
+                model,
+                engine: "Google AI Studio",
+                keyUsed: key.slice(0, 10) + "...",
+              };
             }
           }
         }
       } catch (err) {
-        console.warn(`[Gemini Engine] ${model} with key ${key.slice(0, 8)}... failed:`, err);
+        console.warn(`[Gemini Studio Engine] ${model} with key ${key.slice(0, 8)}... failed:`, err);
       }
     }
   }
@@ -258,14 +415,81 @@ export async function executeGoogleGeminiVisionPrompt(
   mimeType: string = "image/jpeg",
   systemInstruction?: string
 ): Promise<any | null> {
-  const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"];
-  const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
-
-  // Strip potential base64 prefix
   const cleanBase64 = imageBase64.replace(/^data:[a-zA-Z0-9/+-]+;base64,/, "");
 
+  // 1. Primary: Google Cloud Vertex AI Gemini 2.5 Flash Vision
+  const sa = getServiceAccount();
+  const vertexToken = await getGoogleCloudAccessToken();
+  if (vertexToken && sa) {
+    const project = sa.project_id || process.env.VERTEX_AI_PROJECT_ID || "iitm01";
+    const region = process.env.VERTEX_AI_REGION || "asia-south1";
+    const url = `https://${region}-aiplatform.googleapis.com/v1/projects/${project}/locations/${region}/publishers/google/models/gemini-2.5-flash:generateContent`;
+
+    try {
+      const reqBody: any = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType: mimeType || "image/jpeg",
+                  data: cleanBase64,
+                },
+              },
+              { text: prompt },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 2048,
+          responseMimeType: "application/json",
+        },
+      };
+
+      if (systemInstruction) {
+        reqBody.systemInstruction = {
+          parts: [{ text: systemInstruction }],
+        };
+      }
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${vertexToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reqBody),
+        signal: AbortSignal.timeout(15000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          const parsed = extractAndParseJson(rawText);
+          if (parsed && typeof parsed === "object") {
+            return {
+              data: parsed,
+              model: "gemini-2.5-flash",
+              engine: "Google Cloud Vertex AI (asia-south1, iitm01)",
+              keyUsed: "vertex-sa",
+            };
+          }
+        }
+      }
+    } catch (vErr) {
+      console.warn("[Gemini Vision] Vertex AI warning:", vErr);
+    }
+  }
+
+  // 2. Secondary: Google AI Studio Failover
+  const studioModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-3.5-flash"];
+  const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
+
   for (const key of uniqueKeys) {
-    for (const model of models) {
+    for (const model of studioModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const reqBody: any = {
@@ -299,7 +523,7 @@ export async function executeGoogleGeminiVisionPrompt(
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reqBody),
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(15000),
         });
 
         if (res.ok) {
@@ -308,12 +532,17 @@ export async function executeGoogleGeminiVisionPrompt(
           if (rawText) {
             const parsed = extractAndParseJson(rawText);
             if (parsed && typeof parsed === "object") {
-              return { data: parsed, model, keyUsed: key.slice(0, 10) + "..." };
+              return {
+                data: parsed,
+                model,
+                engine: "Google AI Studio",
+                keyUsed: key.slice(0, 10) + "...",
+              };
             }
           }
         }
       } catch (err) {
-        console.warn(`[Gemini Vision] ${model} with key ${key.slice(0, 8)}... failed:`, err);
+        console.warn(`[Gemini Vision Studio] ${model} with key ${key.slice(0, 8)}... failed:`, err);
       }
     }
   }
@@ -330,13 +559,81 @@ export async function executeGoogleGeminiAudioPrompt(
   mimeType: string = "audio/webm",
   systemInstruction?: string
 ): Promise<any | null> {
-  const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"];
-  const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
-
   const cleanBase64 = audioBase64.replace(/^data:[a-zA-Z0-9/+-]+;base64,/, "");
 
+  // 1. Primary: Google Cloud Vertex AI Gemini 2.5 Flash Audio
+  const sa = getServiceAccount();
+  const vertexToken = await getGoogleCloudAccessToken();
+  if (vertexToken && sa) {
+    const project = sa.project_id || process.env.VERTEX_AI_PROJECT_ID || "iitm01";
+    const region = process.env.VERTEX_AI_REGION || "asia-south1";
+    const url = `https://${region}-aiplatform.googleapis.com/v1/projects/${project}/locations/${region}/publishers/google/models/gemini-2.5-flash:generateContent`;
+
+    try {
+      const reqBody: any = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType: mimeType || "audio/webm",
+                  data: cleanBase64,
+                },
+              },
+              { text: prompt },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 2048,
+          responseMimeType: "application/json",
+        },
+      };
+
+      if (systemInstruction) {
+        reqBody.systemInstruction = {
+          parts: [{ text: systemInstruction }],
+        };
+      }
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${vertexToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reqBody),
+        signal: AbortSignal.timeout(15000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          const parsed = extractAndParseJson(rawText);
+          if (parsed && typeof parsed === "object") {
+            return {
+              data: parsed,
+              model: "gemini-2.5-flash",
+              engine: "Google Cloud Vertex AI (asia-south1, iitm01)",
+              keyUsed: "vertex-sa",
+            };
+          }
+        }
+      }
+    } catch (vErr) {
+      console.warn("[Gemini Audio] Vertex AI warning:", vErr);
+    }
+  }
+
+  // 2. Secondary: Google AI Studio Failover
+  const studioModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-3.5-flash"];
+  const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
+
   for (const key of uniqueKeys) {
-    for (const model of models) {
+    for (const model of studioModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const reqBody: any = {
@@ -370,7 +667,7 @@ export async function executeGoogleGeminiAudioPrompt(
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reqBody),
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(15000),
         });
 
         if (res.ok) {
@@ -379,12 +676,17 @@ export async function executeGoogleGeminiAudioPrompt(
           if (rawText) {
             const parsed = extractAndParseJson(rawText);
             if (parsed && typeof parsed === "object") {
-              return { data: parsed, model, keyUsed: key.slice(0, 10) + "..." };
+              return {
+                data: parsed,
+                model,
+                engine: "Google AI Studio",
+                keyUsed: key.slice(0, 10) + "...",
+              };
             }
           }
         }
       } catch (err) {
-        console.warn(`[Gemini Audio STT] ${model} with key ${key.slice(0, 8)}... failed:`, err);
+        console.warn(`[Gemini Audio Studio] ${model} with key ${key.slice(0, 8)}... failed:`, err);
       }
     }
   }

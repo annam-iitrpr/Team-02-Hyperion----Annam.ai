@@ -60,7 +60,7 @@ export function RegionalAgriculturalProfile({
   onSelectCrop,
 }: RegionalAgriculturalProfileProps) {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
   const [showAllCrops, setShowAllCrops] = React.useState<boolean>(false);
 
   const cleanDistrict = district || "Local Region";

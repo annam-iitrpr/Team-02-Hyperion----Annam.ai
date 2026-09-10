@@ -194,7 +194,7 @@ const MILESTONES: StageMilestone[] = [
 
 export const CropGrowthSimulator: React.FC = () => {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const [currentDay, setCurrentDay] = useState<number>(55); // Default to peak comparison stage (Day 55 Heatwave)
   const [isPlaying, setIsPlaying] = useState<boolean>(true);

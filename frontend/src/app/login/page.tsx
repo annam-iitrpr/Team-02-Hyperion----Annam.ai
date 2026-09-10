@@ -41,7 +41,7 @@ import { useLanguage } from "@/context/LanguageContext";
 export default function LoginPage() {
   const router = useRouter();
   const { language, setLanguage } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const [authMethod, setAuthMethod] = useState<"otp" | "password">("otp");
   const [mobileNumber, setMobileNumber] = useState("");

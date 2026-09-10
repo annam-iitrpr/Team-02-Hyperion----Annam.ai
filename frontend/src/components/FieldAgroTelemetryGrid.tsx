@@ -14,7 +14,7 @@ interface FieldAgroTelemetryGridProps {
 
 export function FieldAgroTelemetryGrid({ weather, district, crop = "Soybean", acres = 5 }: FieldAgroTelemetryGridProps) {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   // 1. Scientifically Grounded VPD (Vapor Pressure Deficit)
   const temp = weather.temperature || 28.5;

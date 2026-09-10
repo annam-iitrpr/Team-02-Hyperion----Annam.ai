@@ -55,7 +55,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   onActionClick,
 }) => {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const [activeTab, setActiveTab] = useState<"home" | "crop" | "voice" | "mandi" | "weather">("home");
   const [selectedCrop, setSelectedCrop] = useState<string>("wheat");

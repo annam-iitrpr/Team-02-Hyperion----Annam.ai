@@ -197,7 +197,7 @@ const PS_MODULES_SPECS = [
 
 export default function ArchitecturePage() {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
   // Interactive Pipeline Flow Simulation

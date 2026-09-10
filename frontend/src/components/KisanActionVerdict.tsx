@@ -81,6 +81,21 @@ export const KisanActionVerdict: React.FC = () => {
 
   const currentSpeechText = isHindi ? verdictTextHindi : verdictTextEnglish;
 
+  const speechLangMap: Record<string, string> = {
+    hi: "hi-IN",
+    mr: "mr-IN",
+    pa: "pa-IN",
+    gu: "gu-IN",
+    te: "te-IN",
+    ta: "ta-IN",
+    kn: "kn-IN",
+    ml: "ml-IN",
+    bn: "bn-IN",
+    or: "or-IN",
+    as: "as-IN",
+    en: "en-IN",
+  };
+
   const handleToggleVoice = () => {
     if (isPlayingAudio) {
       stopGoogleSpeech();
@@ -89,7 +104,7 @@ export const KisanActionVerdict: React.FC = () => {
       setIsPlayingAudio(true);
       playGoogleNeuralSpeech(
         currentSpeechText,
-        isHindi ? "hi-IN" : "en-IN",
+        speechLangMap[language] || (isHindi ? "hi-IN" : "en-IN"),
         {
           onEnd: () => setIsPlayingAudio(false),
           onError: () => setIsPlayingAudio(false),
