@@ -155,10 +155,10 @@ export default function YieldCategoryPage() {
               </p>
             </div>
 
-            {/* With Quantis */}
+            {/* With Biological Protection */}
             <div className="p-4 rounded-2xl bg-white border-2 border-emerald-500 space-y-2 shadow-xs">
               <div className="flex items-center justify-between text-emerald-800 font-bold">
-                <span>{isHindi ? "क्वांटिस सुरक्षा के साथ (संरक्षित उपज)" : "With Quantis® Protection"}</span>
+                <span>{isHindi ? "जैविक सुरक्षा के साथ (संरक्षित उपज)" : "With Biological Protection"}</span>
                 <span className="text-xs bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300 font-black text-emerald-800">
                   +{percentGain}% Protected
                 </span>
