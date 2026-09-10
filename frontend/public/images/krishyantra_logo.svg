@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 50" fill="none">
+  <!-- Sprout Icon -->
+  <g transform="translate(4, 5)">
+    <!-- Center Main Leaf -->
+    <path d="M18 36 C18 20 25 8 36 2 C36 18 29 32 18 36 Z" fill="#2d6a4f" />
+    <!-- Left Leaf -->
+    <path d="M18 36 C14 24 5 18 0 16 C0 28 8 34 18 36 Z" fill="#52b788" />
+    <!-- Right Leaf -->
+    <path d="M18 36 C22 25 32 20 38 20 C36 30 28 35 18 36 Z" fill="#40916c" />
+    <!-- Stem/Root base -->
+    <path d="M18 36 L18 41 C18 42 17 43 16 43 C15 43 14 42 14 41" stroke="#1b4332" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Brand Wordmark -->
+  <text x="54" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="900" fill="#1b4332" letter-spacing="-0.5">krishyantra</text>
+  
+  <!-- Tagline -->
+  <text x="55" y="41" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" fill="#40916c" letter-spacing="0.2">Saath Har Kisan Ke Liye</text>
+</svg>

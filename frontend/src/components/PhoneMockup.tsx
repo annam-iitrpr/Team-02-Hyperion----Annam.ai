@@ -24,7 +24,11 @@ import {
   MapPin,
   ChevronRight,
   ShieldAlert,
+  HelpCircle,
+  MoreHorizontal,
+  Bookmark,
 } from "lucide-react";
+import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface PhoneMockupProps {
@@ -32,6 +36,7 @@ interface PhoneMockupProps {
   temperature?: number;
   crop?: string;
   mandiPrice?: number;
+  onActionClick?: (route: string) => void;
 }
 
 const TABS: Array<"home" | "crop" | "voice" | "mandi" | "weather"> = [
@@ -44,9 +49,10 @@ const TABS: Array<"home" | "crop" | "voice" | "mandi" | "weather"> = [
 
 export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   location,
-  temperature = 28,
-  crop,
+  temperature = 26,
+  crop = "Groundnut",
   mandiPrice = 2420,
+  onActionClick,
 }) => {
   const { language } = useLanguage();
   const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
@@ -62,9 +68,9 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
     setMounted(true);
   }, []);
 
-  // ── 1. Automatic Working Phone Cycle (4.5s per scene) ─────────────────
+  // ── 1. Automatic Working Phone Cycle (5s per scene) ─────────────────
   useEffect(() => {
-    const delay = userInteracted ? 9000 : 4500;
+    const delay = userInteracted ? 10000 : 5000;
     const timer = setTimeout(() => {
       setUserInteracted(false);
       setActiveTab((prev) => {
@@ -77,7 +83,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   }, [activeTab, userInteracted]);
 
   // ── 2. Real-time Clock ───────────────────────────────────────────────
-  const [currentTime, setCurrentTime] = useState<string>("09:41");
+  const [currentTime, setCurrentTime] = useState<string>("11:51");
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -90,12 +96,12 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // ── 3. Fluctuating Temperature Telemetry (28.0°C to 28.4°C) ──────────
+  // ── 3. Fluctuating Temperature Telemetry (26.0°C to 26.4°C) ──────────
   const [liveTemp, setLiveTemp] = useState<number>(temperature);
   useEffect(() => {
     const tempInterval = setInterval(() => {
       setLiveTemp(+(temperature + (Math.random() * 0.4 - 0.2)).toFixed(1));
-    }, 3500);
+    }, 4000);
     return () => clearInterval(tempInterval);
   }, [temperature]);
 
@@ -116,17 +122,8 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
       const cInterval = setInterval(() => {
         cropIdx = (cropIdx + 1) % crops.length;
         setSelectedCrop(crops[cropIdx]);
-      }, 2000);
+      }, 2500);
       return () => clearInterval(cInterval);
-    }
-  }, [activeTab]);
-
-  // ── 6. Voice speech wave animation ───────────────────────────────────
-  useEffect(() => {
-    if (activeTab === "voice") {
-      setIsSpeaking(true);
-    } else {
-      setIsSpeaking(false);
     }
   }, [activeTab]);
 
@@ -152,252 +149,230 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   return (
     <div className="relative mx-auto select-none flex items-center justify-center">
       
-      {/* ── Atmospheric Ambient Backdrop Glow ───────────────────────── */}
+      {/* ── Soft Agricultural Glow ──────────────────────────────────── */}
       <div
-        className="absolute -top-16 -left-16 w-72 h-72 rounded-full opacity-25 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #533afd 0%, transparent 70%)" }}
+        className="absolute -top-10 -left-10 w-72 h-72 rounded-full opacity-25 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, #2d6a4f 0%, transparent 70%)" }}
       />
       <div
-        className="absolute -bottom-16 -right-16 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #0ea5e9 0%, transparent 70%)" }}
+        className="absolute -bottom-10 -right-10 w-72 h-72 rounded-full opacity-30 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, #52b788 0%, transparent 70%)" }}
       />
 
-      {/* ── DYNAMIC 3D FLOATING POPUPS EMERGING ON TAB TRANSITIONS ──── */}
-      
-      {/* 1. Dashboard Active Popup (Top Right) */}
-      <div
-        className={`absolute -top-3 -right-8 sm:-right-14 z-30 transition-all duration-500 ease-out pointer-events-none ${
-          activeTab === "home" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-90"
-        }`}
-      >
-        <div className="px-3 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-emerald-200/90 shadow-xl flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-          <span className="text-[10px] font-bold text-emerald-950 font-mono">
-            {isHindi ? "स्प्रे विंडो अनुकूल (11 km/h)" : "Safe Spray Window Active"}
-          </span>
-        </div>
-      </div>
+      {/* ── Realistic Floor Contact Shadow ──────────────────────────── */}
+      <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-black/25 rounded-full blur-xl pointer-events-none" />
 
-      {/* 2. Crop AI Active Popup (Top Left) */}
+      {/* ── Ultra-Realistic Smartphone Hardware Container ────────────── */}
       <div
-        className={`absolute top-28 -left-10 sm:-left-16 z-30 transition-all duration-500 ease-out pointer-events-none ${
-          activeTab === "crop" ? "opacity-100 translate-x-0 scale-100" : "opacity-0 -translate-x-3 scale-90"
-        }`}
-      >
-        <div className="px-3 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-indigo-200/90 shadow-xl flex items-center gap-2">
-          <span className="text-sm">🍃</span>
-          <div className="text-left">
-            <span className="text-[10px] font-bold text-indigo-950 block leading-tight">
-              {isHindi ? "98.6% पीला रतुआ पहचान" : "98.6% Yellow Rust Match"}
-            </span>
-            <span className="text-[8px] text-slate-500 font-mono">Gemini 2.5 Vision</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Voice AI Active Popup (Bottom Right) */}
-      <div
-        className={`absolute bottom-24 -right-10 sm:-right-16 z-30 transition-all duration-500 ease-out pointer-events-none ${
-          activeTab === "voice" ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-3 scale-90"
-        }`}
-      >
-        <div className="px-3 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-purple-200/90 shadow-xl flex items-center gap-2">
-          <span className="text-sm">🎙️</span>
-          <div className="text-left">
-            <span className="text-[10px] font-bold text-purple-950 block leading-tight">
-              {isHindi ? "12 भारतीय भाषाएं" : "12 Indian Languages"}
-            </span>
-            <span className="text-[8px] text-slate-500 font-mono">Chirp 3 HD Audio</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Mandi Active Popup (Top Right) */}
-      <div
-        className={`absolute top-36 -right-10 sm:-right-16 z-30 transition-all duration-500 ease-out pointer-events-none ${
-          activeTab === "mandi" ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-3 scale-90"
-        }`}
-      >
-        <div className="px-3 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-amber-200/90 shadow-xl flex items-center gap-2">
-          <span className="text-sm">🌾</span>
-          <div className="text-left">
-            <span className="text-[10px] font-bold text-amber-950 block leading-tight">
-              {isHindi ? "सीहोर भाव +₹65 ▲" : "Sehore Rate +₹65 ▲"}
-            </span>
-            <span className="text-[8px] text-slate-500 font-mono">₹2,420 / quintal</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 5. Weather Active Popup (Top Left) */}
-      <div
-        className={`absolute top-20 -left-10 sm:-left-16 z-30 transition-all duration-500 ease-out pointer-events-none ${
-          activeTab === "weather" ? "opacity-100 translate-x-0 scale-100" : "opacity-0 -translate-x-3 scale-90"
-        }`}
-      >
-        <div className="px-3 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-sky-200/90 shadow-xl flex items-center gap-2">
-          <span className="text-sm">☀️</span>
-          <div className="text-left">
-            <span className="text-[10px] font-bold text-sky-950 block leading-tight">
-              {isHindi ? "14-दिन सूक्ष्म पूर्वानुमान" : "14-Day Micro-Radar"}
-            </span>
-            <span className="text-[8px] text-slate-500 font-mono">Open-Meteo Ingest</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Apple iPhone 16 Pro Max Titanium Chassis ─────────────────── */}
-      <div
-        className="relative rounded-[3.2rem] p-2 bg-gradient-to-b from-slate-700 via-slate-900 to-slate-950 shadow-[0_25px_60px_-15px_rgba(83,58,253,0.35),0_0_0_1px_rgba(255,255,255,0.15)]"
+        className="relative rounded-[3.2rem] p-[10px] bg-gradient-to-b from-slate-700 via-slate-800 to-slate-950 shadow-[0_25px_60px_-15px_rgba(27,67,50,0.32),0_15px_30px_-10px_rgba(0,0,0,0.22),0_0_0_1px_rgba(255,255,255,0.18)] transition-transform duration-500 hover:scale-[1.01]"
         style={{ width: "330px", maxWidth: "100%" }}
       >
-        {/* Outer Bezel */}
-        <div className="relative rounded-[2.7rem] overflow-hidden bg-slate-950 border-[3px] border-slate-800">
+        {/* Realistic Physical Hardware Buttons (Left Side) */}
+        {/* Action Button */}
+        <div className="absolute -left-[3px] top-24 w-[3.5px] h-6 bg-slate-600 rounded-l-xs ring-1 ring-slate-800 shadow-xs" />
+        {/* Volume Up */}
+        <div className="absolute -left-[3px] top-36 w-[3.5px] h-11 bg-slate-600 rounded-l-xs ring-1 ring-slate-800 shadow-xs" />
+        {/* Volume Down */}
+        <div className="absolute -left-[3px] top-52 w-[3.5px] h-11 bg-slate-600 rounded-l-xs ring-1 ring-slate-800 shadow-xs" />
+
+        {/* Realistic Physical Hardware Button (Right Side: Power/Sleep) */}
+        <div className="absolute -right-[3px] top-36 w-[3.5px] h-16 bg-slate-600 rounded-r-xs ring-1 ring-slate-800 shadow-xs" />
+
+        {/* Inner Black Bezel Frame */}
+        <div className="relative rounded-[2.7rem] overflow-hidden bg-black p-[2.5px] shadow-inner">
           
-          {/* Dynamic Island Notch */}
-          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 z-30 bg-black/90 backdrop-blur-md border border-slate-800 rounded-full px-3 py-1 flex items-center gap-2 shadow-inner">
-            <div className="h-2 w-2 rounded-full bg-slate-800 flex items-center justify-center">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          {/* Top Speaker Ear-piece Slit */}
+          <div className="absolute top-1.5 left-1/2 -translate-x-1/2 z-40 w-12 h-1 bg-slate-800/80 rounded-full" />
+
+          {/* Dynamic Island Notch with Camera Lens & Sensor */}
+          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 z-40 bg-black rounded-full px-3.5 py-1.5 flex items-center justify-between gap-3 shadow-md min-w-[112px]">
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[7.5px] font-mono text-slate-300 font-semibold tracking-wider">
+                krishyantra
+              </span>
             </div>
-            <span className="text-[8px] font-mono text-slate-300 font-semibold tracking-wider">
-              AASRA 2.5
-            </span>
+            {/* Camera lens & infrared sensor dots */}
+            <div className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-[#111827] ring-1 ring-white/10 flex items-center justify-center">
+                <span className="h-0.5 w-0.5 rounded-full bg-indigo-900" />
+              </span>
+              <span className="h-1 w-1 rounded-full bg-[#0a192f]" />
+            </div>
           </div>
 
-          {/* ── Screen Frame ────────────────────────────────────────────── */}
-          <div className="bg-[#f8fafc] overflow-hidden relative flex flex-col justify-between" style={{ height: "560px", width: "100%" }}>
+          {/* ── Screen Frame ──────────────────────────────────────────── */}
+          <div className="bg-[#fcfdfc] overflow-hidden relative flex flex-col justify-between rounded-[2.5rem]" style={{ height: "585px", width: "100%" }}>
             
-            {/* iOS Status Bar + Autoplay Progress Ribbon */}
-            <div className="relative bg-white/90 border-b border-slate-100/80">
-              <div className="flex justify-between items-center px-6 pt-3 pb-1 text-[10px] font-mono font-bold text-slate-600">
-                <span>{currentTime}</span>
-                <div className="flex gap-2 items-center">
-                  <span className="text-[9px] text-emerald-600 font-bold">5G</span>
-                  <span>●●●</span>
-                  <span className="text-[9px] text-slate-700">100%</span>
+            {/* Specular Screen Glass Reflection Highlight */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/[0.04] to-transparent pointer-events-none z-30" />
+
+            {/* iOS Status Bar */}
+            <div className="bg-white/95 border-b border-slate-100 pt-3 px-6 pb-1 flex justify-between items-center text-[10px] font-mono font-bold text-slate-700 relative z-20">
+              <span>{currentTime}</span>
+              <div className="flex gap-1.5 items-center">
+                <span className="text-[9px] text-emerald-700 font-bold">5G</span>
+                <span className="text-[8px]">●●●</span>
+                <span className="text-[9px]">100%</span>
+              </div>
+            </div>
+
+            {/* Sub-header Brand Strip */}
+            <div className="px-4 py-2 bg-white border-b border-slate-100 flex items-center justify-between relative z-20">
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-[#e8f5e9] flex items-center justify-center text-[#2d6a4f]">
+                  <Leaf className="w-3 h-3 text-[#2d6a4f]" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-black text-[#1b4332] block leading-none tracking-tight">
+                    krishyantra
+                  </span>
+                  <span className="text-[7.5px] text-[#40916c] font-medium leading-none">
+                    Saath Har Kisan Ke Liye
+                  </span>
                 </div>
               </div>
-              
-              {/* Subtle Autoplay Progress Line */}
-              <div className="h-0.5 bg-slate-100 w-full overflow-hidden">
-                <div
-                  key={activeTab}
-                  className="h-full bg-gradient-to-r from-[#533afd] to-[#0ea5e9] animate-[marquee_4.5s_linear_infinite]"
-                  style={{ width: "100%" }}
-                />
-              </div>
+              <Bookmark className="w-3.5 h-3.5 text-slate-400" />
             </div>
 
             {/* ── SCREEN VIEWPORTS (Dynamic on activeTab) ────────────────── */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            <div className="flex-1 overflow-y-auto px-3.5 py-2.5 space-y-2.5 relative z-10">
               
-              {/* ── TAB 1: HOME (Dashboard Overview) ────────────────────── */}
+              {/* ── TAB 1: HOME (Target Screenshot Faithful View) ───────── */}
               {activeTab === "home" && (
-                <div className="space-y-3 animate-in fade-in duration-300">
+                <div className="space-y-2.5 animate-in fade-in duration-300">
                   
-                  {/* Farmer Greeting Header Card */}
-                  <div className="rounded-3xl bg-gradient-to-br from-[#533afd] via-[#4434d4] to-[#372bb0] text-white p-4 shadow-md relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
-                    
-                    <div className="flex items-center justify-between relative z-10">
-                      <div>
-                        <p className="text-xs font-black tracking-tight">
-                          {isHindi ? "नमस्ते किसान साथी! 👋" : "Hello Farmer Partner! 👋"}
-                        </p>
-                        <p className="text-[10px] text-indigo-100 font-medium">
-                          {isHindi ? "आपकी फसल, वैज्ञानिक सुरक्षा" : "Precision Crop Intelligence"}
-                        </p>
-                      </div>
-                      <div className="h-9 w-9 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-sm shadow-inner">
-                        🌾
-                      </div>
-                    </div>
-
-                    <div className="mt-2.5 inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 text-[9px] font-medium border border-white/10" suppressHydrationWarning>
-                      <MapPin className="h-2.5 w-2.5 text-emerald-400" />
-                      <span className="truncate max-w-[190px]" suppressHydrationWarning>{displayLocation}</span>
+                  {/* Greeting & Location */}
+                  <div className="space-y-0.5 pt-0.5">
+                    <h3 className="text-sm font-black text-[#1b4332] flex items-center gap-1">
+                      {isHindi ? "सुप्रभात रमेश जी! 👋" : "Good Morning Ramesh Ji! 👋"}
+                    </h3>
+                    <div className="flex items-center gap-1 text-[9.5px] text-slate-500 font-medium">
+                      <MapPin className="w-3 h-3 text-[#2d6a4f]" />
+                      <span>{displayLocation}</span>
                     </div>
                   </div>
 
-                  {/* Weather Quick Tile */}
-                  <div className="rounded-2xl bg-white border border-[#e3e8ee] p-3.5 shadow-xs space-y-2">
+                  {/* Crop Health Card (Soft Green) */}
+                  <div className="rounded-2xl bg-[#eef7ee] border border-[#cbe5cb] p-3 flex items-center gap-2.5 shadow-2xs">
+                    <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-[#2d6a4f] shadow-xs shrink-0">
+                      <Leaf className="w-5 h-5 text-[#2d6a4f]" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[8.5px] text-slate-500 block font-medium">
+                        {isHindi ? "आपकी फसल: मूंगफली" : "Your Groundnut"}
+                      </span>
+                      <span className="text-xs font-black text-[#1b4332] block truncate">
+                        {isHindi ? "स्वस्थ अवस्था में है" : "Looking Healthy"}
+                      </span>
+                      <span className="text-[8px] text-slate-500 block font-mono">
+                        {isHindi ? "2 दिन पहले जांच की गई" : "Last checked 2 days ago"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Today's Advice Card */}
+                  <div className="rounded-2xl bg-white border border-[#e5e7eb] p-3 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-wider">
-                        {isHindi ? "आज का कृषि मौसम" : "Agricultural Weather"}
+                      <span className="text-[9.5px] font-bold text-slate-800 uppercase tracking-wider">
+                        {isHindi ? "आज की सलाह" : "Today's Advice"}
                       </span>
-                      <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                        {isHindi ? "स्प्रे विंडो सक्रिय ✓" : "Spray Window Active ✓"}
+                      <span className="text-[8.5px] text-[#2d6a4f] font-bold bg-[#e8f5e9] px-2 py-0.2 rounded-full">
+                        {isHindi ? "अनुकूल समय" : "Optimal"}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-0.5">
-                      <div>
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-3xl font-black text-[#0d253d] font-mono tracking-tight">{liveTemp}°C</span>
-                          <span className="text-[10px] text-slate-400 font-mono">/32° Max</span>
-                        </div>
-                        <p className="text-[10px] text-slate-600 font-medium">
-                          {isHindi ? "साफ धूप · हवा: 11 km/h" : "Clear & Sunny · Wind: 11 km/h"}
+                    <div className="rounded-xl bg-amber-50/70 border border-amber-200/70 p-2.5 flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                        <Sun className="w-4 h-4 text-amber-600" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] font-bold text-slate-900 leading-tight">
+                          {isHindi ? "स्प्रे का उत्तम समय: 7:00 AM - 9:00 AM" : "Good time to spray: 7:00 AM - 9:00 AM"}
+                        </p>
+                        <p className="text-[8.5px] text-slate-600 font-mono">
+                          Temp {liveTemp}°C · Wind 8 km/h
                         </p>
                       </div>
-                      <div className="h-10 w-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-2xl shadow-inner">
-                        ☀️
+                    </div>
+                  </div>
+
+                  {/* 4 Action Buttons Grid (Faithful to Target) */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onActionClick) onActionClick("/plant-intelligence");
+                        else handleManualTabChange("crop");
+                      }}
+                      className="p-2.5 rounded-xl bg-white border border-[#e5e7eb] hover:border-[#2d6a4f] shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer group"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-[#e8f5e9] text-[#2d6a4f] flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Camera className="w-3.5 h-3.5" />
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Mandi Quick Tile */}
-                  <div className="rounded-2xl bg-gradient-to-r from-amber-50/70 to-emerald-50/70 border border-amber-200/80 p-3.5 shadow-xs space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-amber-900 font-mono uppercase">
-                        {isHindi ? "सीहोर APMC मंडी भाव" : "Sehore APMC Mandi Rate"}
+                      <span className="text-[9.5px] font-bold text-slate-800">
+                        {isHindi ? "पौधा जांचें" : "Check Plant"}
                       </span>
-                      <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-mono">
-                        +₹65 ▲
-                      </span>
-                    </div>
+                    </button>
 
-                    <div className="flex items-baseline justify-between pt-1">
-                      <div>
-                        <span className="text-xs font-black text-slate-900 block">
-                          {isHindi ? "शरबती गेहूं (Sharbati Wheat)" : "Sharbati Wheat"}
-                        </span>
-                        <span className="text-xl font-black text-[#0d253d] font-mono">
-                          ₹{mandiPrice} <span className="text-[10px] font-normal text-slate-500">{isHindi ? "/क्विंटल" : "/quintal"}</span>
-                        </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onActionClick) onActionClick("/weather");
+                        else handleManualTabChange("weather");
+                      }}
+                      className="p-2.5 rounded-xl bg-white border border-[#e5e7eb] hover:border-[#2d6a4f] shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer group"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Sun className="w-3.5 h-3.5" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleManualTabChange("mandi")}
-                        className="text-[10px] font-bold text-[#533afd] hover:text-[#4434d4] flex items-center gap-0.5 cursor-pointer"
-                      >
-                        <span>{isHindi ? "अन्य भाव" : "All Rates"}</span>
-                        <ChevronRight className="h-3 w-3" />
-                      </button>
-                    </div>
+                      <span className="text-[9.5px] font-bold text-slate-800">
+                        {isHindi ? "मौसम" : "Weather"}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onActionClick) onActionClick("/assistant");
+                        else handleManualTabChange("voice");
+                      }}
+                      className="p-2.5 rounded-xl bg-white border border-[#e5e7eb] hover:border-[#2d6a4f] shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer group"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-[#e8f5e9] text-[#2d6a4f] flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Mic className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-[9.5px] font-bold text-slate-800">
+                        {isHindi ? "कृषियंत्र से पूछें" : "Ask Krishyantra"}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onActionClick) onActionClick("/mandi");
+                        else handleManualTabChange("mandi");
+                      }}
+                      className="p-2.5 rounded-xl bg-white border border-[#e5e7eb] hover:border-[#2d6a4f] shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer group"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Store className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-[9.5px] font-bold text-slate-800">
+                        {isHindi ? "मंडी भाव" : "Mandi Rates"}
+                      </span>
+                    </button>
                   </div>
 
-                  {/* AI Advisory Callout */}
-                  <div className="rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100/90 p-3 space-y-1.5 shadow-2xs">
-                    <div className="flex items-center gap-1.5 text-[#533afd] font-bold text-[10px]">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      <span>{isHindi ? "AASRA AI वैज्ञानिक सलाह" : "AASRA AI Advisory"}</span>
-                    </div>
-                    <p className="text-[10px] text-slate-700 leading-snug">
-                      {isHindi
-                        ? "गेहूं में बालियां निकलने का समय है। रात का तापमान 14°C से अधिक होने पर Quantis® @ 300ml का स्प्रे करें।"
-                        : "Wheat is entering the booting stage. If night temperatures exceed 14°C, apply Quantis® @ 300ml/ac."}
-                    </p>
-                  </div>
                 </div>
               )}
 
-              {/* ── TAB 2: CROP (AI Disease Vision Diagnostics) ─────────── */}
+              {/* ── TAB 2: CROP (Plant Diagnostics) ────────────────────── */}
               {activeTab === "crop" && (
-                <div className="space-y-3 animate-in fade-in duration-300">
+                <div className="space-y-2.5 animate-in fade-in duration-300">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-[#0d253d]">
-                      {isHindi ? "AI पत्ती रोग स्कैनर" : "AI Disease Vision Scanner"}
+                    <span className="text-xs font-black text-[#1b4332]">
+                      {isHindi ? "पत्ती रोग पहचान" : "Leaf & Disease Diagnostics"}
                     </span>
                     <button
                       type="button"
@@ -405,148 +380,133 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
                         setIsScanning(true);
                         setTimeout(() => setIsScanning(false), 2000);
                       }}
-                      className="px-2 py-1 rounded-xl bg-indigo-50 text-[#533afd] hover:bg-indigo-100 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                      className="px-2 py-0.5 rounded-full bg-[#e8f5e9] text-[#2d6a4f] text-[9px] font-bold flex items-center gap-1 cursor-pointer"
                     >
-                      <RefreshCw className={`h-3 w-3 ${isScanning ? "animate-spin" : ""}`} />
-                      <span>{isHindi ? "पुनः स्कैन" : "Rescan"}</span>
+                      <RefreshCw className={`h-2.5 w-2.5 ${isScanning ? "animate-spin" : ""}`} />
+                      <span>{isHindi ? "पुनः जांच" : "Scan"}</span>
                     </button>
                   </div>
 
-                  {/* Leaf Scan Viewfinder Simulation */}
-                  <div className="relative rounded-2xl overflow-hidden bg-slate-950 border-2 border-[#533afd] h-40 flex items-center justify-center shadow-inner">
-                    <div className="text-6xl select-none">🍃</div>
-
-                    {/* Scanning Laser Line */}
+                  {/* Leaf Scan Viewfinder */}
+                  <div className="relative rounded-2xl overflow-hidden bg-slate-950 border-2 border-[#2d6a4f] h-36 flex items-center justify-center shadow-inner">
+                    <div className="text-5xl select-none">🍃</div>
                     {isScanning && (
-                      <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_14px_#ef4444] animate-[bounce_1.5s_infinite]" />
+                      <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#10b981] animate-[bounce_1.5s_infinite]" />
                     )}
-
-                    {/* Bounding Box */}
-                    <div className="absolute border-2 border-dashed border-emerald-400 rounded-xl w-28 h-28 pointer-events-none flex items-start justify-end p-1.5">
-                      <span className="text-[7px] font-mono font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-sm shadow-xs">
-                        {isScanning ? (isHindi ? "स्कैन जारी..." : "SCANNING...") : "98.6% MATCH"}
+                    <div className="absolute border-2 border-dashed border-emerald-400 rounded-xl w-24 h-24 pointer-events-none flex items-start justify-end p-1">
+                      <span className="text-[7px] font-mono font-bold bg-[#1b4332] text-white px-1 py-0.5 rounded-xs">
+                        {isScanning ? "ANALYSING..." : "DIAGNOSIS READY"}
                       </span>
                     </div>
                   </div>
 
-                  {/* Diagnosis Result Card */}
-                  <div className="rounded-2xl bg-white border border-[#e3e8ee] p-3.5 shadow-xs space-y-1.5">
+                  <div className="rounded-2xl bg-white border border-[#e5e7eb] p-3 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-mono font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
-                        {isHindi ? "रोग पहचाना गया" : "Pathogen Detected"}
+                      <span className="text-[8.5px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                        Early Stage Spotted
                       </span>
-                      <span className="text-[9px] font-mono text-emerald-700 font-bold">
-                        98.6% Confidence
+                      <span className="text-[8.5px] font-mono text-[#2d6a4f] font-bold">
+                        Leaf Spot Check
                       </span>
                     </div>
-                    <h4 className="text-xs font-black text-[#0d253d]">
-                      {isHindi ? "पीला रतुआ (Yellow Rust)" : "Yellow Rust (Puccinia striiformis)"}
+                    <h4 className="text-[11px] font-black text-[#1b4332]">
+                      Tikka Leaf Spot (Cercospora)
                     </h4>
-                    <p className="text-[10px] text-slate-600 leading-snug">
-                      {isHindi
-                        ? "पत्तियों पर पीले रंग की धारियां देखी गईं। तुरंत कवकनाशक स्प्रे आवश्यक है।"
-                        : "Chlorotic stripes observed on leaf blades. Immediate fungicide intervention recommended."}
+                    <p className="text-[9.5px] text-slate-600 leading-snug">
+                      Small dark lesions detected on lower canopy. Recommended to spray biostimulant or approved protectant.
                     </p>
-                    <div className="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-[10px] text-emerald-950 font-medium">
-                      <strong>{isHindi ? "प्रमाणित दवा: " : "Prescription: "}</strong> Syngenta Tilt® (Propiconazole 25% EC) @ 200 ml/{isHindi ? "एकड़" : "acre"}.
+                    <div className="p-2 rounded-xl bg-[#e8f5e9] border border-[#cbe5cb] text-[9px] text-[#1b4332] font-semibold">
+                      Action: Morning foliar spray at safe wind velocity.
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* ── TAB 3: VOICE (AI Voice Assistant) ───────────────────── */}
+              {/* ── TAB 3: VOICE (Farming Voice Assistant) ──────────────── */}
               {activeTab === "voice" && (
-                <div className="space-y-3.5 animate-in fade-in duration-300">
+                <div className="space-y-2.5 animate-in fade-in duration-300">
                   <div className="text-center space-y-0.5">
-                    <span className="text-xs font-black text-[#0d253d] block">
-                      {isHindi ? "AASRA वॉयस AI सलाहकार" : "AASRA Multilingual Voice AI"}
+                    <span className="text-xs font-black text-[#1b4332] block">
+                      {isHindi ? "कृषियंत्र वॉइस सहायक" : "Krishyantra Voice Assistant"}
                     </span>
-                    <span className="text-[9px] text-slate-400 font-mono">
-                      Google Gemini 2.5 Flash + Chirp 3 HD
+                    <span className="text-[8.5px] text-slate-500 font-medium">
+                      Speak naturally in your own language
                     </span>
                   </div>
 
-                  {/* Farmer Message Bubble */}
-                  <div className="bg-[#533afd] text-white p-3 rounded-2xl rounded-tr-none text-[10px] space-y-1 ml-4 shadow-xs">
-                    <span className="text-[8px] opacity-75 font-mono block">
-                      {isHindi ? "आप (किसान):" : "You (Farmer):"}
+                  {/* Farmer Query */}
+                  <div className="bg-[#1b4332] text-white p-2.5 rounded-2xl rounded-tr-none text-[9.5px] space-y-1 ml-4 shadow-xs">
+                    <span className="text-[7.5px] opacity-75 font-mono block">
+                      {isHindi ? "किसान (Farmer):" : "Farmer:"}
                     </span>
                     <p className="leading-tight font-medium">
-                      {isHindi
-                        ? '"सीहोर में आज गेहूं का क्या भाव है और क्या दोपहर में स्प्रे कर सकते हैं?"'
-                        : '"What is the rate of wheat in Sehore today and is it safe to spray?"'}
+                      "Should I spray fertilizer today given current wind conditions?"
                     </p>
                   </div>
 
-                  {/* AASRA AI Response Bubble */}
-                  <div className="bg-white border border-[#e3e8ee] text-[#0d253d] p-3 rounded-2xl rounded-tl-none text-[10px] space-y-1.5 mr-3 shadow-xs">
+                  {/* Krishyantra Response */}
+                  <div className="bg-white border border-[#e5e7eb] text-[#1b4332] p-2.5 rounded-2xl rounded-tl-none text-[9.5px] space-y-1 mr-3 shadow-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[8px] font-bold text-[#533afd] font-mono">AASRA AI:</span>
-                      <span className="inline-flex items-center gap-0.5 text-[8px] text-emerald-700 bg-emerald-50 px-1.5 rounded-full font-mono">
-                        <Volume2 className="h-2.5 w-2.5" /> 1.2s Audio
+                      <span className="text-[8px] font-bold text-[#2d6a4f] font-mono">Krishyantra:</span>
+                      <span className="text-[7.5px] text-[#2d6a4f] bg-[#e8f5e9] px-1.5 rounded-full font-mono">
+                        Voice Advisory
                       </span>
                     </div>
                     <p className="text-slate-700 leading-snug">
-                      {isHindi
-                        ? "नमस्ते! सीहोर मंडी में आज शरबती गेहूं ₹2,420 प्रति क्विंटल बिका है। हवा 11 km/h है, अतः दोपहर में स्प्रे करना पूर्णतः सुरक्षित है।"
-                        : "Namaste! Sharbati wheat in Sehore mandi is ₹2,420/quintal. Wind speed is 11 km/h, making spray completely safe today."}
+                      "Wind is mild at 8 km/h and no rain is expected. Safe spray window is open from 7:00 AM to 9:00 AM."
                     </p>
                   </div>
 
-                  {/* Animated Equalizer Wave */}
-                  <div className="flex items-center justify-center gap-1.5 py-1">
-                    {[35, 70, 95, 55, 85, 40, 75, 50, 90, 30].map((h, i) => (
+                  {/* Audio Equalizer */}
+                  <div className="flex items-center justify-center gap-1 py-1">
+                    {[30, 65, 90, 50, 80, 45, 75, 40, 85, 30].map((h, i) => (
                       <div
                         key={i}
-                        className="w-1 bg-[#533afd] rounded-full animate-pulse"
-                        style={{
-                          height: `${h * 0.25}px`,
-                          animationDelay: `${i * 100}ms`,
-                        }}
+                        className="w-1 bg-[#2d6a4f] rounded-full animate-pulse"
+                        style={{ height: `${h * 0.22}px`, animationDelay: `${i * 120}ms` }}
                       />
                     ))}
                   </div>
 
-                  {/* Mic Pulse Button */}
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-r from-[#533afd] to-[#4434d4] text-white shadow-lg shadow-[#533afd]/30 cursor-pointer animate-pulse hover:scale-105 transition-all">
-                      <Mic className="h-6 w-6" />
+                    <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-[#2d6a4f] text-white shadow-md cursor-pointer animate-pulse">
+                      <Mic className="h-5 w-5" />
                     </div>
-                    <p className="text-[9px] text-slate-500 font-medium mt-1">
-                      {isHindi ? "बोलने के लिए माइक दबाएं" : "Tap microphone to speak"}
+                    <p className="text-[8.5px] text-slate-500 font-medium mt-1">
+                      Tap to speak in Hindi or English
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* ── TAB 4: MANDI (Live APMC Markets & Comparisons) ──────── */}
+              {/* ── TAB 4: MANDI (Mandi Rates) ─────────────────────────── */}
               {activeTab === "mandi" && (
                 <div className="space-y-2.5 animate-in fade-in duration-300">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-[#0d253d]">
-                      {isHindi ? "140+ मंडियों के भाव" : "140+ Mandi Network"}
+                    <span className="text-xs font-black text-[#1b4332]">
+                      {isHindi ? "मंडी भाव" : "Mandi Market Rates"}
                     </span>
-                    <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Agmarknet Verified
+                    <span className="text-[8.5px] font-mono font-bold text-[#2d6a4f] bg-[#e8f5e9] px-2 py-0.5 rounded-full border border-emerald-200">
+                      Modal Rates
                     </span>
                   </div>
 
-                  {/* Crop Quick Switcher Chips */}
-                  <div className="grid grid-cols-4 gap-1.5 text-[9px] font-bold">
+                  {/* Crop Switcher */}
+                  <div className="grid grid-cols-4 gap-1 text-[8.5px] font-bold">
                     {[
-                      { id: "wheat", label: isHindi ? "गेहूं" : "Wheat" },
-                      { id: "soybean", label: isHindi ? "सोयाबीन" : "Soybean" },
-                      { id: "mustard", label: isHindi ? "सरसों" : "Mustard" },
-                      { id: "cotton", label: isHindi ? "कपास" : "Cotton" },
+                      { id: "wheat", label: "Wheat" },
+                      { id: "soybean", label: "Soybean" },
+                      { id: "mustard", label: "Mustard" },
+                      { id: "cotton", label: "Cotton" },
                     ].map((cr) => (
                       <button
                         key={cr.id}
                         type="button"
                         onClick={() => setSelectedCrop(cr.id)}
-                        className={`py-1.5 px-1 rounded-xl border text-center transition-all cursor-pointer ${
+                        className={`py-1 rounded-lg border text-center transition-all cursor-pointer ${
                           selectedCrop === cr.id
-                            ? "bg-[#533afd] text-white border-[#533afd] shadow-2xs"
-                            : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                            ? "bg-[#1b4332] text-white border-[#1b4332]"
+                            : "bg-white text-slate-700 border-slate-200"
                         }`}
                       >
                         {cr.label}
@@ -554,117 +514,61 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
                     ))}
                   </div>
 
-                  {/* Selected Mandi Rate Details */}
-                  <div className="rounded-2xl bg-white border border-[#e3e8ee] p-3 shadow-xs space-y-2">
+                  <div className="rounded-2xl bg-white border border-[#e5e7eb] p-3 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-xs font-black text-[#0d253d] block">
-                          {isHindi ? currentMandi.nameHi : currentMandi.name}
-                        </span>
-                        <span className="text-[9px] text-slate-400 font-mono">
-                          {isHindi ? currentMandi.name : currentMandi.nameHi}
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 animate-pulse">
+                      <span className="text-xs font-black text-[#1b4332]">
+                        {currentMandi.name}
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md">
                         {currentMandi.delta}
                       </span>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                    <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                       <div>
-                        <span className="text-[9px] text-slate-400 block font-mono uppercase">
-                          {isHindi ? "मोडल भाव" : "Modal Price"}
+                        <span className="text-[8.5px] text-slate-400 uppercase font-mono block">
+                          Modal Rate
                         </span>
-                        <span className="text-xl font-black text-[#0d253d] font-mono">
+                        <span className="text-lg font-black text-[#1b4332] font-mono">
                           ₹{currentMandi.modal.toLocaleString("en-IN")}
                         </span>
+                        <span className="text-[8.5px] text-slate-500 font-normal"> / quintal</span>
                       </div>
-                      <div className="text-right text-[9px] text-slate-500 font-mono">
-                        <div>{isHindi ? "न्यूनतम:" : "Min:"} ₹{currentMandi.min.toLocaleString("en-IN")}</div>
-                        <div>{isHindi ? "अधिकतम:" : "Max:"} ₹{currentMandi.max.toLocaleString("en-IN")}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Nearby Regional Mandi Price Comparison List (Fills Space) */}
-                  <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-2.5 space-y-1.5 shadow-2xs">
-                    <span className="text-[9px] font-mono font-bold text-slate-400 uppercase block">
-                      {isHindi ? "निकटवर्ती मंडी तुलना" : "Regional Mandi Comparison"}
-                    </span>
-                    <div className="space-y-1 font-mono text-[9px]">
-                      <div className="flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-100">
-                        <span className="font-bold text-slate-700">Sehore (सीहोर)</span>
-                        <span className="font-black text-emerald-700">₹2,420/q ▲</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-100">
-                        <span className="font-bold text-slate-700">Bhopal (भोपाल)</span>
-                        <span className="font-black text-slate-700">₹2,410/q</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-100">
-                        <span className="font-bold text-slate-700">Vidisha (विदिशा)</span>
-                        <span className="font-black text-slate-700">₹2,390/q</span>
+                      <div className="text-right text-[8.5px] text-slate-500 font-mono">
+                        <div>Min: ₹{currentMandi.min}</div>
+                        <div>Max: ₹{currentMandi.max}</div>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* ── TAB 5: WEATHER (Micro-Weather Radar) ─────────────────── */}
+              {/* ── TAB 5: WEATHER (Weather & Spray Window) ─────────────── */}
               {activeTab === "weather" && (
-                <div className="space-y-3 animate-in fade-in duration-300">
+                <div className="space-y-2.5 animate-in fade-in duration-300">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-[#0d253d]">
-                      {isHindi ? "14-दिन मौसम रडार" : "14-Day Micro-Weather Radar"}
+                    <span className="text-xs font-black text-[#1b4332]">
+                      {isHindi ? "मौसम व स्प्रे विंडो" : "Weather & Spray Window"}
                     </span>
-                    <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                      Open-Meteo
+                    <span className="text-[8.5px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                      Forecast
                     </span>
                   </div>
 
-                  {/* Weather Big Card */}
-                  <div className="rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 text-white p-4 shadow-md">
+                  <div className="rounded-2xl bg-gradient-to-br from-[#2d6a4f] to-[#1b4332] text-white p-3 shadow-xs">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-3xl font-black font-mono tracking-tight">{liveTemp}°C</span>
-                        <p className="text-[10px] text-sky-100 font-medium">
-                          {isHindi ? "साफ धूप व अनुकूल स्थिति" : "Clear, Sunny & Optimal"}
+                        <span className="text-2xl font-black font-mono">{liveTemp}°C</span>
+                        <p className="text-[9px] text-emerald-100 font-medium">
+                          Clear & Favorable for Spray
                         </p>
                       </div>
-                      <div className="text-3xl">☀️</div>
+                      <div className="text-2xl">☀️</div>
                     </div>
-                    <div className="grid grid-cols-3 gap-1 pt-2.5 mt-2.5 border-t border-white/20 text-[9px] text-sky-100 font-mono">
-                      <div>{isHindi ? "हवा:" : "Wind:"} <strong>11 km/h</strong></div>
-                      <div>{isHindi ? "नमी:" : "Moist:"} <strong>38%</strong></div>
-                      <div>{isHindi ? "बारिश:" : "Rain:"} <strong>0 mm</strong></div>
-                    </div>
-                  </div>
-
-                  {/* 4-Day Micro Forecast */}
-                  <div className="rounded-2xl bg-white border border-[#e3e8ee] p-3 space-y-1.5 shadow-xs">
-                    <span className="text-[9px] font-mono font-bold text-slate-400 uppercase block">
-                      {isHindi ? "4-दिन पूर्वानुमान" : "4-Day Micro-Forecast"}
-                    </span>
-                    <div className="grid grid-cols-4 gap-1.5 text-center font-mono">
-                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[8px] text-slate-500 block">{isHindi ? "आज" : "Today"}</span>
-                        <span className="text-xs">☀️</span>
-                        <span className="text-[10px] font-bold text-slate-800 block">28°</span>
-                      </div>
-                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[8px] text-slate-500 block">{isHindi ? "कल" : "Tmrw"}</span>
-                        <span className="text-xs">⛅</span>
-                        <span className="text-[10px] font-bold text-slate-800 block">29°</span>
-                      </div>
-                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[8px] text-slate-500 block">{isHindi ? "परसों" : "Thu"}</span>
-                        <span className="text-xs">🌤️</span>
-                        <span className="text-[10px] font-bold text-slate-800 block">27°</span>
-                      </div>
-                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-100">
-                        <span className="text-[8px] text-slate-500 block">{isHindi ? "शुक्र" : "Fri"}</span>
-                        <span className="text-xs">☀️</span>
-                        <span className="text-[10px] font-bold text-slate-800 block">28°</span>
-                      </div>
+                    <div className="grid grid-cols-3 gap-1 pt-2 mt-2 border-t border-white/20 text-[8.5px] text-emerald-100 font-mono">
+                      <div>Wind: <strong>8 km/h</strong></div>
+                      <div>Rain: <strong>0 mm</strong></div>
+                      <div>Window: <strong>Open</strong></div>
                     </div>
                   </div>
                 </div>
@@ -672,31 +576,61 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
 
             </div>
 
-            {/* ── Apple iOS Frosted Bottom Dock ────────────────────────── */}
-            <div className="bg-white/90 backdrop-blur-md border-t border-slate-200/80 px-2 py-2 flex justify-around items-center shrink-0 shadow-lg">
-              {[
-                { id: "home", icon: <LayoutDashboard className="h-4 w-4" />, label: isHindi ? "होम" : "Home", fab: false },
-                { id: "crop", icon: <Leaf className="h-4 w-4" />, label: isHindi ? "फसल AI" : "Crop AI", fab: false },
-                { id: "voice", icon: <Mic className="h-4 w-4" />, label: isHindi ? "AI साथी" : "Voice AI", fab: true },
-                { id: "mandi", icon: <BarChart2 className="h-4 w-4" />, label: isHindi ? "मंडी" : "Mandi", fab: false },
-                { id: "weather", icon: <Sun className="h-4 w-4" />, label: isHindi ? "मौसम" : "Weather", fab: false },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleManualTabChange(tab.id as any)}
-                  className={`flex flex-col items-center gap-0.5 text-[8px] font-bold transition-all cursor-pointer ${
-                    tab.fab
-                      ? "bg-gradient-to-r from-[#533afd] to-[#4434d4] text-white rounded-full w-9 h-9 -mt-4 shadow-md hover:scale-110 active:scale-95 flex items-center justify-center"
-                      : activeTab === tab.id
-                      ? "text-[#533afd] scale-105 font-black"
-                      : "text-slate-400 hover:text-slate-600"
-                  }`}
-                >
-                  {tab.icon}
-                  {!tab.fab && <span>{tab.label}</span>}
-                </button>
-              ))}
+            {/* ── Bottom App Dock (Faithful to Target) ───────────────────── */}
+            <div className="bg-white border-t border-slate-100 px-3 py-2 flex justify-between items-center shrink-0">
+              <button
+                type="button"
+                onClick={() => handleManualTabChange("home")}
+                className={`flex flex-col items-center gap-0.5 text-[8px] font-bold cursor-pointer ${
+                  activeTab === "home" ? "text-[#2d6a4f]" : "text-slate-400"
+                }`}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Home</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleManualTabChange("crop")}
+                className={`flex flex-col items-center gap-0.5 text-[8px] font-bold cursor-pointer ${
+                  activeTab === "crop" ? "text-[#2d6a4f]" : "text-slate-400"
+                }`}
+              >
+                <Leaf className="h-4 w-4" />
+                <span>My Farm</span>
+              </button>
+
+              {/* Floating Green Center Mic */}
+              <button
+                type="button"
+                onClick={() => handleManualTabChange("voice")}
+                className="w-9 h-9 rounded-full bg-[#2d6a4f] hover:bg-[#1b4332] text-white flex items-center justify-center -mt-4 shadow-md transition-transform active:scale-95 cursor-pointer"
+                aria-label="Voice Advisor"
+              >
+                <Mic className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleManualTabChange("weather")}
+                className={`flex flex-col items-center gap-0.5 text-[8px] font-bold cursor-pointer ${
+                  activeTab === "weather" ? "text-[#2d6a4f]" : "text-slate-400"
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+                <span>Advice</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleManualTabChange("mandi")}
+                className={`flex flex-col items-center gap-0.5 text-[8px] font-bold cursor-pointer ${
+                  activeTab === "mandi" ? "text-[#2d6a4f]" : "text-slate-400"
+                }`}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span>More</span>
+              </button>
             </div>
 
           </div>

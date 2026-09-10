@@ -281,10 +281,10 @@ export function RealBoundaryMap({
 
     if (points.length >= 3) {
       const polygon = L.polygon(points, {
-        color: "#533afd",
+        color: "#2d6a4f",
         weight: 3,
         dashArray: "6, 4",
-        fillColor: "#533afd",
+        fillColor: "#52b788",
         fillOpacity: 0.28,
       }).addTo(map);
 
@@ -297,13 +297,13 @@ export function RealBoundaryMap({
         className: "custom-field-pin",
         html: `
           <div style="
-            background: #533afd;
+            background: #1b4332;
             color: #ffffff;
             width: 28px;
             height: 28px;
             border-radius: 50%;
             border: 2.5px solid #ffffff;
-            box-shadow: 0 4px 14px rgba(83, 58, 253, 0.45);
+            box-shadow: 0 4px 14px rgba(27, 67, 50, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -345,7 +345,7 @@ export function RealBoundaryMap({
       popupDiv.style.minWidth = "140px";
       popupDiv.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 3px;">
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #533afd;"></span>
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2d6a4f;"></span>
           <span style="font-weight: 800; font-size: 13px; color: #0d253d;">Corner P${idx + 1}</span>
         </div>
         <div style="font-size: 10px; color: #64748b; margin-bottom: 8px; font-family: monospace;">
@@ -421,7 +421,7 @@ export function RealBoundaryMap({
       {/* ── Farm Navigation Toolbar (Clean Stripe / Apple Light Theme) ──── */}
       <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#e3e8ee] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-50 text-[#533afd] border border-indigo-200/60 shrink-0">
+          <div className="p-2.5 rounded-xl bg-[#e8f5e9] text-[#2d6a4f] border border-emerald-200 shrink-0">
             <Tractor className="h-5 w-5" />
           </div>
           <div>
@@ -439,7 +439,7 @@ export function RealBoundaryMap({
           <button
             type="button"
             onClick={handleFlyToFarmlandOutskirts}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#533afd] to-[#4434d4] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-95 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            className="px-3.5 py-2 rounded-xl bg-[#1b4332] hover:bg-[#143326] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-95 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           >
             <Sparkles className="h-3.5 w-3.5" />
             <span>🌾 Fly to Farm Fields (2km)</span>
@@ -451,7 +451,7 @@ export function RealBoundaryMap({
               type="button"
               title="Pan North"
               onClick={() => panMapByOffset(0.01, 0)}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#533afd] transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#2d6a4f] transition-colors cursor-pointer"
             >
               <ArrowUp className="h-3.5 w-3.5" />
             </button>
@@ -459,7 +459,7 @@ export function RealBoundaryMap({
               type="button"
               title="Pan South"
               onClick={() => panMapByOffset(-0.01, 0)}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#533afd] transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#2d6a4f] transition-colors cursor-pointer"
             >
               <ArrowDown className="h-3.5 w-3.5" />
             </button>
@@ -467,7 +467,7 @@ export function RealBoundaryMap({
               type="button"
               title="Pan West"
               onClick={() => panMapByOffset(0, -0.01)}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#533afd] transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#2d6a4f] transition-colors cursor-pointer"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
             </button>
@@ -475,7 +475,7 @@ export function RealBoundaryMap({
               type="button"
               title="Pan East"
               onClick={() => panMapByOffset(0, 0.01)}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#533afd] transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-white rounded-lg text-slate-700 hover:text-[#2d6a4f] transition-colors cursor-pointer"
             >
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
@@ -497,7 +497,7 @@ export function RealBoundaryMap({
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-bold text-[#0d253d]">
-            Live Satellite Boundary: <span className="text-[#533afd] font-black">{calculatedAcres} Acres</span>
+            Live Satellite Boundary: <span className="text-[#2d6a4f] font-black">{calculatedAcres} Acres</span>
           </span>
         </div>
 
@@ -509,7 +509,7 @@ export function RealBoundaryMap({
               onClick={() => setMapType("satellite")}
               className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                 mapType === "satellite"
-                  ? "bg-white text-[#533afd] shadow-xs"
+                  ? "bg-white text-[#2d6a4f] shadow-xs"
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
@@ -520,7 +520,7 @@ export function RealBoundaryMap({
               onClick={() => setMapType("streets")}
               className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                 mapType === "streets"
-                  ? "bg-white text-[#533afd] shadow-xs"
+                  ? "bg-white text-[#2d6a4f] shadow-xs"
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
@@ -533,7 +533,7 @@ export function RealBoundaryMap({
             type="button"
             disabled={points.length === 0}
             onClick={handleUndoLastPoint}
-            className="text-xs text-slate-700 hover:text-[#533afd] font-bold flex items-center gap-1 cursor-pointer bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-xl border border-slate-200 transition-colors disabled:opacity-40"
+            className="text-xs text-slate-700 hover:text-[#2d6a4f] font-bold flex items-center gap-1 cursor-pointer bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-xl border border-slate-200 transition-colors disabled:opacity-40"
             title="Undo the last placed corner pin (पिछला कोना हटाएं)"
           >
             <Undo2 className="h-3.5 w-3.5" />
@@ -558,8 +558,8 @@ export function RealBoundaryMap({
         {/* HUD Overlay Bar (Clean White Stripe Aesthetic) */}
         <div className="absolute bottom-3.5 left-3.5 right-3.5 z-[500] flex items-center justify-between bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-[#e3e8ee] text-[#0d253d] text-xs font-mono shadow-xl pointer-events-none">
           <div className="flex items-center gap-2">
-            <span className="text-[#533afd] font-extrabold flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-[#533afd]" />
+            <span className="text-[#2d6a4f] font-extrabold flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-[#2d6a4f]" />
               {points.length} Corners Locked
             </span>
             <span className="text-slate-400 hidden sm:inline">
@@ -583,14 +583,14 @@ export function RealBoundaryMap({
         <div className="p-3 bg-white border border-[#e3e8ee] rounded-2xl shadow-2xs flex flex-wrap items-center justify-between gap-2.5 text-xs">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-extrabold text-[#0d253d] flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-[#533afd]" />
+              <span className="h-2 w-2 rounded-full bg-[#2d6a4f]" />
               Active Corners ({points.length}):
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
               {points.map((pt, idx) => (
                 <div
                   key={`corner-chip-${idx}-${pt[0]}-${pt[1]}`}
-                  className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl bg-indigo-50/90 border border-indigo-200/80 text-indigo-950 font-mono text-xs font-bold transition-all hover:bg-rose-50 hover:border-rose-300"
+                  className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl bg-[#e8f5e9] border border-emerald-200 text-[#1b4332] font-mono text-xs font-bold transition-all hover:bg-rose-50 hover:border-rose-300"
                 >
                   <span>P{idx + 1}</span>
                   <button

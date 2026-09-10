@@ -89,12 +89,6 @@ export interface UnifiedPipelineResponse {
     generated_by?: string;
     language_used?: string;
   };
-  agronomic_synthesis?: {
-    headline?: string;
-    statement_en?: string;
-    statement_hi?: string;
-  };
-  execution_source?: string;
   execution_metadata: {
     models_executed: string[];
     serving_mode: string;

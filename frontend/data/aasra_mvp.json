@@ -1,37 +1,19 @@
 {
-  "version": "1.0.0-mvp",
-  "lastUpdated": "2026-09-07T12:04:57.627Z",
+  "version": "2.0.0-firebase",
+  "lastUpdated": "2026-09-10T02:22:22.055Z",
   "settings": {
-    "maintenanceMode": false,
-    "maintenanceMessage": "AASRA is currently performing scheduled agricultural system updates. Farm telemetry remains active.",
-    "broadcastAlert": null,
     "featureFlags": {
-      "voiceAssistant": true,
-      "mandiPrices": true,
-      "weatherTelemetry": true,
-      "journalFeature": true,
       "fieldMapping": true,
+      "journalFeature": true,
+      "mandiPrices": true,
+      "plantIntelligence": true,
       "robiAudit": true,
-      "plantIntelligence": true
-    }
+      "voiceAssistant": true,
+      "weatherTelemetry": true
+    },
+    "maintenanceMessage": "AASRA is currently performing scheduled agricultural system updates. Farm telemetry remains active.",
+    "maintenanceMode": false
   },
-  "whatsapp_connections": [
-    {
-      "id": "wa-conn-sameer",
-      "farmerId": "farmer-002",
-      "phoneNumber": "9720413710",
-      "phoneNumberNormalized": "+919720413710",
-      "provider": "meta_cloud",
-      "status": "active",
-      "verifiedAt": "2026-09-03T14:44:00.000Z",
-      "connectedAt": "2026-09-03T14:44:00.000Z",
-      "lastSeenAt": "2026-09-03T17:45:00.000Z"
-    }
-  ],
-  "activation_tokens": [],
-  "whatsapp_messages": [],
-  "alert_events": [],
-  "notification_preferences": [],
   "farmers": [
     {
       "id": "kisan-501234-1788782691665",
@@ -88,46 +70,46 @@
       "updatedAt": "2026-09-07T12:04:57.623Z"
     },
     {
-      "id": "kisan-949347-1788726144623",
+      "id": "kisan-949347-1789006942011",
       "fullName": "ishaan sen",
       "mobileNumber": "7222949347",
       "email": "",
-      "language": "hi",
-      "state": "Madhya Pradesh",
-      "district": "Bhopal",
+      "language": "en",
+      "state": "Punjab",
+      "district": "Rupnagar",
       "tehsil": "Sehore",
       "village": "Village Area",
-      "fieldName": "Wheat Main Field",
-      "fieldAreaAcres": 28.6,
-      "fieldAreaHa": 11.57,
+      "fieldName": "Soybean Main Field",
+      "fieldAreaAcres": 21.29,
+      "fieldAreaHa": 8.62,
       "landOwnership": "Owner",
       "farmingExperience": "1-3 Yrs",
-      "primaryCrop": "Wheat",
-      "cropVariety": "Sharbati C-306",
+      "primaryCrop": "Soybean",
+      "cropVariety": "JS-335",
       "sowingDate": "2026-06-15",
       "growthStage": "Flowering & Pod Formation",
       "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
       "irrigationType": "Borewell + Rainfed",
       "gpsLocation": {
-        "lat": 23.275076595589052,
-        "lon": 77.5148105060172
+        "lat": 24.71648612684654,
+        "lon": 76.968412399292
       },
       "polygon": [
         [
-          23.276278986261158,
-          77.51141975611304
+          24.71768612684654,
+          76.96690167045595
         ],
         [
-          23.275884761007283,
-          77.51693496146014
+          24.71798612684654,
+          76.97020167045595
         ],
         [
-          23.273834770878185,
-          77.51639848037554
+          24.71538612684654,
+          76.96980167045595
         ],
         [
-          23.274761212632267,
-          77.51090455873914
+          24.71508612684654,
+          76.96720167045595
         ]
       ],
       "pestHistory": [
@@ -140,26 +122,61 @@
       "hasKisanCreditCard": true,
       "pmKisanBeneficiary": true,
       "preferredCommunication": "Voice + WhatsApp",
-      "updatedAt": "2026-09-06T20:41:39.399Z"
+      "updatedAt": "2026-09-10T02:22:22.046Z"
     },
     {
-      "id": "farmer-001",
-      "fullName": "Ishaan Sen",
+      "id": "kisan-543210-1789006263325",
+      "fullName": "Ramesh Patel",
       "mobileNumber": "9876543210",
       "email": "ishaan@syngenta-aasra.in",
       "language": "hi",
       "state": "Madhya Pradesh",
-      "district": "Bhopal",
-      "village": "Phanda Kalan",
-      "fieldAreaAcres": 5,
+      "district": "Sehore",
+      "village": "Village Area",
+      "fieldName": "Soybean Main Field",
+      "fieldAreaAcres": 21.54,
+      "fieldAreaHa": 8.72,
+      "landOwnership": "Owner",
+      "farmingExperience": "5-10 Years",
       "primaryCrop": "Soybean",
-      "cropVariety": "JS-9560 High Yield",
-      "sowingDate": "2026-06-25",
-      "soilType": "Deep Black Clay Soil",
-      "irrigationType": "Rainfed + Borewell Drip",
+      "cropVariety": "JS-335",
+      "sowingDate": "2026-06-15",
+      "growthStage": "Flowering & Pod Formation",
+      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "irrigationType": "Borewell + Rainfed",
+      "gpsLocation": {
+        "lat": 23.203209138550648,
+        "lon": 77.08439111709596
+      },
+      "polygon": [
+        [
+          23.2044,
+          77.08290000000001
+        ],
+        [
+          23.2047,
+          77.0862
+        ],
+        [
+          23.202099999999998,
+          77.0858
+        ],
+        [
+          23.2018,
+          77.0832
+        ]
+      ],
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
       "hasKisanCreditCard": true,
       "pmKisanBeneficiary": true,
-      "updatedAt": "2026-09-02T21:37:04.723Z"
+      "preferredCommunication": "Voice + WhatsApp",
+      "updatedAt": "2026-09-10T02:11:03.379Z"
     },
     {
       "id": "farmer-002",
@@ -183,14 +200,13 @@
   ],
   "fields": [
     {
+      "area_acres": 5,
+      "created_at": "2026-06-20T10:00:00Z",
+      "crop": "Soybean",
       "id": "f-bhopal-main",
-      "name": "Main Acreage (Soybean North)",
       "lat": 23.2599,
       "lon": 77.4126,
-      "area_acres": 5,
-      "crop": "Soybean",
-      "variety": "JS-9560 High Yield",
-      "soil_type": "Deep Black Clay Soil",
+      "name": "Main Acreage (Soybean North)",
       "polygon": [
         [
           23.2625,
@@ -209,46 +225,17 @@
           77.4105
         ]
       ],
-      "created_at": "2026-06-20T10:00:00Z"
+      "soil_type": "Deep Black Clay Soil",
+      "variety": "JS-9560 High Yield"
     },
     {
-      "id": "f-sehore-river",
-      "name": "Riverbank Plot (Gram / Chana)",
-      "lat": 23.2014,
-      "lon": 77.0845,
-      "area_acres": 3.2,
-      "crop": "Gram / Chana",
-      "variety": "JG-11 Desi",
-      "soil_type": "Loamy Alluvial",
-      "polygon": [
-        [
-          23.203,
-          77.082
-        ],
-        [
-          23.2045,
-          77.086
-        ],
-        [
-          23.2,
-          77.087
-        ],
-        [
-          23.199,
-          77.083
-        ]
-      ],
-      "created_at": "2026-07-02T14:30:00Z"
-    },
-    {
+      "area_acres": 1.8,
+      "created_at": "2026-07-15T09:15:00Z",
+      "crop": "Soybean",
       "id": "f-phanda-trial",
-      "name": "Biological Trial Plot (Quantis Test)",
       "lat": 23.245,
       "lon": 77.389,
-      "area_acres": 1.8,
-      "crop": "Soybean",
-      "variety": "JS-335 Benchmark",
-      "soil_type": "Clay Loam",
+      "name": "Biological Trial Plot (Quantis Test)",
       "polygon": [
         [
           23.2465,
@@ -267,228 +254,86 @@
           77.387
         ]
       ],
-      "created_at": "2026-07-15T09:15:00Z"
+      "soil_type": "Clay Loam",
+      "variety": "JS-335 Benchmark"
     },
     {
-      "id": "f-149196",
-      "name": "Wheat Main Field",
-      "lat": 23.275076595589052,
-      "lon": 77.5148105060172,
-      "area_acres": 28.6,
-      "crop": "Wheat",
-      "variety": "Sharbati C-306",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "area_acres": 3.2,
+      "created_at": "2026-07-02T14:30:00Z",
+      "crop": "Gram / Chana",
+      "id": "f-sehore-river",
+      "lat": 23.2014,
+      "lon": 77.0845,
+      "name": "Riverbank Plot (Gram / Chana)",
       "polygon": [
         [
-          23.276278986261158,
-          77.51141975611304
+          23.203,
+          77.082
         ],
         [
-          23.275884761007283,
-          77.51693496146014
+          23.2045,
+          77.086
         ],
         [
-          23.273834770878185,
-          77.51639848037554
+          23.2,
+          77.087
         ],
         [
-          23.274761212632267,
-          77.51090455873914
+          23.199,
+          77.083
         ]
       ],
-      "created_at": "2026-09-06T20:22:29.196Z"
+      "soil_type": "Loamy Alluvial",
+      "variety": "JG-11 Desi"
     },
     {
-      "id": "f-809184",
-      "name": "Field Plot 2",
-      "lat": 23.2599,
-      "lon": 77.4126,
-      "area_acres": 21.54,
-      "crop": "Soybean",
-      "variety": "JS-335",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "polygon": [
-        [
-          23.2611,
-          77.4111
-        ],
-        [
-          23.2614,
-          77.4144
-        ],
-        [
-          23.258799999999997,
-          77.414
-        ],
-        [
-          23.258499999999998,
-          77.4114
-        ]
-      ],
-      "created_at": "2026-09-06T23:03:29.184Z"
-    },
-    {
-      "id": "f-940369",
-      "name": "Field Plot 2",
-      "lat": 23.268611095729526,
-      "lon": 77.51512169837953,
-      "area_acres": 5,
-      "crop": "Tomato",
-      "variety": "Abhinav Hybrid",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "polygon": [
-        [
-          23.269811095729526,
-          77.51362169837954
-        ],
-        [
-          23.270111095729526,
-          77.51692169837953
-        ],
-        [
-          23.267511095729525,
-          77.51652169837953
-        ],
-        [
-          23.267211095729525,
-          77.51392169837953
-        ]
-      ],
-      "created_at": "2026-09-06T23:22:20.369Z"
-    },
-    {
-      "id": "f-999764",
-      "name": "Field Plot 2",
-      "lat": 23.264354634296613,
-      "lon": 77.5032473363026,
-      "area_acres": 21.53,
-      "crop": "Tomato",
-      "variety": "Abhinav Hybrid",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "polygon": [
-        [
-          23.269811095729526,
-          77.51362169837954
-        ],
-        [
-          23.270111095729526,
-          77.51692169837953
-        ],
-        [
-          23.267511095729525,
-          77.51652169837953
-        ],
-        [
-          23.267211095729525,
-          77.51392169837953
-        ]
-      ],
-      "created_at": "2026-09-06T23:23:19.764Z"
-    },
-    {
-      "id": "f-035751",
-      "name": "Field Plot 3",
-      "lat": 23.27730396646038,
-      "lon": 77.50747203826904,
-      "area_acres": 363.51,
-      "crop": "Mustard (राई/सरसों)",
-      "variety": "Pusa Bold",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "polygon": [
-        [
-          23.2611,
-          77.4111
-        ],
-        [
-          23.2614,
-          77.4144
-        ],
-        [
-          23.258799999999997,
-          77.414
-        ],
-        [
-          23.258499999999998,
-          77.4114
-        ],
-        [
-          23.271596993241506,
-          77.51517321392085
-        ]
-      ],
-      "created_at": "2026-09-06T23:23:55.751Z"
-    },
-    {
-      "id": "f-697627",
+      "id": "f-942055",
       "name": "Soybean Main Field",
-      "lat": 19.997507033345652,
-      "lon": 73.78984451293947,
-      "area_acres": 6.5,
+      "lat": 24.71648612684654,
+      "lon": 76.968412399292,
+      "area_acres": 21.29,
       "crop": "Soybean",
       "variety": "JS-335",
       "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
       "polygon": [
         [
-          23.276278986261158,
-          77.51141975611304
+          24.71768612684654,
+          76.96690167045595
         ],
         [
-          23.275884761007283,
-          77.51693496146014
+          24.71798612684654,
+          76.97020167045595
         ],
         [
-          23.273834770878185,
-          77.51639848037554
+          24.71538612684654,
+          76.96980167045595
         ],
         [
-          23.274761212632267,
-          77.51090455873914
+          24.71508612684654,
+          76.96720167045595
         ]
       ],
-      "created_at": "2026-09-07T12:04:57.627Z"
+      "created_at": "2026-09-10T02:22:22.055Z"
     }
   ],
   "journal": [
     {
-      "id": "j-3029",
-      "category": "spray",
-      "title": "Applied Syngenta Quantis® (maize (मक्का))",
-      "subtitle": "Main Field · Soybean",
-      "date": "2026-09-06",
-      "badge": "USER LOGGED",
-      "badgeColor": "indigo",
-      "metrics": [
-        {
-          "label": "Dosage",
-          "value": "250 ml / acre"
-        },
-        {
-          "label": "Net Gain",
-          "value": "Calculated"
-        }
-      ],
-      "notes": "Applied 250ml/acre (1.25L total) for thermal stress protection at Flowering & Pod Formation stage.",
-      "costINR": 1280,
-      "returnINR": 5400,
-      "created_at": "2026-09-06T21:27:33.029Z"
-    },
-    {
-      "id": "j-001",
-      "category": "spray",
-      "title": "Syngenta Quantis / Stress Buster Application",
-      "subtitle": "Main Acreage · Soybean (JS-9560 High Yield) · 5.0 Acres",
-      "date": "2026-08-28",
       "badge": "VERIFIED TREATMENT · 4.46x ROBI",
       "badgeColor": "emerald",
+      "category": "spray",
+      "costINR": 6400,
+      "created_at": "2026-08-28T06:30:00Z",
+      "date": "2026-08-28",
+      "id": "j-001",
       "metrics": [
         {
           "label": "Dosage",
           "value": "250 ml / acre (Tractor Boom)"
         },
         {
+          "highlight": true,
           "label": "Net Cash Gain",
-          "value": "+₹22,120",
-          "highlight": true
+          "value": "+₹22,120"
         },
         {
           "label": "Pod Retention",
@@ -500,18 +345,17 @@
         }
       ],
       "notes": "Applied 36 hours before 38.5°C peak heat wave wavefront. Flower abortion halted, cellular osmolyte turgor sustained, preventing 1.24 q/ac loss.",
-      "costINR": 6400,
       "returnINR": 28520,
-      "created_at": "2026-08-28T06:30:00Z"
+      "subtitle": "Main Acreage · Soybean (JS-9560 High Yield) · 5.0 Acres",
+      "title": "Syngenta Quantis / Stress Buster Application"
     },
     {
-      "id": "j-002",
-      "category": "heat",
-      "title": "Nocturnal Heat Stress Warning (25.8°C Night Peak)",
-      "subtitle": "Open-Meteo Satellite Reanalysis Telemetry · Bhopal Station",
-      "date": "2026-08-26",
       "badge": "HIGH THERMAL RISK",
       "badgeColor": "rose",
+      "category": "heat",
+      "created_at": "2026-08-26T23:15:00Z",
+      "date": "2026-08-26",
+      "id": "j-002",
       "metrics": [
         {
           "label": "Peak Night Temp",
@@ -531,16 +375,16 @@
         }
       ],
       "notes": "AASRA detected +4.8 nocturnal degree-hours above the 24°C respiration limit. Initiated biological countdown timer for foliar osmoprotectant application.",
-      "created_at": "2026-08-26T23:15:00Z"
+      "subtitle": "Open-Meteo Satellite Reanalysis Telemetry · Bhopal Station",
+      "title": "Nocturnal Heat Stress Warning (25.8°C Night Peak)"
     },
     {
-      "id": "j-003",
-      "category": "ai",
-      "title": "Google Gemini Multimodal Voice Consultation",
-      "subtitle": "Kisan Voice Advisory in Hindi (Google Chirp 3 HD Audio)",
-      "date": "2026-08-25",
       "badge": "VOICE PRESCRIPTION",
       "badgeColor": "indigo",
+      "category": "ai",
+      "created_at": "2026-08-25T11:20:00Z",
+      "date": "2026-08-25",
+      "id": "j-003",
       "metrics": [
         {
           "label": "Farmer Query",
@@ -551,9 +395,9 @@
           "value": "Syngenta Quantis @ 250ml/ac"
         },
         {
+          "highlight": true,
           "label": "Projected Profit",
-          "value": "+₹22,120 for 5 Acres",
-          "highlight": true
+          "value": "+₹22,120 for 5 Acres"
         },
         {
           "label": "Confidence",
@@ -561,16 +405,16 @@
         }
       ],
       "notes": "AASRA combined real-time weather telemetry with phenology to recommend timely biostimulant spraying with exact break-even APMC Mandi economics.",
-      "created_at": "2026-08-25T11:20:00Z"
+      "subtitle": "Kisan Voice Advisory in Hindi (Google Chirp 3 HD Audio)",
+      "title": "Google Gemini Multimodal Voice Consultation"
     },
     {
-      "id": "j-004",
-      "category": "planting",
-      "title": "R2 Full Flowering Stage Reached",
-      "subtitle": "Phenology Model (Growing Degree Days: 640 °C-Days)",
-      "date": "2026-08-15",
       "badge": "CRITICAL PHENOLOGY WINDOW",
       "badgeColor": "amber",
+      "category": "planting",
+      "created_at": "2026-08-15T08:00:00Z",
+      "date": "2026-08-15",
+      "id": "j-004",
       "metrics": [
         {
           "label": "Phenological Stage",
@@ -590,16 +434,17 @@
         }
       ],
       "notes": "Crop entered maximum reproductive flowering. Any heat spike >35°C daytime or >24°C nighttime causes acute flower drop without osmoprotection.",
-      "created_at": "2026-08-15T08:00:00Z"
+      "subtitle": "Phenology Model (Growing Degree Days: 640 °C-Days)",
+      "title": "R2 Full Flowering Stage Reached"
     },
     {
-      "id": "j-005",
-      "category": "spray",
-      "title": "Syngenta Isabion Amino Acid Foliar Tonic",
-      "subtitle": "Vegetative V4 Stage Root Expansion · 5.0 Acres",
-      "date": "2026-08-04",
       "badge": "NUTRIENT BIO-STIMULANT",
       "badgeColor": "emerald",
+      "category": "spray",
+      "costINR": 1800,
+      "created_at": "2026-08-04T07:45:00Z",
+      "date": "2026-08-04",
+      "id": "j-005",
       "metrics": [
         {
           "label": "Dosage",
@@ -619,36 +464,36 @@
         }
       ],
       "notes": "Applied natural free amino acids to accelerate root branching, soil nutrient uptake, and build vigor prior to reproductive phase.",
-      "costINR": 1800,
-      "created_at": "2026-08-04T07:45:00Z"
+      "subtitle": "Vegetative V4 Stage Root Expansion · 5.0 Acres",
+      "title": "Syngenta Isabion Amino Acid Foliar Tonic"
     }
   ],
   "robi_audits": [
     {
-      "id": "robi-aud-01",
       "certificateNo": "AASRA-ROBI-2026-89421",
+      "crop": "Soybean (JS-9560 High Yield)",
       "farmerName": "Ishaan Sen",
       "fieldAcres": 5,
-      "crop": "Soybean (JS-9560 High Yield)",
-      "savedHarvestQuintals": 6.2,
+      "id": "robi-aud-01",
       "inputCostINR": 6400,
+      "issueDate": "2026-08-28",
       "netProfitINR": 22120,
       "robiMultiplier": 4.46,
-      "verificationHash": "8f9b4a1c720e3d51f962ab00c41d7e82",
-      "issueDate": "2026-08-28"
+      "savedHarvestQuintals": 6.2,
+      "verificationHash": "8f9b4a1c720e3d51f962ab00c41d7e82"
     },
     {
-      "id": "robi-aud-02",
       "certificateNo": "AASRA-ROBI-2026-78310",
+      "crop": "Soybean (JS-335)",
       "farmerName": "Ramesh Patel",
       "fieldAcres": 12.5,
-      "crop": "Soybean (JS-335)",
-      "savedHarvestQuintals": 15.5,
+      "id": "robi-aud-02",
       "inputCostINR": 16000,
+      "issueDate": "2026-08-20",
       "netProfitINR": 55300,
       "robiMultiplier": 4.46,
-      "verificationHash": "3d7b9e2a114f6c88e001ac89de7721ab",
-      "issueDate": "2026-08-20"
+      "savedHarvestQuintals": 15.5,
+      "verificationHash": "3d7b9e2a114f6c88e001ac89de7721ab"
     }
   ]
 }

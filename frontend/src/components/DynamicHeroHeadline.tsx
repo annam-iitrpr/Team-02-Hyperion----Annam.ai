@@ -181,9 +181,9 @@ const featureChips: FeatureDetailData[] = [
       { label: "Crops Supported", value: "60+ Certified Crops" },
       { label: "Languages", value: "12 Indian Dialects" },
     ],
-    actionLabel: "Explore Plant Intelligence",
-    actionLabelHi: "पादप बुद्धिमत्ता देखें",
-    actionHref: "/plant-intelligence",
+    actionLabel: "Launch 6-Model Pipeline",
+    actionLabelHi: "6-मॉडल पाइपलाइन चलाएं",
+    actionHref: "/pipeline",
   },
   {
     id: "vision",

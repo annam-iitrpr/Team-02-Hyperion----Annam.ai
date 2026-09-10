@@ -688,32 +688,41 @@ export default function SignupPage() {
     <div
       suppressHydrationWarning
       translate="no"
-      className="notranslate min-h-screen bg-[#f6f9fc] text-[#0d253d] font-sans pb-20 select-none relative overflow-hidden flex flex-col justify-between"
+      className="notranslate min-h-screen bg-[#fcfdfa] text-[#1c2e24] font-sans pb-20 select-none relative overflow-hidden flex flex-col justify-between selection:bg-[#2d6a4f] selection:text-white"
     >
-      {/* ── Atmospheric Ambient Radial Glows ───────────────────────── */}
+      {/* ── Atmospheric Ambient Agricultural Radial Glows & Dot Grid ───────────────────────── */}
       <div
-        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #533afd 0%, #0ea5e9 60%, transparent 80%)" }}
+        className="absolute inset-0 pointer-events-none opacity-25"
+        style={{
+          backgroundImage: "radial-gradient(#1b4332 0.75px, transparent 0.75px)",
+          backgroundSize: "28px 28px",
+        }}
       />
       <div
-        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #10b981 0%, transparent 70%)" }}
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-15 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, #2d6a4f 0%, #52b788 50%, transparent 70%)" }}
+      />
+      <div
+        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full opacity-15 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, #2d6a4f 0%, #d8f3dc 60%, transparent 70%)" }}
       />
 
       {/* Top Header */}
-      <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-6 relative z-10">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="h-10 w-10 rounded-2xl bg-white border border-[#e3e8ee] shadow-sm flex items-center justify-center p-1 group-hover:scale-105 transition-transform">
-            <Image src="/images/aasra_logo.png" alt="AASRA" width={32} height={32} className="object-contain" priority />
-          </div>
-          <div>
-            <span className="text-xl font-bold font-display text-[#0d253d] tracking-tight block">AASRA</span>
-            <span className="text-[10px] font-mono text-[#533afd] font-bold block uppercase tracking-wider">Farmer Onboarding</span>
+      <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-5 sm:p-6 relative z-10">
+        <Link href="/" className="flex items-center gap-3 group focus:outline-hidden">
+          <div className="relative h-10 w-44 sm:w-52">
+            <Image
+              src="/images/krishyantra_logo.svg"
+              alt="Krishyantra"
+              fill
+              className="object-contain object-left group-hover:opacity-90 transition-opacity"
+              priority
+            />
           </div>
         </Link>
 
-        {/* Minimalist Language Selector Button */}
-        <div className="flex items-center gap-3">
+        {/* Minimalist Language Selector & Log In */}
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="relative">
             <select
               value={selectedLanguage}
@@ -721,7 +730,7 @@ export default function SignupPage() {
                 setSelectedLanguage(e.target.value);
                 setLanguage(e.target.value);
               }}
-              className="pl-3.5 pr-8 py-2 rounded-xl bg-white border border-[#e3e8ee] text-xs font-bold text-[#0d253d] shadow-2xs focus:outline-none focus:border-[#533afd] cursor-pointer appearance-none notranslate"
+              className="pl-3 pr-8 py-2 rounded-xl bg-white border border-[#e2e8df] text-xs font-bold text-[#1c2e24] shadow-2xs focus:outline-none focus:border-[#2d6a4f] cursor-pointer appearance-none notranslate"
               translate="no"
             >
               {INDIAN_LANGUAGES.map((l) => (
@@ -735,7 +744,7 @@ export default function SignupPage() {
 
           <Link
             href="/login"
-            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-[#e3e8ee] text-[#0d253d] text-xs font-bold transition-all shadow-2xs"
+            className="px-4 py-2 rounded-xl bg-white hover:bg-[#f4f7f2] border border-[#e2e8df] text-[#1c2e24] text-xs font-bold transition-all shadow-2xs"
           >
             <span>{isHindi ? "लॉगिन करें" : "Log In"}</span>
           </Link>
@@ -744,12 +753,12 @@ export default function SignupPage() {
 
       {/* ── Main Registration Multi-Step Card ──────────────────────── */}
       <main className="max-w-4xl mx-auto w-full my-4 px-4 sm:px-6 relative z-10">
-        <div className="bg-white border border-[#e3e8ee] shadow-2xl rounded-3xl p-6 sm:p-10 space-y-8">
+        <div className="bg-white border border-[#e8ede4] shadow-[0_20px_60px_-15px_rgba(27,67,50,0.08)] rounded-3xl p-6 sm:p-10 space-y-8">
           
           {/* Top Stage Indicator (4 Steps) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-mono font-bold">
-              <span className="text-[#533afd] uppercase">
+              <span className="text-[#2d6a4f] uppercase tracking-wider">
                 {step === 1 && <span>{isHindi ? "चरण 1: किसान पहचान व फोन सत्यापन" : "Stage 1: Verified Farmer Identity"}</span>}
                 {step === 2 && <span>{isHindi ? "चरण 2: खेत स्थान व नक्शे पर मेढ़ (Boundary)" : "Stage 2: Land Location & Map Boundary"}</span>}
                 {step === 3 && <span>{isHindi ? "चरण 3: फसल व कृषि इतिहास" : "Stage 3: Agronomic Intelligence"}</span>}
@@ -759,9 +768,9 @@ export default function SignupPage() {
             </div>
 
             {/* Step Progress Bar */}
-            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-[#f0f4ee] rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#533afd] to-emerald-500 transition-all duration-300 rounded-full"
+                className="h-full bg-gradient-to-r from-[#1b4332] via-[#2d6a4f] to-[#52b788] transition-all duration-300 rounded-full"
                 style={{ width: `${(step / 4) * 100}%` }}
               />
             </div>
@@ -778,10 +787,10 @@ export default function SignupPage() {
           {/* ── STAGE 1: Farmer Identity & Phone Verification ────────── */}
           <div key="step-1" className={step === 1 ? "space-y-6" : "hidden"}>
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-[#0d253d] font-display">
+              <h2 className="text-2xl sm:text-3xl font-black text-[#1c2e24] font-display">
                 <span>{isHindi ? "किसान की जानकारी व फोन सत्यापन" : "Farmer Identity & Phone Verification"}</span>
               </h2>
-              <p className="text-xs text-[#64748d]">
+              <p className="text-xs text-[#52796f]">
                 <span>{isHindi ? "सत्यापित मोबाइल नंबर से जुड़ें ताकि बाद में आप सुरक्षित लॉगिन कर सकें।" : "Register with a verified mobile number so you can securely log in anytime."}</span>
               </p>
             </div>
@@ -789,7 +798,7 @@ export default function SignupPage() {
             <div className="space-y-4">
               {/* Full Name */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">
+                <label className="text-xs font-bold text-[#1c2e24]">
                   <span>{isHindi ? "किसान का पूरा नाम *" : "Full Farmer Name *"}</span>
                 </label>
                 <div className="relative">
@@ -802,14 +811,14 @@ export default function SignupPage() {
                       setFullName(e.target.value);
                       setErrorMessage(null);
                     }}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-medium text-[#1c2e24] placeholder:text-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15 transition-all"
                   />
                 </div>
               </div>
 
               {/* Mobile Number & OTP Trigger */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">
+                <label className="text-xs font-bold text-[#1c2e24]">
                   <span>{isHindi ? "मोबाइल नंबर (लॉगिन ID) *" : "Mobile Number (Login ID) *"}</span>
                 </label>
                 <div className="flex gap-2">
@@ -828,7 +837,7 @@ export default function SignupPage() {
                       className={`w-full pl-10 pr-4 py-3 rounded-xl border text-xs font-mono font-bold tracking-wider ${
                         isMobileVerified
                           ? "bg-emerald-50 border-emerald-300 text-emerald-800"
-                          : "bg-[#f6f9fc] border-[#e3e8ee] text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                          : "bg-[#fbfcfb] border-[#e2e8df] text-[#1c2e24] placeholder:text-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15"
                       }`}
                     />
                   </div>
@@ -838,7 +847,7 @@ export default function SignupPage() {
                       type="button"
                       onClick={handleSendOtp}
                       disabled={loading || otpTimer > 0}
-                      className="px-4 py-3 rounded-xl bg-[#0d253d] hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                      className="px-4 py-3 rounded-xl bg-[#1b4332] hover:bg-[#143326] text-white text-xs font-bold transition-colors cursor-pointer shrink-0 disabled:opacity-50 shadow-sm"
                     >
                       <span>
                         {loading
@@ -863,13 +872,13 @@ export default function SignupPage() {
 
               {/* OTP Input Form (Revealed when OTP is sent & not yet verified) */}
               {isOtpSent && !isMobileVerified && (
-                <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200 space-y-3 animate-in fade-in duration-300">
+                <div className="p-4 rounded-2xl bg-[#f4f8f5] border border-emerald-200 space-y-3 animate-in fade-in duration-300">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-indigo-950 flex items-center gap-1.5">
-                      <Lock className="h-3.5 w-3.5 text-[#533afd]" />
+                    <span className="text-xs font-bold text-[#1b4332] flex items-center gap-1.5">
+                      <Lock className="h-3.5 w-3.5 text-[#2d6a4f]" />
                       <span>{isHindi ? "4-अंकों का SMS OTP दर्ज करें" : "Enter 4-digit SMS OTP"}</span>
                     </span>
-                    <span className="text-[10px] font-mono text-indigo-600 font-bold bg-white px-2 py-0.5 rounded-full border border-indigo-200">
+                    <span className="text-[10px] font-mono text-[#2d6a4f] font-bold bg-white px-2 py-0.5 rounded-full border border-emerald-200">
                       Mock OTP: {generatedOtp}
                     </span>
                   </div>
@@ -881,12 +890,12 @@ export default function SignupPage() {
                       placeholder="• • • •"
                       value={enteredOtp}
                       onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ""))}
-                      className="w-32 text-center text-lg font-mono font-black tracking-widest py-2 rounded-xl bg-white border border-indigo-300 text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                      className="w-32 text-center text-lg font-mono font-black tracking-widest py-2 rounded-xl bg-white border border-emerald-300 text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     />
                     <button
                       type="button"
                       onClick={handleVerifyOtp}
-                      className="flex-1 py-2 rounded-xl bg-[#533afd] hover:bg-[#4434d4] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
+                      className="flex-1 py-2 rounded-xl bg-[#2d6a4f] hover:bg-[#1b4332] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
                     >
                       <span>{isHindi ? "OTP सत्यापित करें" : "Confirm OTP"}</span>
                     </button>
@@ -896,7 +905,7 @@ export default function SignupPage() {
 
               {/* Farming Experience */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">
+                <label className="text-xs font-bold text-[#1c2e24]">
                   <span>{isHindi ? "खेती का अनुभव (वर्ष)" : "Farming Experience (Years)"}</span>
                 </label>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -907,8 +916,8 @@ export default function SignupPage() {
                       onClick={() => setFarmingExperience(exp)}
                       className={`py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                         farmingExperience === exp
-                          ? "bg-white border-[#533afd] text-[#533afd] shadow-sm ring-1 ring-[#533afd]"
-                          : "bg-[#f6f9fc] border-[#e3e8ee] text-slate-600 hover:border-slate-300"
+                          ? "bg-[#e8f5e9] border-[#2d6a4f] text-[#1b4332] shadow-2xs ring-1 ring-[#2d6a4f]"
+                          : "bg-[#fbfcfb] border-[#e2e8df] text-[#52796f] hover:border-[#b7c9be] hover:text-[#1c2e24]"
                       }`}
                     >
                       <span>{exp}</span>
@@ -933,7 +942,7 @@ export default function SignupPage() {
                 setStep(2);
               }}
               className="w-full py-4 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-              style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
+              style={{ background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)", boxShadow: "0 8px 25px rgba(27, 67, 50, 0.25)" }}
             >
               <span>{isHindi ? "अगला: खेत स्थान व नक्शे पर मेढ़ बनाएं" : "Next: Map Your Field Boundary"}</span>
               <ArrowRight className="h-4 w-4" />
@@ -943,10 +952,10 @@ export default function SignupPage() {
           {/* ── STAGE 2: Interactive Field Boundary Map & Soil GIS ───── */}
           <div key="step-2" className={step === 2 ? "space-y-6" : "hidden"}>
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-[#0d253d] font-display">
+              <h2 className="text-2xl sm:text-3xl font-black text-[#1c2e24] font-display">
                 <span>{isHindi ? "खेत का स्थान व नक्शे पर मेढ़ (Boundary)" : "Field Location & Satellite Boundary"}</span>
               </h2>
-              <p className="text-xs text-[#64748d]">
+              <p className="text-xs text-[#52796f]">
                 <span>{isHindi ? "नक्शे पर अपने खेत को खोजें और कोनों पर क्लिक करके मेढ़ (Boundary) बनाएं।" : "Search your village or locate your field, then click on the map to draw your parcel boundaries."}</span>
               </p>
             </div>
@@ -954,11 +963,11 @@ export default function SignupPage() {
             {/* State & District Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">State (राज्य) *</label>
+                <label className="text-xs font-bold text-[#1c2e24]">State (राज्य) *</label>
                 <select
                   value={selectedState}
                   onChange={(e) => handleStateChange(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d] notranslate"
+                  className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f] notranslate"
                   translate="no"
                 >
                   {Object.keys(INDIAN_STATES_DISTRICTS).map((st) => (
@@ -970,11 +979,11 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">District (जिला) *</label>
+                <label className="text-xs font-bold text-[#1c2e24]">District (जिला) *</label>
                 <select
                   value={selectedDistrict}
                   onChange={(e) => handleDistrictChange(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d] notranslate"
+                  className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f] notranslate"
                   translate="no"
                 >
                   {(INDIAN_STATES_DISTRICTS[selectedState] || ["Sehore"]).map((dst) => (
@@ -996,12 +1005,12 @@ export default function SignupPage() {
                     placeholder={isHindi ? "गांव, कस्बा या तहसील का नाम खोजें (उदा: Bilkisganj, Sehore, Phanda)" : "Search Village, Town or Tehsil (e.g. Bilkisganj, Sehore, Phanda)"}
                     value={searchLocationQuery}
                     onChange={(e) => setSearchLocationQuery(e.target.value)}
-                    className="w-full pl-10 pr-24 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                    className="w-full pl-10 pr-24 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-medium text-[#1c2e24] placeholder:text-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15 transition-all"
                   />
                   <button
                     type="submit"
                     disabled={isSearchingLocation}
-                    className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-[#0d253d] text-white text-[11px] font-bold cursor-pointer hover:bg-slate-800 transition-colors"
+                    className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-[#1b4332] text-white text-[11px] font-bold cursor-pointer hover:bg-[#143326] transition-colors"
                   >
                     <span>{isSearchingLocation ? "Searching..." : "Search Village"}</span>
                   </button>
@@ -1013,22 +1022,22 @@ export default function SignupPage() {
                   onClick={handleLocateOnMap}
                   disabled={isLocatingUser}
                   title="Only click this if you are physically standing on your crop field right now."
-                  className="px-3.5 py-3 rounded-xl bg-white border border-[#e3e8ee] hover:border-[#533afd] text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0 transition-all hover:bg-indigo-50/50"
+                  className="px-3.5 py-3 rounded-xl bg-white border border-[#e2e8df] hover:border-[#2d6a4f] text-[#1c2e24] text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0 transition-all hover:bg-[#f4f8f5]"
                 >
-                  <Crosshair className={`h-4 w-4 text-[#533afd] ${isLocatingUser ? "animate-spin" : ""}`} />
+                  <Crosshair className={`h-4 w-4 text-[#2d6a4f] ${isLocatingUser ? "animate-spin" : ""}`} />
                   <span>{isHindi ? "डिवाइस GPS (यदि खेत पर हों)" : "Device GPS (If at field)"}</span>
                 </button>
               </div>
 
               <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
                 <span>💡 <strong>Tip:</strong> If sitting at home, search your village name or drag the map directly to your farm.</span>
-                <span className="font-mono text-[10px] text-indigo-600">
+                <span className="font-mono text-[10px] text-[#2d6a4f] font-bold">
                   Map Center: {mapCenter.lat.toFixed(4)}°N, {mapCenter.lon.toFixed(4)}°E
                 </span>
               </div>
 
               {locationPermissionStatus && (
-                <p className="text-[11px] font-mono text-[#533afd] bg-indigo-50/60 p-2 rounded-lg border border-indigo-100">
+                <p className="text-[11px] font-mono text-[#1b4332] bg-[#e8f5e9] p-2 rounded-lg border border-emerald-200">
                   ℹ️ {locationPermissionStatus}
                 </p>
               )}
@@ -1061,10 +1070,10 @@ export default function SignupPage() {
             </div>
 
               {/* Farm Size Acreage Controller (Synchronized with Map) */}
-              <div className="p-5 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] space-y-3">
+              <div className="p-5 rounded-2xl bg-[#f8faf7] border border-[#e2e8df] space-y-3">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs font-bold text-[#0d253d]">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="h-2 w-2 rounded-full bg-[#2d6a4f]" />
                     <span>Total Farm Acreage (खेत का कुल क्षेत्रफल / रकबा):</span>
                   </div>
 
@@ -1072,7 +1081,7 @@ export default function SignupPage() {
                     <span className="font-mono text-xs text-slate-500">
                       ({(acres * 0.4047).toFixed(2)} Hectares)
                     </span>
-                    <div className="flex items-center bg-white border border-[#533afd] rounded-xl px-3 py-1 shadow-2xs">
+                    <div className="flex items-center bg-white border border-[#2d6a4f] rounded-xl px-3 py-1 shadow-2xs">
                       <input
                         type="number"
                         min="0.1"
@@ -1080,9 +1089,9 @@ export default function SignupPage() {
                         step="0.1"
                         value={acres}
                         onChange={(e) => setAcres(Number(e.target.value))}
-                        className="w-16 font-mono text-sm font-black text-[#533afd] focus:outline-none text-right mr-1"
+                        className="w-16 font-mono text-sm font-black text-[#1b4332] focus:outline-none text-right mr-1"
                       />
-                      <span className="font-mono text-xs font-bold text-slate-700">Acres</span>
+                      <span className="font-mono text-xs font-bold text-[#1c2e24]">Acres</span>
                     </div>
                   </div>
                 </div>
@@ -1094,7 +1103,7 @@ export default function SignupPage() {
                   step="0.1"
                   value={acres}
                   onChange={(e) => setAcres(Number(e.target.value))}
-                  className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#533afd]"
+                  className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#2d6a4f]"
                 />
 
                 <div className="flex justify-between text-[10px] text-slate-400 font-mono">
@@ -1107,13 +1116,13 @@ export default function SignupPage() {
               {/* Soil & Irrigation */}
               <div className="space-y-3">
                 {detectedSoil && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-emerald-900 text-xs shadow-2xs">
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#e8f5e9] border border-emerald-200 text-[#1b4332] text-xs shadow-2xs">
                     <Sparkles className="h-4 w-4 text-emerald-600 shrink-0 animate-pulse" />
                     <div className="flex-1 flex flex-wrap items-center gap-1.5">
-                      <span className="font-bold text-[11px] uppercase tracking-wider text-emerald-700">
+                      <span className="font-bold text-[11px] uppercase tracking-wider text-[#2d6a4f]">
                         {isHindi ? "✨ AI द्वारा जांची गई मिट्टी:" : "✨ AI Soil Auto-Detected:"}
                       </span>
-                      <span className="font-bold text-emerald-950">
+                      <span className="font-bold text-[#1b4332]">
                         {detectedSoil.detectedSoilType}
                       </span>
                       {detectedSoil.typicalPh && (
@@ -1122,7 +1131,7 @@ export default function SignupPage() {
                         </span>
                       )}
                       {detectedSoil.texture && (
-                        <span className="text-[10px] text-emerald-700">
+                        <span className="text-[10px] text-[#2d6a4f]">
                           • {detectedSoil.texture}
                         </span>
                       )}
@@ -1133,9 +1142,9 @@ export default function SignupPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <label className="text-xs font-bold text-slate-700">Soil Type (मिट्टी की किस्म)</label>
+                      <label className="text-xs font-bold text-[#1c2e24]">Soil Type (मिट्टी की किस्म)</label>
                       {isLoadingIntelligence && (
-                        <span className="text-[10px] text-[#533afd] font-mono animate-pulse">
+                        <span className="text-[10px] text-[#2d6a4f] font-mono animate-pulse">
                           Detecting ICAR soil...
                         </span>
                       )}
@@ -1143,7 +1152,7 @@ export default function SignupPage() {
                     <select
                       value={soilType}
                       onChange={(e) => setSoilType(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d] focus:border-[#533afd]"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     >
                       {soilOptionsList.map((opt) => (
                         <option key={opt} value={opt}>
@@ -1157,11 +1166,11 @@ export default function SignupPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Irrigation (सिंचाई साधन)</label>
+                    <label className="text-xs font-bold text-[#1c2e24]">Irrigation (सिंचाई साधन)</label>
                     <select
                       value={irrigationType}
                       onChange={(e) => setIrrigationType(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d]"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     >
                       <option value="Borewell + Rainfed">Borewell + Rainfed (बोरवेल + वर्षा)</option>
                       <option value="Canal Irrigation">Canal Irrigation (नहरी सिंचाई)</option>
@@ -1176,7 +1185,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-5 py-3.5 rounded-xl border border-[#e3e8ee] hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl border border-[#e2e8df] hover:bg-[#f4f8f5] text-[#52796f] text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
@@ -1186,7 +1195,7 @@ export default function SignupPage() {
                   type="button"
                   onClick={() => setStep(3)}
                   className="flex-1 py-3.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
+                  style={{ background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)", boxShadow: "0 8px 25px rgba(27, 67, 50, 0.25)" }}
                 >
                   <span>{isHindi ? "अगला: फसल व कृषि इतिहास" : "Next: Crop & Agronomics"}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -1197,19 +1206,19 @@ export default function SignupPage() {
           {/* ── STAGE 3: Crop Intelligence & Agronomic Profile ───────── */}
           <div key="step-3" className={step === 3 ? "space-y-6" : "hidden"}>
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-[#0d253d] font-display">
+              <h2 className="text-2xl sm:text-3xl font-black text-[#1c2e24] font-display">
                 <span>{isHindi ? "फसल व कृषि इतिहास" : "Agronomic & Crop Intelligence"}</span>
               </h2>
-                <p className="text-xs text-[#64748d]">
+                <p className="text-xs text-[#52796f]">
                   <span>{isHindi ? "फसल की किस्म व बुवाई की तारीख से AI आपके खेत के विकास चरण को स्वतः सेट करेगा।" : "Calibrates 14-day heat stress predictions and precise Syngenta product dosages."}</span>
                 </p>
               </div>
 
               <div className="space-y-4">
                 {/* Regional Header & Custom Crop Button */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 bg-indigo-50/70 p-3 rounded-2xl border border-indigo-100">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 bg-[#e8f5e9]/75 p-3.5 rounded-2xl border border-emerald-200">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-[#533afd] shrink-0" />
+                    <Sparkles className="h-4 w-4 text-[#2d6a4f] shrink-0" />
                     <div>
                       <span className="text-xs font-bold text-[#0d253d]">
                         {isHindi
@@ -1225,14 +1234,14 @@ export default function SignupPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {isLoadingIntelligence && (
-                      <span className="text-[10px] font-mono text-[#533afd] animate-pulse bg-white px-2 py-0.5 rounded-full border border-indigo-200">
+                      <span className="text-[10px] font-mono text-[#2d6a4f] animate-pulse bg-white px-2 py-0.5 rounded-full border border-emerald-200">
                         Analyzing ICAR...
                       </span>
                     )}
                     <button
                       type="button"
                       onClick={() => setShowCustomCropModal(true)}
-                      className="text-xs font-bold text-[#533afd] hover:text-[#432ec7] bg-white hover:bg-indigo-50/50 px-3 py-1.5 rounded-xl border border-indigo-200 shadow-2xs flex items-center gap-1 cursor-pointer transition-colors"
+                      className="text-xs font-bold text-[#2d6a4f] hover:text-[#1b4332] bg-white hover:bg-[#e8f5e9] px-3 py-1.5 rounded-xl border border-emerald-200 shadow-2xs flex items-center gap-1 cursor-pointer transition-colors"
                     >
                       <Plus className="h-3.5 w-3.5" />
                       <span>{isHindi ? "अन्य फसल जोड़ें" : "Add Custom Crop"}</span>
@@ -1249,7 +1258,7 @@ export default function SignupPage() {
                       placeholder={isHindi ? `${selectedDistrict} में उगाई जाने वाली फसल खोजें...` : `Filter crops in ${selectedDistrict}...`}
                       value={cropSearchQuery}
                       onChange={(e) => setCropSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                      className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-medium text-[#1c2e24] placeholder:text-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15"
                     />
                     {cropSearchQuery && (
                       <button
@@ -1278,8 +1287,8 @@ export default function SignupPage() {
                         onClick={() => setSelectedCategoryFilter(cat.id)}
                         className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
                           selectedCategoryFilter === cat.id
-                            ? "bg-[#533afd] text-white shadow-2xs"
-                            : "bg-[#f6f9fc] text-slate-600 hover:bg-slate-200/60 border border-[#e3e8ee]"
+                            ? "bg-[#1b4332] text-white shadow-2xs"
+                            : "bg-[#fbfcfb] text-[#52796f] hover:bg-[#e8f5e9]/50 border border-[#e2e8df]"
                         }`}
                       >
                         {cat.label}
@@ -1307,8 +1316,8 @@ export default function SignupPage() {
                           }}
                           className={`rounded-2xl border text-left overflow-hidden transition-all duration-200 cursor-pointer flex flex-col justify-between group ${
                             isSelected
-                              ? "bg-white border-[#533afd] shadow-lg ring-2 ring-[#533afd]/20 scale-[1.02]"
-                              : "bg-white hover:border-slate-300 border-[#e3e8ee] text-slate-700"
+                              ? "bg-white border-[#2d6a4f] shadow-lg ring-2 ring-[#2d6a4f]/25 scale-[1.02]"
+                              : "bg-white hover:border-[#b7c9be] border-[#e2e8df] text-slate-700"
                           }`}
                         >
                           <div className="relative h-24 w-full overflow-hidden bg-slate-900">
@@ -1327,7 +1336,7 @@ export default function SignupPage() {
                               {c.category?.replace("_", " ")}
                             </span>
                           </div>
-                          <div className="p-3 bg-slate-50/70 flex flex-col justify-between flex-1">
+                          <div className="p-3 bg-[#f8faf7] flex flex-col justify-between flex-1">
                             <div>
                               <span className="text-xs font-bold text-[#0d253d] block notranslate line-clamp-1" translate="no">
                                 {isHindi ? c.nameHi : c.nameEn}
@@ -1337,7 +1346,7 @@ export default function SignupPage() {
                               </span>
                             </div>
                             {isSelected && (
-                              <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#533afd]">
+                              <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#2d6a4f]">
                                 <CheckCircle2 className="h-3 w-3" />
                                 <span>Selected</span>
                               </div>
@@ -1351,7 +1360,7 @@ export default function SignupPage() {
                   {displayedCrops.length === 0 && (
                     <div className="text-center py-8 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
                       <Leaf className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                      <p className="text-xs font-bold text-slate-700 mb-1">
+                      <p className="text-xs font-bold text-[#1c2e24] mb-1">
                         {isHindi ? "कोई फसल नहीं मिली" : "No crops matching your search"}
                       </p>
                       <p className="text-[11px] text-slate-500 mb-3">
@@ -1363,7 +1372,7 @@ export default function SignupPage() {
                           setCustomCropName(cropSearchQuery);
                           setShowCustomCropModal(true);
                         }}
-                        className="px-4 py-2 rounded-xl text-white font-bold text-xs shadow-sm bg-[#533afd] hover:bg-[#432ec7] cursor-pointer"
+                        className="px-4 py-2 rounded-xl text-white font-bold text-xs shadow-sm bg-[#1b4332] hover:bg-[#143326] cursor-pointer"
                       >
                         + {isHindi ? `"${cropSearchQuery}" फसल जोड़ें` : `Add "${cropSearchQuery}" as Custom Crop`}
                       </button>
@@ -1375,9 +1384,9 @@ export default function SignupPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <label className="text-xs font-bold text-slate-700">Crop Variety (फसल की किस्म)</label>
+                      <label className="text-xs font-bold text-[#1c2e24]">Crop Variety (फसल की किस्म)</label>
                       {currentCropObj?.varieties && currentCropObj.varieties.length > 0 && (
-                        <span className="text-[10px] text-[#533afd] font-bold">
+                        <span className="text-[10px] text-[#2d6a4f] font-bold">
                           {currentCropObj.varieties.length} Local Cultivars
                         </span>
                       )}
@@ -1387,7 +1396,7 @@ export default function SignupPage() {
                       placeholder="e.g. JS-335 / PBW-824 / Bhima Super"
                       value={cropVariety}
                       onChange={(e) => setCropVariety(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d] notranslate"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f] notranslate"
                       translate="no"
                     />
                     {currentCropObj?.varieties && currentCropObj.varieties.length > 0 && (
@@ -1399,8 +1408,8 @@ export default function SignupPage() {
                             onClick={() => setCropVariety(v)}
                             className={`text-[10px] px-2 py-0.5 rounded-md border font-mono transition-colors cursor-pointer ${
                               cropVariety === v
-                                ? "bg-[#533afd] text-white border-[#533afd]"
-                                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                                ? "bg-[#1b4332] text-white border-[#1b4332]"
+                                : "bg-white text-[#52796f] border-[#e2e8df] hover:bg-[#f4f8f5]"
                             }`}
                           >
                             {v}
@@ -1411,7 +1420,7 @@ export default function SignupPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">
+                    <label className="text-xs font-bold text-[#1c2e24]">
                       Sowing Date (बुवाई की तारीख - पिछली या आगामी)
                     </label>
                     <input
@@ -1428,16 +1437,16 @@ export default function SignupPage() {
                           else if (diff >= 75) setGrowthStage("Maturity & Pre-Harvest");
                         }
                       }}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d]"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     />
                   </div>
                 </div>
 
                 {/* Dynamic DAS & Phenology Indicator */}
                 {sowingDate && (
-                  <div className="p-3 rounded-xl bg-indigo-50/80 border border-indigo-200/70 flex items-center justify-between text-xs">
+                  <div className="p-3 rounded-xl bg-[#e8f5e9]/80 border border-emerald-200/80 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-[#533afd]" />
+                      <Calendar className="h-4 w-4 text-[#2d6a4f]" />
                       <span className="font-bold text-[#0d253d]">
                         {(() => {
                           const diff = Math.floor((new Date().getTime() - new Date(sowingDate).getTime()) / (1000 * 60 * 60 * 24));
@@ -1448,7 +1457,7 @@ export default function SignupPage() {
                         })()}
                       </span>
                     </div>
-                    <span className="font-mono text-[11px] font-bold text-[#533afd] bg-white px-2 py-0.5 rounded-md border border-indigo-100 shadow-2xs">
+                    <span className="font-mono text-[11px] font-bold text-[#1b4332] bg-white px-2 py-0.5 rounded-md border border-emerald-200 shadow-2xs">
                       Phase: {growthStage}
                     </span>
                   </div>
@@ -1457,11 +1466,11 @@ export default function SignupPage() {
                 {/* Sowing Method & Previous Crop Rotation */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Sowing Method (बुवाई विधि)</label>
+                    <label className="text-xs font-bold text-[#1c2e24]">Sowing Method (बुवाई विधि)</label>
                     <select
                       value={sowingMethod}
                       onChange={(e) => setSowingMethod(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d]"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     >
                       <option value="Line Sowing / Seed Drill (कतार बुवाई / सीड ड्रिल)">Line Sowing / Seed Drill (कतार बुवाई)</option>
                       <option value="Broadcasting (छिटकवां विधि)">Broadcasting (छिटकवां विधि)</option>
@@ -1471,11 +1480,11 @@ export default function SignupPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Previous Crop (पिछली फसल)</label>
+                    <label className="text-xs font-bold text-[#1c2e24]">Previous Crop (पिछली फसल)</label>
                     <select
                       value={previousCrop}
                       onChange={(e) => setPreviousCrop(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d]"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     >
                       <option value="Wheat (गेहूं)">Wheat (गेहूं)</option>
                       <option value="Chickpea / Gram (चना)">Chickpea / Gram (चना)</option>
@@ -1488,11 +1497,11 @@ export default function SignupPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Water Source (जल स्रोत)</label>
+                    <label className="text-xs font-bold text-[#1c2e24]">Water Source (जल स्रोत)</label>
                     <select
                       value={waterSource}
                       onChange={(e) => setWaterSource(e.target.value)}
-                      className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d]"
+                      className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                     >
                       <option value="Tube Well / Borewell (नलकूप / बोरवेल)">Tube Well / Borewell (नलकूप)</option>
                       <option value="Canal Network (नहर)">Canal Network (नहर)</option>
@@ -1504,11 +1513,11 @@ export default function SignupPage() {
 
                 {/* Growth Stage Override */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Current Growth Stage (वर्तमान विकास अवस्था)</label>
+                  <label className="text-xs font-bold text-[#1c2e24]">Current Growth Stage (वर्तमान विकास अवस्था)</label>
                   <select
                     value={growthStage}
                     onChange={(e) => setGrowthStage(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d]"
+                    className="w-full px-3.5 py-3 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] text-xs font-bold text-[#1c2e24] focus:outline-none focus:border-[#2d6a4f]"
                   >
                     <option value="Germination & Seedling">Germination & Seedling (अंकुरण व शुरुआती बढ़वार)</option>
                     <option value="Vegetative Canopy Growth">Vegetative Canopy Growth (शाखाएं व पत्तियां फैलना)</option>
@@ -1518,13 +1527,13 @@ export default function SignupPage() {
                 </div>
 
                 {/* Security & Privacy Agreement */}
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
-                  <ShieldCheck className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
+                <div className="p-4 rounded-2xl bg-[#e8f5e9] border border-emerald-200 flex items-start gap-3">
+                  <ShieldCheck className="h-5 w-5 text-[#2d6a4f] shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <span className="text-xs font-bold text-emerald-900 block">
+                    <span className="text-xs font-bold text-[#1b4332] block">
                       <span>{isHindi ? "किसान डेटा गोपनीयता सुरक्षा (DPDP Act 2023 Compliant)" : "Farmer Data Privacy Guarantee"}</span>
                     </span>
-                    <p className="text-[11px] text-emerald-800 leading-relaxed">
+                    <p className="text-[11px] text-[#2d6a4f] leading-relaxed">
                       <span>{isHindi ? "आपका खेत डेटा केवल मौसम व वैज्ञानिक सलाह के लिए उपयोग होता है। किसी तीसरे पक्ष को बेचा नहीं जाता।" : "Your land coordinates and crop records are AES-256 encrypted and never shared or monetized."}</span>
                     </p>
                   </div>
@@ -1535,7 +1544,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="px-5 py-3.5 rounded-xl border border-[#e3e8ee] hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl border border-[#e2e8df] hover:bg-[#f4f8f5] text-[#52796f] text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
@@ -1547,8 +1556,8 @@ export default function SignupPage() {
                   disabled={loading}
                   className="flex-1 py-3.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                   style={{
-                    background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-                    boxShadow: "0 8px 25px rgba(83, 58, 253, 0.35)",
+                    background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+                    boxShadow: "0 8px 25px rgba(27, 67, 50, 0.28)",
                   }}
                 >
                   {loading ? (
@@ -1565,26 +1574,26 @@ export default function SignupPage() {
 
           {/* ── STAGE 4: Digital Smart Card Passport ─────────────────── */}
           <div key="step-4" className={step === 4 ? "space-y-6 text-center" : "hidden"}>
-            <div className="h-14 w-14 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-md">
-              <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+            <div className="h-14 w-14 rounded-3xl bg-emerald-100 text-[#2d6a4f] flex items-center justify-center mx-auto shadow-md">
+              <CheckCircle2 className="h-8 w-8 text-[#2d6a4f]" />
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-[#0d253d] font-display">
+              <h2 className="text-2xl sm:text-3xl font-black text-[#1c2e24] font-display">
                 <span>{isHindi ? "बधाई हो! आपका किसान खाता सक्रिय है" : "Registration Successful & Verified!"}</span>
               </h2>
-              <p className="text-xs text-[#64748d]">
+              <p className="text-xs text-[#52796f]">
                 <span>{isHindi ? "आपका डिजिटल किसान स्मार्ट पासपोर्ट जारी कर दिया गया है।" : "Your digital farm passport is active and stored in the secure registry database."}</span>
               </p>
             </div>
 
-            {/* Digital Holographic AASRA Smart Card */}
-            <div className="max-w-md mx-auto p-6 rounded-3xl bg-gradient-to-br from-[#0d253d] via-[#1a237e] to-[#0d253d] text-white text-left space-y-4 shadow-2xl border border-indigo-400/40 relative overflow-hidden">
+            {/* Digital Holographic Krishyantra Smart Card */}
+            <div className="max-w-md mx-auto p-6 rounded-3xl bg-gradient-to-br from-[#091811] via-[#1b4332] to-[#091811] text-white text-left space-y-4 shadow-2xl border border-emerald-500/30 relative overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/15 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-200 uppercase">
-                    AASRA KISAN SMART CARD
+                  <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-200 uppercase">
+                    KRISHYANTRA KISAN SMART CARD
                   </span>
                 </div>
                 <span className="text-[10px] font-mono text-emerald-300 font-bold bg-emerald-500/20 px-2 py-0.5 rounded-full">
@@ -1593,26 +1602,26 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Farmer Name</span>
+                <span className="text-[10px] font-mono text-emerald-200/70 uppercase">Farmer Name</span>
                 <h3 className="text-xl font-bold font-display text-white">{fullName}</h3>
-                <p className="text-xs font-mono text-indigo-300 notranslate" translate="no">
+                <p className="text-xs font-mono text-emerald-200/90 notranslate" translate="no">
                   +91 {mobileNumber} • {selectedDistrict}, {selectedState}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs font-mono">
                 <div className="p-2 rounded-xl bg-white/5">
-                  <span className="text-slate-400 text-[10px] block">Primary Crop:</span>
+                  <span className="text-emerald-200/60 text-[10px] block">Primary Crop:</span>
                   <span className="font-bold text-white notranslate" translate="no">{primaryCrop} ({cropVariety})</span>
                 </div>
                 <div className="p-2 rounded-xl bg-white/5">
-                  <span className="text-slate-400 text-[10px] block">Acreage Mapped:</span>
+                  <span className="text-emerald-200/60 text-[10px] block">Acreage Mapped:</span>
                   <span className="font-bold text-emerald-300">{acres} Acres ({(acres * 0.4047).toFixed(1)} Ha)</span>
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-between text-[9px] font-mono text-slate-400 border-t border-white/10">
-                <span suppressHydrationWarning>Vault ID: AASRA-{mobileNumber ? mobileNumber.slice(-4) : "FARM"}-2026</span>
+              <div className="pt-2 flex items-center justify-between text-[9px] font-mono text-emerald-200/70 border-t border-white/10">
+                <span suppressHydrationWarning>Vault ID: KRISHYANTRA-{mobileNumber ? mobileNumber.slice(-4) : "FARM"}-2026</span>
                 <span className="text-emerald-400">AES-256 SECURED</span>
               </div>
             </div>
@@ -1631,8 +1640,8 @@ export default function SignupPage() {
                 }}
                 className="w-full py-4 rounded-2xl text-white font-bold text-sm shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 style={{
-                  background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-                  boxShadow: "0 10px 30px rgba(83, 58, 253, 0.4)",
+                  background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+                  boxShadow: "0 10px 30px rgba(27, 67, 50, 0.35)",
                 }}
               >
                 <span>{isHindi ? "मेरा खेत डैशबोर्ड खोलें" : "Open My Farm Dashboard"}</span>
@@ -1645,9 +1654,9 @@ export default function SignupPage() {
       </main>
 
       {/* Footer Security Stamp */}
-      <footer className="p-6 text-center text-xs text-slate-400 font-mono relative z-10 flex items-center justify-center gap-2">
+      <footer className="p-6 text-center text-xs text-[#52796f] font-mono relative z-10 flex items-center justify-center gap-2">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-        <span>Encrypted with Syngenta Krishi Digital Vault • DPDP Act 2023 Compliant</span>
+        <span>Encrypted with Krishyantra Digital Vault • DPDP Act 2023 Compliant • Indian Agriculture Stack</span>
       </footer>
 
       {/* ── Modal: Add Custom / Specialty Crop ────────────────────── */}
@@ -1656,7 +1665,7 @@ export default function SignupPage() {
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Leaf className="h-5 w-5 text-[#533afd]" />
+                <Leaf className="h-5 w-5 text-[#2d6a4f]" />
                 <h3 className="text-base font-bold text-[#0d253d]">
                   {isHindi ? "कस्टम / विशिष्ट फसल जोड़ें" : "Add Custom / Specialty Crop"}
                 </h3>
@@ -1672,22 +1681,22 @@ export default function SignupPage() {
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Crop Name (फसल का नाम) *</label>
+                <label className="font-bold text-[#1c2e24]">Crop Name (फसल का नाम) *</label>
                 <input
                   type="text"
                   placeholder="e.g. Dragon Fruit, Chia Seeds, Mentha, Apple, Cardamom..."
                   value={customCropName}
                   onChange={(e) => setCustomCropName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] font-bold text-[#0d253d] focus:border-[#533afd] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] font-bold text-[#1c2e24] focus:border-[#2d6a4f] focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Category (श्रेणी)</label>
+                <label className="font-bold text-[#1c2e24]">Category (श्रेणी)</label>
                 <select
                   value={customCropCategory}
                   onChange={(e) => setCustomCropCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] font-bold text-[#0d253d]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] font-bold text-[#1c2e24] focus:border-[#2d6a4f] focus:outline-none"
                 >
                   <option value="cereal">Cereal / Grain (अनाज)</option>
                   <option value="cash_crop">Cash Crop (नकदी फसल)</option>
@@ -1701,13 +1710,13 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Cultivar / Variety (किस्म / हाइब्रिड)</label>
+                <label className="font-bold text-[#1c2e24]">Cultivar / Variety (किस्म / हाइब्रिड)</label>
                 <input
                   type="text"
                   placeholder="e.g. Red Flesh Hybrid / Local Desi"
                   value={customCropVariety}
                   onChange={(e) => setCustomCropVariety(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] font-bold text-[#0d253d] focus:border-[#533afd] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#fbfcfb] border border-[#e2e8df] font-bold text-[#1c2e24] focus:border-[#2d6a4f] focus:outline-none"
                 />
               </div>
             </div>
@@ -1743,7 +1752,7 @@ export default function SignupPage() {
                   setCustomCropName("");
                   setCustomCropVariety("");
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-[#533afd] hover:bg-[#4434d4] text-white font-bold text-xs disabled:opacity-50 shadow-md cursor-pointer transition-all"
+                className="flex-1 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#143326] text-white font-bold text-xs disabled:opacity-50 shadow-md cursor-pointer transition-all"
               >
                 {isHindi ? "फसल जोड़ें और चुनें" : "Add & Select Crop"}
               </button>

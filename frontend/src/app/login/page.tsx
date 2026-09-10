@@ -33,6 +33,7 @@ import {
   Leaf,
   Activity,
   Award,
+  Globe,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -56,6 +57,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [needsSignup, setNeedsSignup] = useState(false);
+
+  const handleLanguageChange = (code: string) => {
+    setSelectedLanguage(code);
+    setLanguage(code);
+  };
 
   // OTP Countdown timer
   useEffect(() => {
@@ -265,38 +271,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f9fc] text-[#0d253d] font-sans flex flex-col justify-between select-none relative overflow-hidden">
+    <div className="min-h-screen bg-[#fcfdfa] text-[#1b4332] font-sans flex flex-col justify-between select-none relative overflow-hidden">
       
-      {/* ── Atmospheric Ambient Radial Meshes (Stripe Aesthetic) ──── */}
-      <div
-        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #533afd 0%, #0ea5e9 60%, transparent 80%)" }}
+      {/* ── Atmospheric Ambient Agricultural Grid & Glows ──── */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(#2d6a4f 0.75px, transparent 0.75px)",
+          backgroundSize: "24px 24px",
+          opacity: 0.08,
+        }}
       />
       <div
-        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #10b981 0%, transparent 70%)" }}
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-15 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, #2d6a4f 0%, #52b788 60%, transparent 80%)" }}
+      />
+      <div
+        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full opacity-15 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, #52b788 0%, transparent 70%)" }}
       />
 
       {/* Top Header */}
       <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-6 relative z-10">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="h-10 w-10 rounded-2xl bg-white border border-[#e3e8ee] shadow-sm flex items-center justify-center p-1 group-hover:scale-105 transition-transform">
-            <Image src="/images/aasra_logo.png" alt="AASRA" width={32} height={32} className="object-contain" priority />
-          </div>
-          <div>
-            <span className="text-xl font-bold font-display text-[#0d253d] tracking-tight block">AASRA</span>
-            <span className="text-[10px] font-mono text-[#533afd] font-bold block uppercase tracking-wider">Farmer Portal</span>
-          </div>
+        <Link href="/" className="flex items-center gap-3 group">
+          <Image
+            src="/images/krishyantra_logo.svg"
+            alt="Krishyantra"
+            width={160}
+            height={36}
+            className="h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+            priority
+          />
         </Link>
 
-        <Link
-          href="/signup"
-          className="px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 hover:scale-105"
-          style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
-        >
-          <UserPlus className="h-3.5 w-3.5" />
-          <span>{isHindi ? "नया किसान? खाता बनाएं" : "New Farmer? Sign Up"}</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <select
+              value={language}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              className="appearance-none bg-white border border-[#e8ede4] hover:border-[#2d6a4f] px-3.5 py-1.5 pr-8 rounded-full text-xs font-semibold text-[#1b4332] shadow-2xs focus:outline-none transition-colors cursor-pointer"
+            >
+              {INDIAN_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.native} ({lang.name})
+                </option>
+              ))}
+            </select>
+            <Globe className="h-3.5 w-3.5 text-[#2d6a4f] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <Link
+            href="/signup"
+            className="px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 hover:scale-105"
+            style={{
+              background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+              boxShadow: "0 4px 14px rgba(27, 67, 50, 0.2)",
+            }}
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            <span>{isHindi ? "नया किसान? खाता बनाएं" : "New Farmer? Sign Up"}</span>
+          </Link>
+        </div>
       </header>
 
       {/* Main Login Form Container */}
@@ -308,14 +343,14 @@ export default function LoginPage() {
           <div className="hidden lg:block lg:col-span-5 space-y-6">
             
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#e3e8ee] shadow-2xs text-xs font-mono font-bold text-[#533afd]">
-                <Sparkles className="h-3.5 w-3.5 text-[#533afd]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e8f5e9] border border-[#c8e6c9] text-xs font-mono font-bold text-[#1b4332]">
+                <Leaf className="h-3.5 w-3.5 text-[#2d6a4f]" />
                 <span>AUTHENTIC KRISHI LOGIN</span>
               </div>
-              <h2 className="text-3xl font-black font-display text-[#0d253d] tracking-tight leading-tight">
+              <h2 className="text-3xl font-black font-display text-[#1b4332] tracking-tight leading-tight">
                 {isHindi ? "अपने खेत के लाइव डैशबोर्ड में प्रवेश करें" : "Access Your Living Farm Dashboard"}
               </h2>
-              <p className="text-xs sm:text-sm text-[#64748d] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#4a5568] leading-relaxed">
                 {isHindi
                   ? "मौसम रडार, रोग पहचान कैमरा, 140+ मंडियों के लाइव भाव और बैंक मुनाफा रिपोर्ट तक सीधी पहुंच।"
                   : "Continuous telemetry monitoring, thermal stress early warnings, and verified APMC mandi spot prices."}
@@ -325,21 +360,21 @@ export default function LoginPage() {
             {/* 3 Live Telemetry Cards */}
             <div className="space-y-2.5">
               {[
-                { title: isHindi ? "14-दिन मौसम रडार सक्रिय" : "14-Day Micro-Weather Active", sub: isHindi ? "सटीक स्प्रे विंडो अपडेट" : "VPD & Delta-T Live Stream", icon: CloudSun, color: "text-amber-600 bg-amber-50" },
-                { title: isHindi ? "140+ मंडियों के भाव जुड़े हैं" : "140+ APMC Mandi Network", sub: isHindi ? "दैनिक सत्यापित रेट्स" : "Daily Spot Price Discovery", icon: Store, color: "text-emerald-600 bg-emerald-50" },
-                { title: isHindi ? "सिंजेंटा डिजिटल सुरक्षा" : "Encrypted Telemetry Shield", sub: isHindi ? "AES-256 सुरक्षित डेटा" : "AES-256 Data Protection", icon: ShieldCheck, color: "text-indigo-600 bg-indigo-50" },
+                { title: isHindi ? "14-दिन मौसम रडार सक्रिय" : "14-Day Micro-Weather Active", sub: isHindi ? "सटीक स्प्रे विंडो अपडेट" : "VPD & Delta-T Live Stream", icon: CloudSun, color: "text-[#2d6a4f] bg-[#e8f5e9]" },
+                { title: isHindi ? "140+ मंडियों के भाव जुड़े हैं" : "140+ APMC Mandi Network", sub: isHindi ? "दैनिक सत्यापित रेट्स" : "Daily Spot Price Discovery", icon: Store, color: "text-[#1b4332] bg-[#d8f3dc]" },
+                { title: isHindi ? "कृषियंत्र डिजिटल सुरक्षा" : "Encrypted Telemetry Shield", sub: isHindi ? "AES-256 सुरक्षित डेटा" : "AES-256 Data Protection", icon: ShieldCheck, color: "text-[#2d6a4f] bg-[#e8f5e9]" },
               ].map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={idx}
-                    className="p-3.5 rounded-2xl bg-white border border-[#e3e8ee] shadow-2xs flex items-center gap-3"
+                    className="p-3.5 rounded-2xl bg-white/90 backdrop-blur-sm border border-[#e8ede4] shadow-xs flex items-center gap-3 hover:border-[#b7e4c7] transition-all"
                   >
                     <div className={`h-9 w-9 rounded-xl ${item.color} flex items-center justify-center shrink-0`}>
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="truncate">
-                      <span className="text-xs font-bold text-[#0d253d] block truncate">{item.title}</span>
+                      <span className="text-xs font-bold text-[#1b4332] block truncate">{item.title}</span>
                       <span className="text-[10px] text-slate-500 font-mono block truncate">{item.sub}</span>
                     </div>
                   </div>
@@ -351,16 +386,16 @@ export default function LoginPage() {
 
           {/* Right Column: Interactive Login Form Card (7 Cols) */}
           <div className="lg:col-span-7">
-            <div className="bg-white border border-[#e3e8ee] shadow-2xl rounded-3xl p-6 sm:p-9 space-y-6">
+            <div className="bg-white border border-[#e8ede4] shadow-[0_20px_60px_-15px_rgba(27,67,50,0.08)] rounded-3xl p-6 sm:p-9 space-y-6">
               
               <div className="text-center space-y-1">
-                <span className="text-[10px] font-mono font-bold text-[#533afd] bg-indigo-50 px-3 py-0.5 rounded-full border border-indigo-200 uppercase">
+                <span className="text-[10px] font-mono font-bold text-[#1b4332] bg-[#e8f5e9] px-3 py-0.5 rounded-full border border-[#c8e6c9] uppercase tracking-wider">
                   Secure Farmer Access
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-black font-display text-[#0d253d] tracking-tight mt-1">
+                <h1 className="text-2xl sm:text-3xl font-black font-display text-[#1b4332] tracking-tight mt-1">
                   {isHindi ? "खेत खाते में लॉगिन करें" : "Log In to Your Farm"}
                 </h1>
-                <p className="text-xs text-[#64748d]">
+                <p className="text-xs text-[#4a5568]">
                   {isHindi
                     ? "लाइव सैटेलाइट मौसम, रोग पहचान व मंडी भाव का उपयोग करें"
                     : "Access field telemetry, thermal stress early warnings, and AI crop advisory"}
@@ -368,7 +403,7 @@ export default function LoginPage() {
               </div>
 
               {/* Auth Method Tabs */}
-              <div className="grid grid-cols-2 p-1 bg-[#f6f9fc] border border-[#e3e8ee] rounded-2xl">
+              <div className="grid grid-cols-2 p-1 bg-[#f4f7f4] border border-[#e8ede4] rounded-2xl">
                 <button
                   type="button"
                   onClick={() => {
@@ -377,8 +412,8 @@ export default function LoginPage() {
                   }}
                   className={`py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                     authMethod === "otp"
-                      ? "bg-white text-[#533afd] shadow-xs border border-[#e3e8ee]"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white text-[#1b4332] shadow-xs border border-[#e8ede4]"
+                      : "text-slate-600 hover:text-[#1b4332]"
                   }`}
                 >
                   <Phone className="h-3.5 w-3.5" />
@@ -393,8 +428,8 @@ export default function LoginPage() {
                   }}
                   className={`py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                     authMethod === "password"
-                      ? "bg-white text-[#533afd] shadow-xs border border-[#e3e8ee]"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white text-[#1b4332] shadow-xs border border-[#e8ede4]"
+                      : "text-slate-600 hover:text-[#1b4332]"
                   }`}
                 >
                   <KeyRound className="h-3.5 w-3.5" />
@@ -428,7 +463,7 @@ export default function LoginPage() {
                         </span>
                         <Link
                           href="/signup"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#533afd] hover:bg-[#432dd8] text-white font-bold text-xs shadow transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs shadow transition-all cursor-pointer"
                         >
                           <UserPlus className="h-3.5 w-3.5" />
                           <span>{isHindi ? "साइन अप करें" : "Sign Up Now"}</span>
@@ -445,18 +480,18 @@ export default function LoginPage() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center justify-between"
+                  className="p-3.5 rounded-2xl bg-[#e8f5e9] border border-[#b7e4c7] text-[#1b4332] text-xs flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2">
-                    <Smartphone className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <Smartphone className="h-4 w-4 text-[#2d6a4f] shrink-0" />
                     <span>
                       {isHindi ? "ओटीपी भेजा गया: " : "SMS OTP Code: "}
-                      <strong className="font-mono text-sm tracking-widest text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                      <strong className="font-mono text-sm tracking-widest text-[#1b4332] bg-white border border-[#b7e4c7] px-2 py-0.5 rounded-md">
                         {generatedOtp}
                       </strong>
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-700">
+                  <span className="text-[10px] font-mono text-[#2d6a4f]">
                     {otpTimer}s
                   </span>
                 </motion.div>
@@ -468,11 +503,11 @@ export default function LoginPage() {
                   
                   {!otpSent ? (
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700">
+                      <label className="text-xs font-bold text-[#1b4332]">
                         {isHindi ? "मोबाइल नंबर (10 अंक) *" : "Mobile Number *"}
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-slate-400">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-[#2d6a4f]">
                           +91
                         </span>
                         <input
@@ -484,7 +519,7 @@ export default function LoginPage() {
                             setMobileNumber(e.target.value.replace(/\D/g, ""));
                             setErrorMessage(null);
                           }}
-                          className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-sm font-bold text-[#0d253d] focus:outline-none focus:border-[#533afd] transition-colors"
+                          className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#fcfdfa] border border-[#e8ede4] text-sm font-bold text-[#1b4332] placeholder-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15 transition-all"
                         />
                       </div>
                       <span className="text-[10px] text-slate-400 font-mono block">
@@ -495,7 +530,7 @@ export default function LoginPage() {
                     <div className="space-y-3">
                       <div className="space-y-1.5">
                         <div className="flex justify-between items-center text-xs">
-                          <label className="font-bold text-slate-700">
+                          <label className="font-bold text-[#1b4332]">
                             {isHindi ? "4-अंकों का सत्यापन कोड (OTP) *" : "4-Digit Verification Code *"}
                           </label>
                           <button
@@ -505,7 +540,7 @@ export default function LoginPage() {
                               setOtpCode("");
                               setErrorMessage(null);
                             }}
-                            className="text-[#533afd] font-bold text-[11px] hover:underline"
+                            className="text-[#2d6a4f] font-bold text-[11px] hover:underline cursor-pointer"
                           >
                             {isHindi ? "नंबर बदलें" : "Change Number"}
                           </button>
@@ -521,7 +556,7 @@ export default function LoginPage() {
                             setOtpCode(e.target.value.replace(/\D/g, ""));
                             setErrorMessage(null);
                           }}
-                          className="w-full text-center tracking-[1em] text-xl font-mono font-black py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                          className="w-full text-center tracking-[1em] text-xl font-mono font-black py-3 rounded-xl bg-[#fcfdfa] border border-[#e8ede4] text-[#1b4332] focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15 transition-all"
                         />
                       </div>
 
@@ -529,7 +564,7 @@ export default function LoginPage() {
                         <button
                           type="button"
                           onClick={handleSendOtp}
-                          className="text-xs text-[#533afd] font-bold hover:underline flex items-center gap-1 mx-auto"
+                          className="text-xs text-[#2d6a4f] font-bold hover:underline flex items-center gap-1 mx-auto cursor-pointer"
                         >
                           <RotateCcw className="h-3 w-3" />
                           <span>{isHindi ? "नया ओटीपी भेजें" : "Resend OTP"}</span>
@@ -543,8 +578,8 @@ export default function LoginPage() {
                     disabled={loading}
                     className="w-full py-3.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
                     style={{
-                      background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-                      boxShadow: "0 8px 20px rgba(83, 58, 253, 0.3)",
+                      background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+                      boxShadow: "0 8px 20px rgba(27, 67, 50, 0.25)",
                     }}
                   >
                     {loading ? (
@@ -570,11 +605,11 @@ export default function LoginPage() {
                 <form onSubmit={handlePasswordLogin} className="space-y-4">
                   
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">
+                    <label className="text-xs font-bold text-[#1b4332]">
                       {isHindi ? "ईमेल पता *" : "Email Address *"}
                     </label>
                     <div className="relative">
-                      <Mail className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Mail className="h-4 w-4 text-[#2d6a4f] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="email"
                         placeholder="e.g. ramesh@aasra.farm"
@@ -583,17 +618,17 @@ export default function LoginPage() {
                           setEmail(e.target.value);
                           setErrorMessage(null);
                         }}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#fcfdfa] border border-[#e8ede4] text-xs font-bold text-[#1b4332] placeholder-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15 transition-all"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">
+                    <label className="text-xs font-bold text-[#1b4332]">
                       {isHindi ? "पासवर्ड *" : "Password *"}
                     </label>
                     <div className="relative">
-                      <Lock className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Lock className="h-4 w-4 text-[#2d6a4f] absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="password"
                         placeholder="••••••••"
@@ -602,7 +637,7 @@ export default function LoginPage() {
                           setPassword(e.target.value);
                           setErrorMessage(null);
                         }}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#fcfdfa] border border-[#e8ede4] text-xs font-bold text-[#1b4332] placeholder-slate-400 focus:outline-none focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#2d6a4f]/15 transition-all"
                       />
                     </div>
                   </div>
@@ -612,8 +647,8 @@ export default function LoginPage() {
                     disabled={loading}
                     className="w-full py-3.5 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
                     style={{
-                      background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-                      boxShadow: "0 8px 20px rgba(83, 58, 253, 0.3)",
+                      background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+                      boxShadow: "0 8px 20px rgba(27, 67, 50, 0.25)",
                     }}
                   >
                     {loading ? (
@@ -630,9 +665,9 @@ export default function LoginPage() {
               )}
 
               {/* Sign Up Redirect */}
-              <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100">
+              <div className="pt-2 text-center text-xs text-slate-500 border-t border-[#e8ede4]">
                 <span>{isHindi ? "अभी तक खाता नहीं बनाया? " : "Don't have a farm registered? "}</span>
-                <Link href="/signup" className="text-[#533afd] font-bold hover:underline">
+                <Link href="/signup" className="text-[#2d6a4f] font-bold hover:underline">
                   {isHindi ? "नया खेत जोड़ें (Sign Up)" : "Sign Up & Map Real Farm"}
                 </Link>
               </div>
@@ -645,9 +680,9 @@ export default function LoginPage() {
       </main>
 
       {/* Footer Security Stamp */}
-      <footer className="p-6 text-center text-xs text-slate-400 font-mono relative z-10 flex items-center justify-center gap-2">
-        <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-        <span>Encrypted with Syngenta Krishi Digital Security • Zero Data Leakage</span>
+      <footer className="p-6 text-center text-xs text-[#2d6a4f]/80 font-mono relative z-10 flex items-center justify-center gap-2">
+        <ShieldCheck className="h-3.5 w-3.5 text-[#2d6a4f]" />
+        <span>Encrypted with Krishyantra Digital Vault • DPDP Act 2023 Compliant • Indian Agriculture Stack</span>
       </footer>
 
     </div>
