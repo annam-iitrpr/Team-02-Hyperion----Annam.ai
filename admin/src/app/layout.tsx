@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AASRA Admin Panel",
-  description: "Internal admin panel for AASRA system management",
+  title: "KrishYantra Admin Studio & Operations Hub",
+  description: "Internal operations, telemetry inspection, and database control hub for KrishYantra",
   robots: "noindex, nofollow",
 };
 

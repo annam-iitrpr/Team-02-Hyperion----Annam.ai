@@ -65,12 +65,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className={`l-sidebar${sidebarOpen ? " open" : ""}`}>
         {/* Logo */}
         <div className="sidebar-logo">
-          <div className="sidebar-logo-mark">
+          <div className="sidebar-logo-mark" style={{ background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)", color: "#d8f3dc" }}>
             <Shield size={14} />
           </div>
           <div>
-            <div className="sidebar-logo-text">AASRA Admin</div>
-            <div className="sidebar-logo-sub">Control Panel</div>
+            <div className="sidebar-logo-text">KrishYantra</div>
+            <div className="sidebar-logo-sub">Admin Operations Hub</div>
           </div>
         </div>
 
@@ -93,15 +93,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             );
           })}
 
-          <div className="sidebar-section-label" style={{ marginTop: 8 }}>External</div>
+          <div className="sidebar-section-label" style={{ marginTop: 8 }}>Live Platform</div>
           <a
-            href={`${MAIN_SITE_URL}/plant-intelligence`}
+            href={MAIN_SITE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"
+            style={{ color: "#52b788" }}
+            title={`Launch Main KrishYantra Application at ${MAIN_SITE_URL}`}
           >
             <ExternalLink size={15} />
-            <span>Main Farmer Site</span>
+            <span>Open Main KrishYantra ↗</span>
           </a>
         </nav>
 
@@ -145,19 +147,60 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Menu size={18} />
           </button>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginRight: "auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginRight: "auto" }}>
             <span
               className="badge badge-success"
-              style={{ display: "flex", alignItems: "center", gap: 4 }}
+              style={{ display: "flex", alignItems: "center", gap: 5 }}
             >
               <span className="status-dot online" />
               Admin Session Active
             </span>
+            <span
+              className="badge"
+              style={{
+                background: "rgba(45, 106, 79, 0.12)",
+                color: "#52b788",
+                border: "1px solid rgba(82, 183, 136, 0.25)",
+                fontSize: 11,
+                fontWeight: 500,
+              }}
+            >
+              Sync: Connected
+            </span>
           </div>
 
-          <span className="text-muted" style={{ fontSize: 12 }}>
-            AASRA v1.0 · {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-          </span>
+          {/* One-way Main Website Launch Button */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a
+              href={MAIN_SITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+                border: "1px solid #40916c",
+                color: "#ffffff",
+                fontWeight: 600,
+                padding: "6px 14px",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontSize: "12px",
+                boxShadow: "0 2px 8px rgba(27,67,50,0.3)",
+                transition: "all 0.2s ease",
+              }}
+              title={`Open live KrishYantra website (${MAIN_SITE_URL}) in a new tab`}
+            >
+              <ExternalLink size={13} color="#ffffff" />
+              <span>Open Main KrishYantra App</span>
+            </a>
+
+            <span className="text-muted" style={{ fontSize: 12 }}>
+              KrishYantra Operations · {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          </div>
         </header>
 
         {/* Page content */}

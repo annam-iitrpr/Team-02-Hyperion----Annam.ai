@@ -51,29 +51,31 @@ export default function LoginPage() {
             style={{
               width: 52,
               height: 52,
-              background: "var(--primary)",
-              borderRadius: 12,
+              background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
+              borderRadius: 14,
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 16,
+              boxShadow: "0 4px 16px rgba(27,67,50,0.3)",
+              border: "1px solid #40916c",
             }}
           >
-            <Shield size={24} color="white" />
+            <Shield size={24} color="#d8f3dc" />
           </div>
           <h1
             style={{
               fontSize: 22,
-              fontWeight: 600,
+              fontWeight: 700,
               color: "var(--ink)",
               letterSpacing: "-0.5px",
               marginBottom: 6,
             }}
           >
-            AASRA Admin Panel
+            KrishYantra Admin Studio
           </h1>
           <p style={{ fontSize: 13, color: "var(--ink-subtle)" }}>
-            Secure administrative access only
+            Authorized Operations & Database Control Hub
           </p>
         </div>
 

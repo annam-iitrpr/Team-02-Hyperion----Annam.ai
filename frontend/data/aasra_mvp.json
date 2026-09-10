@@ -1,6 +1,6 @@
 {
   "version": "2.0.0-firebase",
-  "lastUpdated": "2026-09-10T09:39:55.888Z",
+  "lastUpdated": "2026-09-10T10:45:15.431Z",
   "settings": {
     "featureFlags": {
       "fieldMapping": true,
@@ -31,7 +31,7 @@
       "soilType": "Alluvial Sandy Loam",
       "sowingDate": "2026-07-15",
       "state": "Uttar Pradesh",
-      "updatedAt": "2026-09-03T17:45:00.000Z",
+      "updatedAt": "2026-09-10T10:45:15.431Z",
       "village": "Bilram"
     },
     {
@@ -89,29 +89,33 @@
       "village": "Village Area"
     },
     {
-      "id": "kisan-543210-1789033187853",
-      "fullName": "Ramesh Patel",
-      "mobileNumber": "9876543210",
-      "email": "ishaan@syngenta-aasra.in",
-      "language": "hi",
-      "state": "Madhya Pradesh",
+      "cropVariety": "Bollgard II",
       "district": "Sehore",
-      "village": "Village Area",
-      "fieldName": "Bt Cotton Main Field",
+      "email": "ishaan@syngenta-aasra.in",
+      "farmingExperience": "5-10 Years",
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
       "fieldAreaAcres": 21.54,
       "fieldAreaHa": 8.72,
-      "landOwnership": "Owner",
-      "farmingExperience": "5-10 Years",
-      "primaryCrop": "Bt Cotton",
-      "cropVariety": "Bollgard II",
-      "sowingDate": "2026-06-15",
-      "growthStage": "Flowering & Pod Formation",
-      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "irrigationType": "Borewell + Rainfed",
+      "fieldName": "Bt Cotton Main Field",
+      "fullName": "Ramesh Patel",
       "gpsLocation": {
         "lat": 23.15172473085266,
         "lon": 77.08436965942384
       },
+      "growthStage": "Flowering & Pod Formation",
+      "hasKisanCreditCard": true,
+      "id": "kisan-543210-1789033187853",
+      "irrigationType": "Borewell + Rainfed",
+      "landOwnership": "Owner",
+      "language": "hi",
+      "mobileNumber": "9876543210",
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "pmKisanBeneficiary": true,
       "polygon": [
         [
           23.2044,
@@ -130,42 +134,42 @@
           77.0832
         ]
       ],
-      "pestHistory": [
-        "Heat Stress Flower Drop"
-      ],
+      "preferredCommunication": "Voice + WhatsApp",
+      "primaryCrop": "Bt Cotton",
+      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "sowingDate": "2026-06-15",
+      "state": "Madhya Pradesh",
+      "updatedAt": "2026-09-10T09:39:55.888Z",
+      "village": "Village Area"
+    },
+    {
+      "cropVariety": "Bollgard II",
+      "district": "Rupnagar",
+      "email": "",
+      "farmingExperience": "1-3 Yrs",
       "fertilizersUsed": [
         "DAP",
         "Urea"
       ],
-      "hasKisanCreditCard": true,
-      "pmKisanBeneficiary": true,
-      "preferredCommunication": "Voice + WhatsApp",
-      "updatedAt": "2026-09-10T09:39:55.888Z"
-    },
-    {
-      "id": "kisan-787878-1789030845685",
-      "fullName": "ritvik",
-      "mobileNumber": "7878787878",
-      "email": "",
-      "language": "en",
-      "state": "Punjab",
-      "district": "Rupnagar",
-      "village": "Village Area",
-      "fieldName": "Bt Cotton Main Field",
       "fieldAreaAcres": 1.22,
       "fieldAreaHa": 0.49,
-      "landOwnership": "Owner",
-      "farmingExperience": "1-3 Yrs",
-      "primaryCrop": "Bt Cotton",
-      "cropVariety": "Bollgard II",
-      "sowingDate": "2026-06-15",
-      "growthStage": "Germination & Seedling",
-      "soilType": "Medium Black Clay Loam (मध्यम काली दोमट)",
-      "irrigationType": "Purely Rainfed",
+      "fieldName": "Bt Cotton Main Field",
+      "fullName": "ritvik",
       "gpsLocation": {
         "lat": 30.3136166899307,
         "lon": 76.51016235351564
       },
+      "growthStage": "Germination & Seedling",
+      "hasKisanCreditCard": true,
+      "id": "kisan-787878-1789030845685",
+      "irrigationType": "Purely Rainfed",
+      "landOwnership": "Owner",
+      "language": "en",
+      "mobileNumber": "7878787878",
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "pmKisanBeneficiary": true,
       "polygon": [
         [
           30.319265797099945,
@@ -184,38 +188,34 @@
           76.52502475593052
         ]
       ],
-      "pestHistory": [
-        "Heat Stress Flower Drop"
-      ],
-      "fertilizersUsed": [
-        "DAP",
-        "Urea"
-      ],
-      "hasKisanCreditCard": true,
-      "pmKisanBeneficiary": true,
       "preferredCommunication": "Voice + WhatsApp",
-      "updatedAt": "2026-09-10T09:04:10.870Z"
+      "primaryCrop": "Bt Cotton",
+      "soilType": "Medium Black Clay Loam (मध्यम काली दोमट)",
+      "sowingDate": "2026-06-15",
+      "state": "Punjab",
+      "updatedAt": "2026-09-10T09:04:10.870Z",
+      "village": "Village Area"
     },
     {
       "cropVariety": "JS-335",
-      "district": "Rupnagar",
+      "district": "Bhopal",
       "email": "",
-      "farmingExperience": "1-3 Yrs",
+      "farmingExperience": "1-3 Years",
       "fertilizersUsed": [
         "DAP",
         "Urea"
       ],
-      "fieldAreaAcres": 21.29,
-      "fieldAreaHa": 8.62,
+      "fieldAreaAcres": 26,
+      "fieldAreaHa": 10.52,
       "fieldName": "Soybean Main Field",
-      "fullName": "ishaan sen",
+      "fullName": "Ishaan Sen",
       "gpsLocation": {
-        "lat": 24.71648612684654,
-        "lon": 76.968412399292
+        "lat": 23.268571100000003,
+        "lon": 77.5152102
       },
       "growthStage": "Flowering & Pod Formation",
       "hasKisanCreditCard": true,
-      "id": "kisan-949347-1789006942011",
+      "id": "kisan-949347-1788360476317",
       "irrigationType": "Borewell + Rainfed",
       "landOwnership": "Owner",
       "language": "en",
@@ -226,33 +226,91 @@
       "pmKisanBeneficiary": true,
       "polygon": [
         [
-          24.71768612684654,
-          76.96690167045595
+          23.274647871699766,
+          77.5107764818967
         ],
         [
-          24.71798612684654,
-          76.97020167045595
+          23.273859410369944,
+          77.51636625879448
         ],
         [
-          24.71538612684654,
-          76.96980167045595
+          23.275495216393097,
+          77.5166498956698
         ],
         [
-          24.71508612684654,
-          76.96720167045595
+          23.276382470196953,
+          77.5111305250692
         ]
       ],
       "preferredCommunication": "Voice + WhatsApp",
       "primaryCrop": "Soybean",
-      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "soilType": "Black Cotton Soil (काली मिट्टी)",
       "sowingDate": "2026-06-15",
-      "state": "Punjab",
+      "state": "Madhya Pradesh",
       "tehsil": "Sehore",
-      "updatedAt": "2026-09-10T08:56:30.817Z",
+      "updatedAt": "2026-09-10T10:32:23.291Z",
       "village": "Village Area"
     }
   ],
   "fields": [
+    {
+      "area_acres": 21.54,
+      "created_at": "2026-09-10T09:39:55.883Z",
+      "crop": "Bt Cotton",
+      "id": "f-195883",
+      "lat": 23.15172473085266,
+      "lon": 77.08436965942384,
+      "name": "Bt Cotton Main Field",
+      "polygon": [
+        [
+          23.2044,
+          77.08290000000001
+        ],
+        [
+          23.2047,
+          77.0862
+        ],
+        [
+          23.202099999999998,
+          77.0858
+        ],
+        [
+          23.2018,
+          77.0832
+        ]
+      ],
+      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "variety": "Bollgard II"
+    },
+    {
+      "area_acres": 21.54,
+      "created_at": "2026-09-10T09:11:48.057Z",
+      "crop": "Bt Cotton",
+      "id": "f-508057",
+      "lat": 30.31654342009353,
+      "lon": 76.52361631393434,
+      "name": "Bt Cotton Main Field",
+      "polygon": [
+        [
+          23.2044,
+          77.08290000000001
+        ],
+        [
+          23.2047,
+          77.0862
+        ],
+        [
+          23.202099999999998,
+          77.0858
+        ],
+        [
+          23.2018,
+          77.0832
+        ]
+      ],
+      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "variety": "Bollgard II"
+    },
     {
       "area_acres": 21.54,
       "created_at": "2026-09-10T09:00:47.431Z",
@@ -397,64 +455,6 @@
       ],
       "soil_type": "Loamy Alluvial",
       "variety": "JG-11 Desi"
-    },
-    {
-      "id": "f-508057",
-      "name": "Bt Cotton Main Field",
-      "lat": 30.31654342009353,
-      "lon": 76.52361631393434,
-      "area_acres": 21.54,
-      "crop": "Bt Cotton",
-      "variety": "Bollgard II",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "polygon": [
-        [
-          23.2044,
-          77.08290000000001
-        ],
-        [
-          23.2047,
-          77.0862
-        ],
-        [
-          23.202099999999998,
-          77.0858
-        ],
-        [
-          23.2018,
-          77.0832
-        ]
-      ],
-      "created_at": "2026-09-10T09:11:48.057Z"
-    },
-    {
-      "id": "f-195883",
-      "name": "Bt Cotton Main Field",
-      "lat": 23.15172473085266,
-      "lon": 77.08436965942384,
-      "area_acres": 21.54,
-      "crop": "Bt Cotton",
-      "variety": "Bollgard II",
-      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "polygon": [
-        [
-          23.2044,
-          77.08290000000001
-        ],
-        [
-          23.2047,
-          77.0862
-        ],
-        [
-          23.202099999999998,
-          77.0858
-        ],
-        [
-          23.2018,
-          77.0832
-        ]
-      ],
-      "created_at": "2026-09-10T09:39:55.883Z"
     }
   ],
   "journal": [
