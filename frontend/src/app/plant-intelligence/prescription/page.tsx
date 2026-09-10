@@ -10,6 +10,12 @@ import { FarmCropSwitcher } from "@/components/FarmCropSwitcher";
 import { findCropMandiRate } from "@/lib/mandiEngine";
 import { predictCropYield } from "@/lib/yieldPredictionEngine";
 import {
+  generateFarmerWhyExplanation,
+  generateFarmerHowExplanation,
+  getSoilTypePersonalization,
+  getGeneralCulturalRecommendations,
+} from "@/lib/farmerAdvisoryEngine";
+import {
   FlaskConical,
   Droplets,
   Clock,
@@ -39,6 +45,10 @@ import {
   Info,
   Sprout,
   Cloud,
+  Lightbulb,
+  Sun,
+  HelpCircle,
+  Compass,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1871,6 +1881,58 @@ export default function PrescriptionCategoryPage() {
   const deltaT = pipelineData?.model2_readiness?.delta_t || 3.8;
   const spraySafe = pipelineData?.model2_readiness?.spray_window_safe ?? true;
 
+  // 8. Farmer-First Natural Language Advisory (No AI Slop / No Jargon)
+  const farmerWhy = useMemo(
+    () =>
+      generateFarmerWhyExplanation({
+        cropName: isHindi ? normalizedCrop.nameHi : normalizedCrop.nameEn,
+        cropKey: normalizedCrop.key,
+        growthStage,
+        productName: isHindi ? activeProduct.nameHi : activeProduct.name,
+        productCategory: isHindi ? activeProduct.categoryHi : activeProduct.category,
+        activeIngredient: activeProduct.activeIngredient,
+        targetPests: activeProduct.targetPests,
+        tempMax: pipelineData?.telemetry_summary?.temp_max_c || 35,
+        isHindi,
+      }),
+    [normalizedCrop, growthStage, activeProduct, pipelineData?.telemetry_summary?.temp_max_c, isHindi]
+  );
+
+  const farmerHow = useMemo(
+    () =>
+      generateFarmerHowExplanation({
+        productName: isHindi ? activeProduct.nameHi : activeProduct.name,
+        doseDisplay: activeProduct.doseDisplay,
+        acres,
+        totalWaterLiters,
+        knapsackTanks,
+        dosePerTank: dosePer15LTank,
+        doseUnit: activeProduct.doseUnit,
+        timingEn: activeProduct.timing,
+        timingHi: activeProduct.timingHi,
+        isHindi,
+      }),
+    [activeProduct, acres, totalWaterLiters, knapsackTanks, dosePer15LTank, isHindi]
+  );
+
+  const soilGuidance = useMemo(
+    () => getSoilTypePersonalization(soilType),
+    [soilType]
+  );
+
+  const culturalAdvisory = useMemo(
+    () =>
+      getGeneralCulturalRecommendations({
+        cropKey: normalizedCrop.key,
+        growthStage,
+        tempMax: pipelineData?.telemetry_summary?.temp_max_c || 35,
+        rainProb: pipelineData?.telemetry_summary?.rain_prob_next_48h || 10,
+        soilTypeRaw: soilType,
+        isHindi,
+      }),
+    [normalizedCrop.key, growthStage, pipelineData?.telemetry_summary?.temp_max_c, pipelineData?.telemetry_summary?.rain_prob_next_48h, soilType, isHindi]
+  );
+
   // Multilingual Speech Readout
   const handleListenPrescription = useCallback(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -1879,9 +1941,10 @@ export default function PrescriptionCategoryPage() {
       return;
     }
 
+    const firstWhy = isHindi ? farmerWhy.linesHi[0] : farmerWhy.linesEn[0];
     const textToSpeak = isHindi
-      ? `नमस्ते! आपके ${farmName} के ${acres} एकड़ ${normalizedCrop.nameHi} के लिए अनुशंसित सिंजेंटा समाधान ${activeProduct.nameHi} है। कुल मात्रा ${doseCalc.totalDisplay}, जिसे ${totalWaterLiters > 0 ? totalWaterLiters + " लीटर पानी में" : "मिट्टी में मिलाकर"} प्रयोग करें। समय पर छिड़काव से आपको लगभग ${netProfitOnTime.toLocaleString("en-IN")} रुपये का शुद्ध अतिरिक्त मुनाफा होगा।`
-      : `Prescription for ${farmName}, ${acres} acres of ${normalizedCrop.nameEn}. Recommended Syngenta solution is ${activeProduct.name}. Total required dosage is ${doseCalc.totalDisplay} in ${totalWaterLiters > 0 ? totalWaterLiters + " litres of water" : "dry soil broadcast"}. Applying on time protects ${totalQuintalsProtected} quintals valued at ${netProfitOnTime.toLocaleString("en-IN")} rupees net cash profit.`;
+      ? `राम-राम किसान भाई! आपके ${acres} एकड़ खेत में ${normalizedCrop.nameHi} के लिए अनुशंसित दवा ${activeProduct.nameHi} है। ${firstWhy} आपके खेत के लिए कुल मात्रा ${doseCalc.totalDisplay} है। लगभग ${knapsackTanks} पंप पानी में घोलकर सुबह या शाम छिड़कें।`
+      : `Hello! For your ${acres} acres of ${normalizedCrop.nameEn}, recommended solution is ${activeProduct.name}. Total required dosage is ${doseCalc.totalDisplay} mixed across ~${knapsackTanks} sprayer tanks. Apply during morning or evening hours for maximum yield protection.`;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = isHindi ? "hi-IN" : "en-IN";
@@ -1891,14 +1954,12 @@ export default function PrescriptionCategoryPage() {
   }, [
     isHindi,
     isSpeaking,
-    farmName,
     acres,
     normalizedCrop,
     activeProduct,
     doseCalc,
-    totalWaterLiters,
-    netProfitOnTime,
-    totalQuintalsProtected,
+    knapsackTanks,
+    farmerWhy,
   ]);
 
   return (
@@ -2019,16 +2080,16 @@ export default function PrescriptionCategoryPage() {
                   onClick={() => setSelectedProductIdx(idx)}
                   className={`p-4 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-3 ${
                     isSelected
-                      ? "bg-indigo-50/80 border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs"
-                      : "bg-[#f8fafc] hover:bg-slate-100/80 border-slate-200"
+                      ? "bg-[#e8f5e9] border-[#2d6a4f] ring-2 ring-[#2d6a4f]/20 shadow-xs"
+                      : "bg-[#fbfcf8] hover:bg-[#f0f5ee] border-[#e8ede4]"
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span
-                        className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full ${
+                        className={`text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full ${
                           idx === 0
-                            ? "bg-emerald-600 text-white"
+                            ? "bg-[#1b4332] text-white"
                             : "bg-slate-200 text-slate-700"
                         }`}
                       >
@@ -2040,85 +2101,202 @@ export default function PrescriptionCategoryPage() {
                           ? `वैकल्पिक #${idx}`
                           : `ALTERNATIVE #${idx}`}
                       </span>
-                      <span className="text-[11px] font-mono font-black text-indigo-700">
+                      <span className="text-[11px] font-mono font-black text-[#2d6a4f]">
                         {prod.rankScore} Score
                       </span>
                     </div>
-                    <span className="text-base font-extrabold text-[#0d253d] block font-display mt-1">
+                    <span className="text-base font-extrabold text-[#11261f] block font-display mt-1">
                       {isHindi ? prod.nameHi : prod.name}
                     </span>
-                    <span className="text-[11px] text-slate-500 block leading-snug line-clamp-2">
+                    <span className="text-[11px] text-slate-600 block leading-snug line-clamp-2">
                       {isHindi ? prod.categoryHi : prod.category}
                     </span>
                   </div>
 
-                  <div className="text-xs font-mono pt-2 border-t border-slate-200/60 flex items-center justify-between text-slate-700">
+                  <div className="text-xs font-mono pt-2 border-t border-[#e8ede4] flex items-center justify-between text-slate-700">
                     <span className="font-bold">{prod.doseDisplay}</span>
-                    <span className="text-emerald-700 font-bold">{prod.efficacyPct}% Efficacy</span>
+                    <span className="text-[#2d6a4f] font-bold">{prod.efficacyPct}% Efficacy</span>
                   </div>
                 </button>
               );
             })}
           </div>
 
-          {/* Detailed Specifications of Active Product */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-[#f6f9fc] to-indigo-50/30 border border-slate-200/90 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-xs font-mono font-bold text-indigo-700 uppercase tracking-wider block">
-                  {isHindi ? "सक्रिय संघटक व जैव-क्रियाविधि" : "ACTIVE INGREDIENT & BIOLOGICAL MODE OF ACTION"}
-                </span>
-                <h3 className="text-lg font-black text-[#0d253d]">
-                  {isHindi ? activeProduct.nameHi : activeProduct.name}
+          {/* ── 1. ACTIVE PRODUCT: WHY, HOW, PERSONALIZED DOSAGE & GENERAL ADVISORY ── */}
+          <div className="p-5 sm:p-7 rounded-3xl bg-[#f8faf7] border border-[#e8ede4] shadow-xs space-y-6">
+            
+            {/* Header: Product Identity & Personalized Dosage by Field Size + Soil Type */}
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-6 border-b border-[#e8ede4]">
+              
+              {/* Left Column: Solution Identity & Plain Layman Translation */}
+              <div className="space-y-2.5 max-w-2xl">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-mono font-extrabold text-[#1b4332] bg-[#e8f5e9] px-2.5 py-0.5 rounded-full border border-[#cbe5cb] uppercase tracking-wider">
+                    {isHindi ? "अनुशंसित पौध समाधान" : "RECOMMENDED FIELD SOLUTION"}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-600">
+                    {isHindi ? activeProduct.categoryHi : activeProduct.category}
+                  </span>
+                </div>
+
+                <h3 className="text-2xl font-black text-[#11261f] font-display tracking-tight flex items-center gap-2">
+                  <ShieldCheck className="h-6 w-6 text-[#2d6a4f] shrink-0" />
+                  <span>{isHindi ? activeProduct.nameHi : activeProduct.name}</span>
                 </h3>
-                <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
-                  <strong>{isHindi ? "घटक:" : "Composition:"}</strong> {activeProduct.activeIngredient}
-                  <br />
-                  <strong>{isHindi ? "क्रियाविधि:" : "Mechanism:"}</strong> {activeProduct.modeOfAction}
-                </p>
-                <p className="text-xs text-emerald-800 font-medium pt-1">
-                  💡 {isHindi ? activeProduct.whyChooseHi : activeProduct.whyChoose}
-                </p>
+
+                {/* Plain-Language Layman Translation Note */}
+                <div className="bg-white p-3.5 rounded-2xl border border-[#e8ede4] text-xs space-y-1.5">
+                  <div className="text-slate-600">
+                    <span className="font-bold text-slate-800">{isHindi ? "दवा का घटक (Composition):" : "Active Composition:"}</span>{" "}
+                    <span className="font-mono text-[11px] text-slate-700">{activeProduct.activeIngredient}</span>
+                  </div>
+                  {(farmerWhy.jargonTranslationHi || farmerWhy.jargonTranslationEn) && (
+                    <div className="text-emerald-900 font-medium pt-1.5 border-t border-slate-100 flex items-start gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0 mt-0.5" />
+                      <span>{isHindi ? farmerWhy.jargonTranslationHi : farmerWhy.jargonTranslationEn}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Exact Dosage Card for Farmer's Acreage */}
-              <div className="bg-white p-4 rounded-2xl border border-indigo-200/80 shadow-2xs space-y-1 sm:text-right shrink-0 min-w-[210px]">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">
-                  {isHindi ? `आपके ${acres} एकड़ हेतु कुल मात्रा` : `Calculated Total for ${acres} Acres`}
-                </span>
-                <span className="text-2xl font-mono font-black text-indigo-700 block">
-                  {doseCalc.totalDisplay}
-                </span>
-                <span className="text-xs text-slate-500 font-mono block">
-                  {totalWaterLiters > 0
-                    ? `(${totalWaterLiters.toLocaleString("en-IN")} L ${isHindi ? "पानी में घोलें" : "Water in Tank"})`
-                    : `(${isHindi ? "खेत में छिटकें / रेत संग मिलाएं" : "Soil Broadcast / Mix with sand"})`}
-                </span>
-                <div className="pt-2 mt-1 border-t border-slate-100">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold block">
-                    {isHindi ? "दुकान से खरीद हेतु अनुशंसित पैक:" : "Recommended Retail Packs:"}
+              {/* Right Column: Personalized Dosage Card (Field Size & Soil Type Grounded) */}
+              <div className="bg-white p-5 rounded-2xl border border-[#cbe5cb] shadow-xs space-y-3 shrink-0 lg:max-w-md w-full">
+                <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                  <span className="text-[11px] uppercase font-extrabold text-[#1b4332] tracking-wider flex items-center gap-1.5">
+                    <Compass className="h-3.5 w-3.5 text-[#2d6a4f]" />
+                    <span>{isHindi ? "आपके खेत व मिट्टी हेतु सही मात्रा" : "Personalized for Your Farm & Soil"}</span>
                   </span>
-                  <span className="text-xs font-extrabold text-emerald-800 font-mono block">
-                    {doseCalc.recommendedPacks}
+                  <span className="text-[10px] font-mono font-bold bg-[#e8f5e9] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#cbe5cb]">
+                    {acres} Acres
                   </span>
+                </div>
+
+                <div className="flex items-baseline justify-between gap-3">
+                  <div>
+                    <span className="text-xs text-slate-500 font-medium block">
+                      {isHindi ? "कुल आवश्यक दवा:" : "Calculated Total Requirement:"}
+                    </span>
+                    <span className="text-3xl font-mono font-black text-[#1b4332] block tracking-tight">
+                      {doseCalc.totalDisplay}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs text-slate-500 font-medium block">
+                      {isHindi ? "दुकान से पैक खरीदें:" : "Recommended Retail Pack:"}
+                    </span>
+                    <span className="text-sm font-extrabold text-[#2d6a4f] font-mono block">
+                      {doseCalc.recommendedPacks}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mixing & Pump Summary */}
+                <div className="text-xs text-slate-700 bg-[#fbfcf8] p-2.5 rounded-xl border border-[#e8ede4] flex items-center justify-between">
+                  <span className="font-semibold">
+                    {totalWaterLiters > 0
+                      ? isHindi
+                        ? `~${knapsackTanks} पंप (15L टैंक) पानी`
+                        : `~${knapsackTanks} Sprayer Tanks (15L)`
+                      : isHindi
+                      ? "दानेदार छिटकाव"
+                      : "Dry Granular Broadcast"}
+                  </span>
+                  <span className="font-mono font-bold text-[#1b4332]">
+                    {totalWaterLiters > 0 ? `${dosePer15LTank} ${activeProduct.doseUnit} / ${isHindi ? "पंप" : "tank"}` : ""}
+                  </span>
+                </div>
+
+                {/* Soil Guidance Note */}
+                <div className="pt-2 border-t border-slate-100 text-[11px] space-y-1">
+                  <div className="flex items-center gap-1 font-bold text-slate-800">
+                    <Sprout className="h-3.5 w-3.5 text-[#2d6a4f]" />
+                    <span>{isHindi ? soilGuidance.soilLabelHi : soilGuidance.soilLabelEn}</span>
+                  </div>
+                  <p className="text-slate-600 leading-snug">
+                    {isHindi ? soilGuidance.guidanceHi : soilGuidance.guidanceEn}
+                  </p>
                 </div>
               </div>
             </div>
 
+            {/* ── 2 & 3: THE "WHY" AND "HOW" 2-COLUMN DISPLAY ── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              
+              {/* THE "WHY" (यह दवा क्यों जरूरी है? - Max 3-4 lines, high trust) */}
+              <div className="bg-[#fdfcf7] border border-[#e6ecd8] rounded-2xl p-5 shadow-2xs space-y-3.5">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-xl bg-[#e8f5e9] flex items-center justify-center text-[#2d6a4f] shrink-0 border border-[#cbe5cb]">
+                    <Lightbulb className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-900 block">
+                      {isHindi ? "विश्वास व वैज्ञानिक कारण (WHY)" : "TRUST & AGRONOMIC REASONING (WHY)"}
+                    </span>
+                    <h4 className="text-base font-black text-[#11261f] font-display">
+                      {isHindi ? farmerWhy.headlineHi : farmerWhy.headlineEn}
+                    </h4>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs text-slate-700 leading-relaxed">
+                  {(isHindi ? farmerWhy.linesHi : farmerWhy.linesEn).map((line, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="h-4 w-4 rounded-full bg-[#e8f5e9] text-[#1b4332] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <p className="flex-1 font-medium">{line}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* THE "HOW" (दवा का सही छिड़काव कैसे करें? - Max 4 clear practical steps) */}
+              <div className="bg-[#f4f8f4] border border-[#d4e4d4] rounded-2xl p-5 shadow-2xs space-y-3.5">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-xl bg-[#e8f5e9] flex items-center justify-center text-[#2d6a4f] shrink-0 border border-[#cbe5cb]">
+                    <Droplets className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1b4332] block">
+                      {isHindi ? "खेत में सही उपयोग (HOW)" : "FIELD APPLICATION GUIDE (HOW)"}
+                    </span>
+                    <h4 className="text-base font-black text-[#11261f] font-display">
+                      {isHindi ? farmerHow.headlineHi : farmerHow.headlineEn}
+                    </h4>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs text-slate-700 leading-relaxed">
+                  {(isHindi ? farmerHow.stepsHi : farmerHow.stepsEn).map((step, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="h-4 w-4 rounded-full bg-[#1b4332] text-white font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <div className="flex-1">
+                        <strong className="text-slate-900 block font-semibold">{step.title}</strong>
+                        <p className="text-slate-600 font-medium">{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 4 Bottom Field Metrics Strip */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs pt-1">
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
+              <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4] shadow-2xs">
                 <span className="text-slate-400 font-mono text-[10px] uppercase block font-bold">
                   {isHindi ? "छिड़काव का सही समय" : "Application Timing"}
                 </span>
-                <span className="font-semibold text-slate-800 mt-0.5 block">
+                <span className="font-semibold text-slate-800 mt-1 block">
                   {isHindi ? activeProduct.timingHi : activeProduct.timing}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
+              <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4] shadow-2xs">
                 <span className="text-slate-400 font-mono text-[10px] uppercase block font-bold">
                   {isHindi ? "नोजल व स्प्रे टैंक" : "Sprayer & Water Tanks"}
                 </span>
-                <span className="font-semibold text-slate-800 mt-0.5 block">
+                <span className="font-semibold text-slate-800 mt-1 block">
                   {totalWaterLiters > 0
                     ? `~${knapsackTanks} ${isHindi ? "पंप (15L टैंक)" : "Knapsack Tanks (15L)"} @ ${dosePer15LTank} ${activeProduct.doseUnit}/${isHindi ? "टैंक" : "tank"}`
                     : isHindi
@@ -2126,23 +2304,77 @@ export default function PrescriptionCategoryPage() {
                     : "Direct Granular Broadcast"}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
+              <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4] shadow-2xs">
                 <span className="text-slate-400 font-mono text-[10px] uppercase block font-bold">
                   {isHindi ? "कुल उत्पाद खर्च" : "Estimated Product Cost"}
                 </span>
-                <span className="font-bold text-slate-900 mt-0.5 block font-mono text-sm">
+                <span className="font-bold text-[#1b4332] mt-1 block font-mono text-sm">
                   ₹{totalProductCost.toLocaleString("en-IN")} (@ ₹{activeProduct.costPerAcre}/ac)
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
+              <div className="p-3.5 rounded-xl bg-white border border-[#e8ede4] shadow-2xs">
                 <span className="text-slate-400 font-mono text-[10px] uppercase block font-bold">
                   {isHindi ? "लक्षित कीट / रोग" : "Target Pests & Stresses"}
                 </span>
-                <span className="font-semibold text-slate-800 mt-0.5 block truncate">
+                <span className="font-semibold text-slate-800 mt-1 block truncate">
                   {activeProduct.targetPests.join(", ")}
                 </span>
               </div>
             </div>
+
+            {/* ── iv. SEPARATE SQUARE BOX FOR GENERAL RECOMMENDATIONS (ZERO-COST CULTURAL PRACTICES) ── */}
+            {culturalAdvisory && (
+              <div className="mt-6 p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#fbfcf8] via-[#f8faf7] to-[#eef5ee] border-2 border-[#cbe5cb] shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#d9e8d9] pb-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-2xl bg-[#1b4332] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <Sprout className="h-5 w-5 text-emerald-300" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-mono font-extrabold bg-[#e8f5e9] text-[#1b4332] px-2.5 py-0.5 rounded-full border border-[#cbe5cb] uppercase tracking-wider">
+                          {isHindi ? "देसी खेत प्रबंधन • बिना किसी दवा खर्च के" : "ZERO-COST CULTURAL ADVISORY"}
+                        </span>
+                        <span className="text-[11px] text-emerald-800 font-semibold">
+                          {isHindi ? "सामान्य कृषि सलाह" : "General Agronomic Practices"}
+                        </span>
+                      </div>
+                      <h4 className="text-lg font-black text-[#11261f] font-display mt-0.5">
+                        {isHindi ? culturalAdvisory.headlineHi : culturalAdvisory.headlineEn}
+                      </h4>
+                    </div>
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium sm:text-right">
+                    {isHindi ? culturalAdvisory.subtitleHi : culturalAdvisory.subtitleEn}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                  {(isHindi ? culturalAdvisory.practicesHi : culturalAdvisory.practicesEn).map((practice, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white p-4 rounded-2xl border border-[#e8ede4] hover:border-[#cbe5cb] transition-all shadow-2xs space-y-2 flex flex-col justify-between"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{practice.icon}</span>
+                          <h5 className="font-extrabold text-sm text-[#11261f] font-display">
+                            {practice.title}
+                          </h5>
+                        </div>
+                        <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                          {practice.text}
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                        <span>{isHindi ? "देसी तरीका" : "Field Habit"}</span>
+                        <span className="text-emerald-700 font-bold">₹0 Cost</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
