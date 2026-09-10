@@ -154,10 +154,39 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Restore from saved profile immediately
-    const profile = getStoredProfile();
-    const activeLang = profile?.language || "en";
+    // Read stored language preference first from explicit key, then from registered profile, default to 'en'
+    let activeLang = "en";
+    try {
+      const stored = localStorage.getItem("aasra_selected_language");
+      if (stored && stored.trim().length > 0) {
+        activeLang = stored.trim();
+      } else {
+        const profile = getStoredProfile();
+        if (profile?.isRegistered && profile?.language) {
+          activeLang = profile.language;
+        }
+      }
+    } catch (_) {}
+
     setLanguageState(activeLang);
+
+    // Sync cookies properly based on activeLang so no stale Hindi or non-matching cookie lingers
+    const hostname = window.location.hostname;
+    const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+    const domains = ["", hostname, `.${hostname}`, isLocal ? "" : hostname.split(".").slice(-2).join(".")];
+
+    if (activeLang === "en") {
+      domains.forEach((d) => {
+        const dAttr = d ? `; domain=${d}` : "";
+        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${dAttr}`;
+        document.cookie = `googtrans=/auto/en; path=/${dAttr}`;
+      });
+    } else {
+      const domainAttr = isLocal ? "" : `; domain=${hostname}`;
+      const cookieValue = `/auto/${activeLang}`;
+      document.cookie = `googtrans=${cookieValue}; path=/;${domainAttr}`;
+      document.cookie = `googtrans=${cookieValue}; path=/;`;
+    }
 
     // Inject Google Translate widget
     window.googleTranslateElementInit = () => {
@@ -222,12 +251,18 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLanguageState(lang);
     setIsChangingLanguage(true);
 
-    // 2. Persist in profile and explicit language storage
-    const profile = getStoredProfile();
-    saveProfile({ ...profile, language: lang });
+    // 2. Persist in explicit language storage and update profile if it exists
     try {
       localStorage.setItem("aasra_selected_language", lang);
-    } catch {}
+      const raw = localStorage.getItem("aasra_farmer_profile");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          parsed.language = lang;
+          localStorage.setItem("aasra_farmer_profile", JSON.stringify(parsed));
+        }
+      }
+    } catch (_) {}
 
     // 3. Set googtrans cookie across all domain levels for Google Translate
     const hostname = window.location.hostname;
@@ -254,7 +289,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       });
     }
 
-    // 4. Drive Google Translate combo and perform a clean, swift reload to guarantee 100% of the entire page changes to that single language
+    // 4. Drive Google Translate combo and perform a clean reload so 100% of the page adopts the selected language
     applyGoogleTranslate(lang);
 
     setTimeout(() => {

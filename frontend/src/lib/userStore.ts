@@ -119,7 +119,7 @@ export const EMPTY_FARMER_PROFILE: FarmerProfile = {
   fullName: "",
   mobileNumber: "",
   email: "",
-  language: "hi",
+  language: "en",
   state: "Uttar Pradesh",
   district: "Agra",
   village: "",
@@ -312,7 +312,9 @@ export function saveProfile(profile: FarmerProfile): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem("aasra_farmer_profile", JSON.stringify(profile));
-    localStorage.setItem("aasra_is_logged_in", "true");
+    if (profile.isRegistered) {
+      localStorage.setItem("aasra_is_logged_in", "true");
+    }
     window.dispatchEvent(new CustomEvent("aasra-profile-updated", { detail: profile }));
   } catch (e) {
     console.error("Failed to save farmer profile", e);
