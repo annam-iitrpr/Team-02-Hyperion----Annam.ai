@@ -406,7 +406,7 @@ export default function DashboardPage() {
               </div>
               <p className="text-[11px] font-sans opacity-85 leading-tight">
                 {weather.windSpeed < 15 && weather.temperature < 33
-                  ? (language === "hi" ? "सिंजेंटा क्वांटिस व इसाबियन के अवशोषण के लिए अनुकूल स्थिति।" : "Ideal conditions for Quantis / Isabion foliar uptake.")
+                  ? (language === "hi" ? "पर्ण छिड़काव अवशोषण के लिए अनुकूल स्थिति।" : "Ideal conditions for foliar spray uptake.")
                   : (language === "hi" ? "तेज हवा या अधिक तापमान। देर शाम छिड़काव करें।" : "High wind drift or heat risk. Apply in late evening.")}
               </p>
             </div>

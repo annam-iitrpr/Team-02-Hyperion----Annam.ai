@@ -397,8 +397,8 @@ export default function PlantIntelligencePage() {
                 </div>
                 <p className="text-[11px] text-slate-500 font-sans">
                   {isHindi
-                    ? `${primaryProduct} (${recommendedDosage}) के लिए ${spraySafe ? "आदर्श" : "प्रतिकूल"} परिस्थितियाँ।`
-                    : `${spraySafe ? "Ideal" : "Adverse"} conditions for ${primaryProduct} (${recommendedDosage}) foliar uptake.`}
+                    ? (spraySafe ? "पर्ण छिड़काव अवशोषण के लिए अनुकूल परिस्थितियाँ।" : "प्रतिकूल वायुमंडलीय परिस्थितियाँ। छिड़काव स्थगित रखें।")
+                    : (spraySafe ? "Ideal atmospheric conditions for foliar spray uptake." : "Adverse conditions for foliar uptake. Hold spray.")}
                 </p>
               </div>
 
