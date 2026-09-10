@@ -520,14 +520,28 @@ def extract_variety(query: str, catalog_item: Dict[str, Any]) -> Tuple[Optional[
     return None, ""
 
 
-def resolve_nearest_mandi(lat: Optional[float], lon: Optional[float], district: Optional[str] = "", state: Optional[str] = "") -> Tuple[Dict[str, Any], Optional[float]]:
-    if district and district.strip():
-        clean_d = re.sub(r"District|Division|Mandi|Tahsil|Tehsil|City|Bypass", "", district, flags=re.I).strip().lower()
-        for m in MANDI_REGISTRY:
-            if m["district"].lower() == clean_d or any(a.lower() == clean_d for a in m["aliases"]):
-                dist = haversine_distance_km(lat, lon, m["lat"], m["lon"]) if (lat and lon) else None
-                return m, dist
+def resolve_district_coordinates(district: Optional[str] = "", state: Optional[str] = "") -> Optional[Dict[str, Any]]:
+    """
+    Dynamically resolve a district or place name to its real GPS coordinates (lat, lon, district, state).
+    """
+    if not district or not district.strip():
+        return None
+    clean_d = re.sub(r"District|Division|Mandi|Tahsil|Tehsil|City|Bypass", "", district, flags=re.I).strip().lower()
+    for m in MANDI_REGISTRY:
+        if m["district"].lower() == clean_d or clean_d in m["district"].lower() or any(a.lower() == clean_d for a in m["aliases"]):
+            return {
+                "lat": m["lat"],
+                "lon": m["lon"],
+                "district": m["district"],
+                "state": m["state"],
+                "mandi": m["name_en"],
+                "mandi_hi": m["name_hi"],
+            }
+    return None
 
+
+def resolve_nearest_mandi(lat: Optional[float], lon: Optional[float], district: Optional[str] = "", state: Optional[str] = "") -> Tuple[Dict[str, Any], Optional[float]]:
+    # 1. If physical GPS coordinates are provided, prioritize nearest APMC geospatial lookup!
     if lat and lon and 6.0 <= lat <= 38.0 and 68.0 <= lon <= 98.0:
         best_m = MANDI_REGISTRY[0]
         min_d = float("inf")
@@ -538,6 +552,15 @@ def resolve_nearest_mandi(lat: Optional[float], lon: Optional[float], district: 
                 best_m = m
         return best_m, min_d
 
+    # 2. If district is specified and coordinates are absent, resolve by district
+    if district and district.strip():
+        clean_d = re.sub(r"District|Division|Mandi|Tahsil|Tehsil|City|Bypass", "", district, flags=re.I).strip().lower()
+        for m in MANDI_REGISTRY:
+            if m["district"].lower() == clean_d or any(a.lower() == clean_d for a in m["aliases"]):
+                dist = haversine_distance_km(lat, lon, m["lat"], m["lon"]) if (lat and lon) else None
+                return m, dist
+
+    # 3. If state is specified
     if state and state.strip():
         clean_s = state.strip().lower()
         for m in MANDI_REGISTRY:

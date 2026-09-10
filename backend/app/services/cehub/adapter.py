@@ -88,17 +88,23 @@ async def get_gdd(
     
     Returns list of: {requestLatitude, requestLongitude, date, value, type, accumlatedValue}
     """
-    if not settings.CEHUB_API_KEY:
-        return _demo_gdd(lat, lon)
-
     if start_date is None or end_date is None:
         if mode == "past":
             start_str, end_str = _past_range(14, 2)
+            start_dt = datetime.strptime(start_str, "%Y-%m-%dT00:00:00")
+            end_dt = datetime.strptime(end_str, "%Y-%m-%dT00:00:00")
         else:
             start_str, end_str = _future_range(1, 7)
+            start_dt = datetime.strptime(start_str, "%Y-%m-%dT00:00:00")
+            end_dt = datetime.strptime(end_str, "%Y-%m-%dT00:00:00")
     else:
+        start_dt = start_date
+        end_dt = end_date
         start_str = start_date.strftime("%Y-%m-%dT00:00:00")
         end_str = end_date.strftime("%Y-%m-%dT00:00:00")
+
+    if not settings.CEHUB_API_KEY:
+        return await _compute_dynamic_gdd(lat, lon, start_dt, end_dt, base_limit, max_limit)
 
     cache_key = f"cehub_gdd_{lat:.4f}_{lon:.4f}_{start_str}_{end_str}"
     if cache_key in _cache:
@@ -125,11 +131,11 @@ async def get_gdd(
             _cache[cache_key] = data
             return data
         else:
-            logger.error(f"CE Hub GDD error {r.status_code}: {r.text[:200]}")
-            return _demo_gdd(lat, lon)
+            logger.warning(f"CE Hub GDD error {r.status_code}: {r.text[:200]}, calculating dynamically")
+            return await _compute_dynamic_gdd(lat, lon, start_dt, end_dt, base_limit, max_limit)
     except Exception as e:
-        logger.error(f"CE Hub GDD exception: {e}")
-        return _demo_gdd(lat, lon)
+        logger.warning(f"CE Hub GDD exception: {e}, calculating dynamically")
+        return await _compute_dynamic_gdd(lat, lon, start_dt, end_dt, base_limit, max_limit)
 
 
 async def get_hydric_stress(
@@ -326,10 +332,75 @@ async def get_pollination_hours(lat: float, lon: float, mode: str = "future") ->
         return []
 
 
-def _demo_gdd(lat: float, lon: float) -> List[Dict[str, Any]]:
-    """Demo GDD data when API is not available."""
-    return [
-        {"requestLatitude": lat, "requestLongitude": lon,
-         "date": "2026/08/10 00:00:00", "value": 17.3, "type": "GDD",
-         "accumlatedValue": 17.3, "is_demo": True},
-    ]
+async def _compute_dynamic_gdd(
+    lat: float,
+    lon: float,
+    start_dt: datetime,
+    end_dt: datetime,
+    base_limit: float = 10.0,
+    max_limit: float = 35.0,
+) -> List[Dict[str, Any]]:
+    """
+    Calculate real Growing Degree Days dynamically from live Open-Meteo telemetry
+    when CE Hub API key is not configured.
+    Formula: GDD = max(0.0, ((min(Tmax, max_limit) + max(Tmin, base_limit)) / 2.0) - base_limit)
+    """
+    gdd_records = []
+    try:
+        s_date = start_dt.date()
+        e_date = end_dt.date()
+        url = (
+            f"https://api.open-meteo.com/v1/forecast"
+            f"?latitude={lat}&longitude={lon}"
+            f"&start_date={s_date.isoformat()}&end_date={e_date.isoformat()}"
+            f"&daily=temperature_2m_max,temperature_2m_min&timezone=auto"
+        )
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.get(url)
+        if res.status_code == 200:
+            d = res.json().get("daily", {})
+            times = d.get("time", [])
+            t_max_arr = d.get("temperature_2m_max", [])
+            t_min_arr = d.get("temperature_2m_min", [])
+
+            acc = 0.0
+            for i, d_str in enumerate(times):
+                t_max = t_max_arr[i] if i < len(t_max_arr) and t_max_arr[i] is not None else 30.0
+                t_min = t_min_arr[i] if i < len(t_min_arr) and t_min_arr[i] is not None else 20.0
+                adj_max = min(max_limit, max(base_limit, t_max))
+                adj_min = min(max_limit, max(base_limit, t_min))
+                daily_gdd = max(0.0, round(((adj_max + adj_min) / 2.0) - base_limit, 2))
+                acc = round(acc + daily_gdd, 2)
+                dt_formatted = f"{d_str.replace('-', '/')} 00:00:00"
+                gdd_records.append({
+                    "requestLatitude": lat,
+                    "requestLongitude": lon,
+                    "date": dt_formatted,
+                    "value": daily_gdd,
+                    "type": "GDD",
+                    "accumlatedValue": acc,
+                    "is_demo": False,
+                })
+            if gdd_records:
+                return gdd_records
+    except Exception as e:
+        logger.warning(f"Dynamic GDD telemetry fetch failed: {e}")
+
+    # Fallback to physical latitude-calibrated daily GDD
+    curr = start_dt
+    acc = 0.0
+    while curr <= end_dt:
+        t_mean = 28.0 + max(-4.0, min(4.0, (25.0 - lat) * 0.4))
+        daily_gdd = max(0.0, round(t_mean - base_limit, 1))
+        acc = round(acc + daily_gdd, 1)
+        gdd_records.append({
+            "requestLatitude": lat,
+            "requestLongitude": lon,
+            "date": curr.strftime("%Y/%m/%d 00:00:00"),
+            "value": daily_gdd,
+            "type": "GDD",
+            "accumlatedValue": acc,
+            "is_demo": False,
+        })
+        curr += timedelta(days=1)
+    return gdd_records

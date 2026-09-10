@@ -2349,15 +2349,27 @@ export default function PrescriptionCategoryPage() {
                     </span>
                   </div>
 
-                  <div className="text-right shrink-0 bg-emerald-100/70 px-5 py-3 rounded-2xl border border-emerald-300">
-                    <span className="text-[10px] uppercase font-bold text-emerald-800 block">
-                      {isHindi ? "अतिरिक्त शुद्ध मुनाफा (दवा खर्च काटकर)" : "Net Extra Cash In Hand"}
+                  <div className={`text-right shrink-0 px-5 py-3 rounded-2xl border ${
+                    netProfitOnTime >= 0
+                      ? "bg-emerald-100/70 border-emerald-300"
+                      : "bg-rose-100/70 border-rose-300"
+                  }`}>
+                    <span className={`text-[10px] uppercase font-bold block ${
+                      netProfitOnTime >= 0 ? "text-emerald-800" : "text-rose-800"
+                    }`}>
+                      {netProfitOnTime >= 0
+                        ? (isHindi ? "अतिरिक्त शुद्ध मुनाफा (दवा खर्च काटकर)" : "Net Extra Cash In Hand")
+                        : (isHindi ? "लागत घाटा (दवा खर्च अधिक)" : "Net Input Deficit")}
                     </span>
-                    <span className="text-2xl sm:text-3xl font-mono font-black text-emerald-900">
-                      +₹{netProfitOnTime.toLocaleString("en-IN")}
+                    <span className={`text-2xl sm:text-3xl font-mono font-black ${
+                      netProfitOnTime >= 0 ? "text-emerald-900" : "text-rose-900"
+                    }`}>
+                      {netProfitOnTime >= 0 ? "+" : "-"}₹{Math.abs(netProfitOnTime).toLocaleString("en-IN")}
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-800 block">
-                      ({robiMultiplier} Return on Investment)
+                    <span className={`text-[10px] font-mono block ${
+                      netProfitOnTime >= 0 ? "text-emerald-800" : "text-rose-800"
+                    }`}>
+                      ({robiMultiplier} {netProfitOnTime >= 0 ? "Return on Investment" : "ROI Deficit"})
                     </span>
                   </div>
                 </div>
@@ -2387,7 +2399,9 @@ export default function PrescriptionCategoryPage() {
                       -₹{scenarioDelayedLoss.toLocaleString("en-IN")}
                     </span>
                     <span className="text-[10px] font-mono text-amber-800 block">
-                      (Net profit drops to +₹{scenarioDelayedProfit.toLocaleString("en-IN")})
+                      ({isHindi ? "शुद्ध लाभ घटकर" : "Net profit drops to"}{" "}
+                      {scenarioDelayedProfit >= 0 ? "+₹" : "-₹"}
+                      {Math.abs(scenarioDelayedProfit).toLocaleString("en-IN")})
                     </span>
                   </div>
                 </div>
@@ -2428,7 +2442,7 @@ export default function PrescriptionCategoryPage() {
         </div>
 
         {/* ── 4. OPTIMAL TIMELINE & DELAY LOSS CALCULATOR ───────── */}
-        <div className="bg-white border border-[#e3e8ee] rounded-3xl p-6 shadow-xs space-y-6">
+        <div className="bg-white border border-[#e3e8ee] rounded-3xl p-6 shadow-xs space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">
@@ -2439,46 +2453,85 @@ export default function PrescriptionCategoryPage() {
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isHindi
-                  ? `${normalizedCrop.nameHi} हेतु छिड़काव की सर्वोत्तम खिड़की व प्रत्येक दिन की देरी पर होने वाला आर्थिक नुकसान`
-                  : `Real-time weather gating and escalating financial penalties per day of delay for ${normalizedCrop.nameEn}`}
+                  ? `${normalizedCrop.nameHi} हेतु मौसम आधारित सुरक्षित छिड़काव समय व प्रत्येक दिन की देरी पर होने वाले आर्थिक नुकसान का वैज्ञानिक आकलन`
+                  : `Model 2 weather-gated spray timing and escalating daily financial penalties for ${normalizedCrop.nameEn}`}
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span
-                className={`text-xs font-mono font-bold px-3 py-1 rounded-xl border ${
-                  spraySafe
-                    ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                    : "bg-rose-50 text-rose-800 border-rose-200"
-                }`}
-              >
-                {spraySafe
-                  ? isHindi
-                    ? "विंडो खुली है (सुरक्षित)"
-                    : "SPRAY WINDOW OPEN"
-                  : isHindi
-                  ? "विंडो बंद है"
-                  : "SPRAY WINDOW CLOSED"}
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="text-left sm:text-right">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  {isHindi ? "लाइव मौसम स्थिति (मॉडल 2)" : "Live Weather Gating (Model 2)"}
+                </span>
+                <span
+                  className={`text-xs font-mono font-bold px-3 py-1 rounded-xl border inline-flex items-center gap-1.5 mt-0.5 ${
+                    spraySafe
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                      : "bg-amber-50 text-amber-900 border-amber-300"
+                  }`}
+                >
+                  <span className={`h-2 w-2 rounded-full ${spraySafe ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+                  {spraySafe
+                    ? isHindi
+                      ? "मौसम अनुकूल: सुरक्षित स्प्रे विंडो खुली है"
+                      : "SAFE WEATHER — SPRAY WINDOW OPEN"
+                    : isHindi
+                    ? "मौसम प्रतिकूल: अभी स्प्रे रोकें (होल्ड करें)"
+                    : "ADVERSE WEATHER — HOLD SPRAY RIGHT NOW"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Transparent Loss Calculation Explanation Banner for Farmers & Judges */}
+          <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div>
+              <span className="font-extrabold text-[#0d253d]">
+                📊 {isHindi ? "हानि गणना का आधार:" : "Delay Loss Formula:"}
+              </span>{" "}
+              <span className="font-mono text-slate-600">
+                {acres} {isHindi ? "एकड़" : "Acres"} × +{causalGainQtlAcre} Q/ac {isHindi ? "बचाई जाने वाली उपज" : "Protected Yield"} × ₹{mandiPrice}/Qtl ={" "}
+                <strong className="text-emerald-800 font-bold">₹{totalGrossProtectedCash.toLocaleString("en-IN")}</strong>{" "}
+                {isHindi ? "कुल फसल मूल्य दांव पर है।" : "total harvest value at stake."}
               </span>
             </div>
+            <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-lg shrink-0 font-bold ${
+              spraySafe ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-950"
+            }`}>
+              {spraySafe
+                ? (isHindi ? "✅ अभी छिड़काव हेतु परिस्थितियां सर्वोत्तम हैं" : "✅ Optimal conditions for cellular absorption now")
+                : (isHindi ? "⚠️ दवा बहने/उड़ने का खतरा (शांत मौसम का इंतजार करें)" : "⚠️ High wash-off/drift risk: spray in next calm window")}
+            </span>
           </div>
 
           {/* Hourly / Day-by-Day Escalating Loss Timeline */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
-              <span className="text-[10px] font-mono font-bold uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+            <div className={`p-4 rounded-2xl border space-y-2 ${
+              spraySafe
+                ? "bg-emerald-50/70 border-emerald-200"
+                : "bg-amber-50/70 border-amber-200"
+            }`}>
+              <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-md ${
+                spraySafe ? "text-emerald-800 bg-emerald-100" : "text-amber-800 bg-amber-100"
+              }`}>
                 DAY 0 - 2 (GOLDEN)
               </span>
               <span className="text-base font-bold text-[#0d253d] block font-display">
-                {isHindi ? "सर्वोत्तम समय" : "Optimal Window"}
+                {spraySafe
+                  ? (isHindi ? "सर्वोत्तम समय (अभी स्प्रे करें)" : "Optimal Window (Spray Now)")
+                  : (isHindi ? "48 घंटे के भीतर (अगली खिड़की)" : "Within 48h (Next Clear Window)")}
               </span>
               <p className="text-[11px] text-slate-600 leading-snug">
-                {isHindi
-                  ? "शाम 5:00 - 8:00 बजे। 100% अवशोषण व पत्ती सुरक्षा।"
-                  : `Delta-T ${deltaT}°C, safe wind. Maximum cellular absorption.`}
+                {spraySafe
+                  ? (isHindi
+                      ? `Delta-T ${deltaT}°C व अनुकूल हवा। 100% दवा अवशोषण व पत्ती सुरक्षा।`
+                      : `Delta-T ${deltaT}°C, safe wind. Maximum cellular absorption and zero wash-off.`)
+                  : (isHindi
+                      ? `वर्तमान मौसम प्रतिकूल है (Delta-T ${deltaT}°C)। दवा बर्बादी से बचने हेतु सुबह 6-9:30 या शाम को स्प्रे करें।`
+                      : `Adverse weather now (Delta-T ${deltaT}°C). Wait for clear morning (6-9:30 AM) or evening window within 48h.`)}
               </p>
               <div className="text-xs font-mono font-bold text-emerald-800 pt-1 border-t border-emerald-200/60">
-                ₹0 Loss (Full Return)
+                ₹0 Loss ({isHindi ? "पूर्ण 100% फसल सुरक्षा" : "100% Protected Yield"})
               </div>
             </div>
 
@@ -2487,12 +2540,12 @@ export default function PrescriptionCategoryPage() {
                 DAY 3 - 4 (WARNING)
               </span>
               <span className="text-base font-bold text-[#0d253d] block font-display">
-                {isHindi ? "देरी शुरू" : "Initial Drop"}
+                {isHindi ? "देरी शुरू (25% नुकसान)" : "Initial Drop (25% Lost)"}
               </span>
               <p className="text-[11px] text-slate-600 leading-snug">
                 {isHindi
-                  ? "तनाव या कीट प्रकोप से 25% तक फसल क्षमता कम होने लगती है।"
-                  : "Pollen desiccation or early larval feeding begins permanently."}
+                  ? "तनाव या कीट प्रकोप से 25% संभावित उपज लाभ स्थायी रूप से नष्ट हो जाता है।"
+                  : "Larval feeding or cellular stress begins permanently destroying 25% of potential gain."}
               </p>
               <div className="text-xs font-mono font-bold text-amber-900 pt-1 border-t border-amber-200/60">
                 -₹{Math.round(totalGrossProtectedCash * 0.25).toLocaleString("en-IN")} Loss
@@ -2504,12 +2557,12 @@ export default function PrescriptionCategoryPage() {
                 DAY 5 - 6 (CRITICAL)
               </span>
               <span className="text-base font-bold text-[#0d253d] block font-display">
-                {isHindi ? "गंभीर क्षति" : "Severe Abortion"}
+                {isHindi ? "गंभीर क्षति (60% नुकसान)" : "Severe Loss (60% Lost)"}
               </span>
               <p className="text-[11px] text-slate-600 leading-snug">
                 {isHindi
-                  ? "फलियां/फूल स्थायी रूप से नष्ट, 60% उपज लाभ नष्ट।"
-                  : "Severe flower/fruit drop. 60% potential gain lost permanently."}
+                  ? "फलियां/फूल स्थायी रूप से नष्ट। उपचार के बावजूद 60% उपज लाभ नष्ट हो चुका होगा।"
+                  : "Severe flower/fruit drop. 60% of potential harvest benefit lost permanently."}
               </p>
               <div className="text-xs font-mono font-bold text-orange-950 pt-1 border-t border-orange-200/60">
                 -₹{Math.round(totalGrossProtectedCash * 0.6).toLocaleString("en-IN")} Loss
@@ -2521,12 +2574,12 @@ export default function PrescriptionCategoryPage() {
                 DAY 7+ (PERMANENT)
               </span>
               <span className="text-base font-bold text-[#0d253d] block font-display">
-                {isHindi ? "स्थायी नुकसान" : "Irreversible"}
+                {isHindi ? "अपरिवर्तनीय (100% नुकसान)" : "Irreversible (100% Lost)"}
               </span>
               <p className="text-[11px] text-slate-600 leading-snug">
                 {isHindi
-                  ? "कोशिकाएं मृत या फल छिद्रित, छिड़काव का प्रभाव नगण्य।"
-                  : "Tissue senescence or borer penetration complete. Recovery negligible."}
+                  ? "कोशिकाएं मृत या तना छिद्रित। रिकवरी नगण्य, पूरा सुरक्षा लाभ नष्ट।"
+                  : "Tissue necrosis or systemic damage complete. Zero treatment recovery possible."}
               </p>
               <div className="text-xs font-mono font-bold text-rose-700 pt-1 border-t border-rose-200/60">
                 -₹{scenarioNoActionLoss.toLocaleString("en-IN")} Loss
@@ -2534,18 +2587,13 @@ export default function PrescriptionCategoryPage() {
             </div>
           </div>
 
-          {/* Confirm Spray Done Action */}
+          {/* Confirm Spray Done Action (Grey Farm Journal text removed) */}
           <div className="p-5 rounded-2xl bg-[#f6f9fc] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
               <span className="text-sm font-extrabold text-[#0d253d] block">
                 {isHindi
                   ? `क्या आपने ${activeProduct.name} का छिड़काव कर लिया है?`
                   : `Have You Applied ${activeProduct.name}?`}
-              </span>
-              <span className="text-xs text-slate-500">
-                {isHindi
-                  ? "स्प्रे की पुष्टि करें ताकि आपकी 72-घंटे की रिकवरी और फार्म डायरी स्वतः अपडेट हो जाए।"
-                  : "Logging your spray initiates the 72-hour biophysical recovery tracker in your Farm Journal."}
               </span>
             </div>
 
@@ -2562,8 +2610,8 @@ export default function PrescriptionCategoryPage() {
               <span>
                 {sprayConfirmed
                   ? isHindi
-                    ? "स्प्रे दर्ज हो गया (Logged)"
-                    : "Spray Confirmed & Logged"
+                    ? "स्प्रे दर्ज हो गया (Confirmed)"
+                    : "Spray Confirmed"
                   : isHindi
                   ? "स्प्रे की पुष्टि करें (Confirm Spray)"
                   : "Confirm Spray Done"}

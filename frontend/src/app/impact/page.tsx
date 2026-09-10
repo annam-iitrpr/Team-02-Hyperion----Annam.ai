@@ -351,13 +351,13 @@ export default function ImpactPage() {
               </div>
             </div>
 
-            {/* 3 Metric Cards Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* 2 Metric Cards Row (Baseline vs With Shielding) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
               {/* 1. BASELINE POTENTIAL */}
-              <div className="p-5 rounded-2xl bg-[#f8faf7] border border-[#e8ede4] space-y-1.5 shadow-2xs">
+              <div className="p-5 rounded-2xl bg-[#f8faf7] border border-[#e8ede4] space-y-2 shadow-2xs">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
-                  BASELINE POTENTIAL (MODEL 5)
+                  {isHindi ? "आधारभूत संभावित उपज (मॉडल 5)" : "BASELINE POTENTIAL (MODEL 5)"}
                 </span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-mono font-black text-[#11261f]">
@@ -365,41 +365,32 @@ export default function ImpactPage() {
                   </span>
                   <span className="text-xs text-slate-500 font-bold">qtl / acre</span>
                 </div>
-                <span className="text-xs text-slate-500 block font-medium">
-                  Total Farm Potential: {totalBaseline} Quintals
-                </span>
-              </div>
-
-              {/* 2. UNTREATED (HEAT DAMAGED) */}
-              <div className="p-5 rounded-2xl bg-rose-50/60 border border-rose-200/80 space-y-1.5 shadow-2xs">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">
-                  UNTREATED (COUNTERFACTUAL)
-                </span>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-mono font-black text-rose-600">
-                    {untreatedYield}
-                  </span>
-                  <span className="text-xs text-rose-600 font-bold">qtl / acre</span>
+                <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-2 border-t border-slate-200/60">
+                  <span>{isHindi ? `कुल खेत क्षमता: ${totalBaseline} क्विंटल` : `Total Farm Output: ${totalBaseline} Quintals`}</span>
+                  <span className="font-mono font-semibold">{isHindi ? `अनुमानित आय: ₹${untreatedRevenue.toLocaleString("en-IN")}` : `Expected Revenue: ₹${untreatedRevenue.toLocaleString("en-IN")}`}</span>
                 </div>
-                <span className="text-xs text-rose-700 font-semibold block">
-                  Revenue: ₹{untreatedRevenue.toLocaleString("en-IN")}
-                </span>
               </div>
 
-              {/* 3. WITH INTERVENTIONS (MITIGATED) */}
-              <div className="p-5 rounded-2xl bg-[#e8f5e9]/70 border border-[#cbe5cb] space-y-1.5 shadow-2xs">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 block">
-                  WITH SHIELDING (PREDICTED)
-                </span>
+              {/* 2. WITH INTERVENTIONS (SHIELDED) */}
+              <div className="p-5 rounded-2xl bg-[#e8f5e9]/70 border border-[#cbe5cb] space-y-2 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 block">
+                    {isHindi ? "उपचार के साथ (मॉडल 6 अनुमानित)" : "WITH SHIELDING (PREDICTED)"}
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
+                    +{yieldGainPerAcre} qtl/ac
+                  </span>
+                </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-mono font-black text-[#1b4332]">
                     {mitigatedYield}
                   </span>
                   <span className="text-xs text-emerald-700 font-bold">qtl / acre</span>
                 </div>
-                <span className="text-xs text-[#1b4332] font-bold block">
-                  Revenue: ₹{mitigatedRevenue.toLocaleString("en-IN")} (+₹{diffRevenue.toLocaleString("en-IN")})
-                </span>
+                <div className="flex items-center justify-between text-xs text-[#1b4332] font-bold pt-2 border-t border-emerald-200/60">
+                  <span>{isHindi ? `कुल सुरक्षित उपज: ${(mitigatedYield * acres).toFixed(1)} क्विंटल` : `Total Output: ${(mitigatedYield * acres).toFixed(1)} Quintals`}</span>
+                  <span className="font-mono">₹{mitigatedRevenue.toLocaleString("en-IN")} (+₹{diffRevenue.toLocaleString("en-IN")})</span>
+                </div>
               </div>
 
             </div>

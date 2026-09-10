@@ -34,6 +34,8 @@ export interface UnifiedPipelineResponse {
     readiness_score: number;
     delta_t: number;
     safety_reasons: string[];
+    spray_window_label?: string;
+    spray_window_reason?: string;
   };
   model3_portfolio: {
     top_recommendations: Array<{

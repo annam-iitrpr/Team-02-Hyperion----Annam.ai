@@ -114,6 +114,49 @@ const REGIONAL_VARIETY_POTENTIALS: Record<string, Record<string, number>> = {
     "kufrijyoti": 95.0,
     "default": 90.0,
   },
+  sugarcane: {
+    "co0238": 380.0,
+    "co86032": 410.0,
+    "co0118": 360.0,
+    "com0265": 430.0,
+    "default": 350.0,
+  },
+  ganna: {
+    "co0238": 380.0,
+    "co86032": 410.0,
+    "co0118": 360.0,
+    "com0265": 430.0,
+    "default": 350.0,
+  },
+  groundnut: {
+    "gg20": 14.0,
+    "tag24": 15.5,
+    "kadiri6": 13.8,
+    "default": 13.5,
+  },
+  moongphali: {
+    "default": 13.5,
+  },
+  bajra: {
+    "hybrid": 14.5,
+    "desi": 12.0,
+    "default": 13.0,
+  },
+  jowar: {
+    "maldandi": 12.5,
+    "csh16": 14.0,
+    "default": 12.0,
+  },
+  barley: {
+    "rd2035": 19.5,
+    "default": 18.0,
+  },
+  garlic: {
+    "default": 45.0,
+  },
+  ginger: {
+    "default": 65.0,
+  },
 };
 
 export function predictCropYield(input: YieldPredictionInput): YieldPredictionOutput {
