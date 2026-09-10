@@ -220,7 +220,7 @@ export default function AdminCopilotPage() {
               `Model 2 (Spray Gate): Verdict = ${d?.model2_spray_gate?.decision || "BLOCKED"} (${d?.model2_spray_gate?.reason || "High Temp Scorch Risk"}).`,
               `Model 3 (Syngenta Portfolio): Ranked ${d?.model3_syngenta_match?.recommended_products?.length || 3} bio-stimulants / crop solutions.`,
               `Model 5 (Yield Baseline): Benchmarked baseline expected yield at ${d?.model5_yield_baseline?.predicted_yield_baseline_q_ha || "18.4"} Q/Ha.`,
-              `Model 6 (Causal Double ML): Estimated net ROBI uplift multiplier = ${d?.model6_causal_robi?.predicted_robi_multiplier || "2.14"}x with 95% confidence interval.`,
+              `Model 6 (Causal Double ML): Estimated net ROBI uplift multiplier = ${String(d?.model6_causal_robi?.robi_ratio || d?.model6_causal_robi?.predicted_robi_multiplier || "2.14").replace(/x$/, "")}x with 95% confidence interval.`,
             ],
             whatWasNotDone: [
               "Model 4 was omitted (architecture is 5-model: M1, M2, M3, M5, M6 per project design).",
