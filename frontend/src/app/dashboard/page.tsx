@@ -15,7 +15,6 @@ import { useFarm } from "@/context/FarmContext";
 import { calculateDeterministicROI } from "@/lib/calculations/roiEngine";
 import { findCropMandiRate } from "@/lib/mandiEngine";
 import { resolveDistrictCoordinatesAsync } from "@/lib/districtCoords";
-import { ClosedLoopDashboardCard } from "@/components/ClosedLoopDashboardCard";
 import {
   Sun,
   RefreshCw,
@@ -240,16 +239,6 @@ export default function DashboardPage() {
               <span>{language === "hi" ? "खेत विवरण बदलें" : "Edit Farm Details"}</span>
             </Link>
           </div>
-
-        {/* 🌟 Model 4 · Closed-Loop Pharmacovigilance & 48h WhatsApp Verification (Featured at Top) */}
-        <div id="closed-loop-section">
-          <ClosedLoopDashboardCard
-            district={currentDistrict}
-            crop={currentCrop}
-            acres={currentAcres}
-            farmerName={profile.fullName}
-          />
-        </div>
 
         {/* Real-Time Telemetry & Sensors Permission Hub - Compact and Auto-Hides when Granted */}
         <RealtimePermissionsHub

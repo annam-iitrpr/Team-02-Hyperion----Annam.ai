@@ -116,7 +116,33 @@ export const DEMO_FARMER_PROFILE: FarmerProfile = {
 };
 
 export const EMPTY_FARMER_PROFILE: FarmerProfile = {
-  ...DEMO_FARMER_PROFILE,
+  fullName: "",
+  mobileNumber: "",
+  email: "",
+  language: "hi",
+  state: "Uttar Pradesh",
+  district: "Agra",
+  village: "",
+  pincode: "",
+  fieldName: "My Farm",
+  fieldAreaAcres: 2.5,
+  fieldAreaHa: 1.01,
+  landOwnership: "Owner",
+  farmingExperience: "5 Years",
+  primaryCrop: "Wheat",
+  cropVariety: "Standard",
+  sowingDate: "2025-11-15",
+  growthStage: "Vegetative",
+  soilType: "Alluvial Loam",
+  irrigationType: "Tube Well",
+  hasSoilHealthCard: false,
+  pestHistory: [],
+  fertilizersUsed: [],
+  preferredCommunication: "WhatsApp",
+  voiceResponsesEnabled: true,
+  helpTopics: [],
+  dataConsent: true,
+  isRegistered: false,
 };
 
 const DB_USERS_KEY = "aasra_registered_users_database_v1";
@@ -246,42 +272,40 @@ export async function lookupFarmerInDatabase(mobileOrEmail: string): Promise<Far
  * Session Helpers
  */
 export function isUserLoggedIn(): boolean {
-  if (typeof window === "undefined") return true;
+  if (typeof window === "undefined") return false;
   try {
     const explicitlyLoggedOut = localStorage.getItem("aasra_is_logged_in") === "false";
     if (explicitlyLoggedOut) return false;
 
+    const isLoggedIn = localStorage.getItem("aasra_is_logged_in") === "true";
     const raw = localStorage.getItem("aasra_farmer_profile");
-    if (raw) {
+    if (raw && isLoggedIn) {
       const parsed = JSON.parse(raw);
-      if (parsed && parsed.fullName && parsed.fullName.trim().length > 0) {
+      if (parsed && parsed.fullName && parsed.fullName.trim().length > 0 && parsed.isRegistered === true) {
         return true;
       }
     }
-    // Default to true so hackathon judges immediately explore Sameer Mishra demo farm
-    return true;
+    return false;
   } catch (e) {
-    return true;
+    return false;
   }
 }
 
 export function getStoredProfile(): FarmerProfile {
-  if (typeof window === "undefined") return DEMO_FARMER_PROFILE;
+  if (typeof window === "undefined") return EMPTY_FARMER_PROFILE;
   try {
-    const explicitlyLoggedOut = localStorage.getItem("aasra_is_logged_in") === "false";
-    if (explicitlyLoggedOut) return { ...DEMO_FARMER_PROFILE, isRegistered: false };
-
+    const isLoggedIn = localStorage.getItem("aasra_is_logged_in") === "true";
     const raw = localStorage.getItem("aasra_farmer_profile");
-    if (raw) {
+    if (raw && isLoggedIn) {
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object" && parsed.fullName) {
-        return { ...DEMO_FARMER_PROFILE, ...parsed };
+      if (parsed && typeof parsed === "object" && parsed.fullName && parsed.isRegistered === true) {
+        return { ...EMPTY_FARMER_PROFILE, ...parsed };
       }
     }
   } catch (e) {
     console.error("Failed to read farmer profile from storage", e);
   }
-  return DEMO_FARMER_PROFILE;
+  return EMPTY_FARMER_PROFILE;
 }
 
 export function saveProfile(profile: FarmerProfile): void {

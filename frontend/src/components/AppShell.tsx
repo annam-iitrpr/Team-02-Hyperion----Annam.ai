@@ -45,16 +45,12 @@ import {
 
 const PUBLIC_PATHS = [
   "/",
-  "/dashboard",
   "/login",
   "/signup",
   "/how-it-works",
   "/impact-story",
   "/architecture",
-  "/closed-loop",
-  "/what-if",
   "/product",
-  "/journal",
   "/impact",
 ];
 
@@ -108,7 +104,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     const isAuthed = isUserLoggedIn();
     setLoggedIn(isAuthed);
     setProfile(getStoredProfile());
-  }, [pathname]);
+    if (!isAuthed && pathname === "/dashboard") {
+      router.replace("/signup?redirect=/dashboard");
+    }
+  }, [pathname, router]);
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -703,52 +702,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </div>
             
             <div className="flex flex-col gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const demoProfile: any = {
-                    fullName: "Sameer Mishra",
-                    mobileNumber: "9720413710",
-                    language: "en",
-                    state: "Punjab",
-                    district: "Rupnagar",
-                    tehsil: "Chamkaur Sahib",
-                    village: "Chamkaur Sahib",
-                    pincode: "140111",
-                    fieldName: "Wheat Main Field",
-                    fieldAreaAcres: 5.0,
-                    primaryCrop: "Wheat",
-                    cropVariety: "PBW-826 (High Yield Punjab Wheat)",
-                    sowingDate: "2025-11-15",
-                    soilType: "Alluvial Fertile Loam (Punjab Plains)",
-                    irrigationType: "Canal + Electric Tube Well",
-                    hasKisanCreditCard: true,
-                    pmKisanBeneficiary: true,
-                    isRegistered: true,
-                  };
-                  saveProfile(demoProfile);
-                  setLoggedIn(true);
-                  setProfile(demoProfile);
-                }}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#1b4332] to-[#2d6a4f] text-white font-bold text-xs shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                style={{
-                  boxShadow: "0 6px 18px rgba(27, 67, 50, 0.25)",
-                }}
-              >
-                <Sparkles className="h-4 w-4 text-emerald-300 animate-pulse" />
-                <span>{language === "hi" ? "🚀 लाइव डेमो फार्म खोलें (समीर मिश्रा · पंजाब)" : "🚀 Explore Live Demo Farm (Sameer Mishra · Punjab)"}</span>
-              </button>
-
-              <div className="relative flex items-center justify-center my-1">
-                <div className="border-t border-slate-200 w-full" />
-                <span className="bg-white px-2 text-[10px] font-mono text-slate-400 uppercase">or</span>
-              </div>
-
               <Link
                 href={`/signup?redirect=${encodeURIComponent(pathname || "/dashboard")}`}
-                className="w-full py-3 px-4 rounded-xl text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] active-press cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] active-press cursor-pointer"
                 style={{
-                  background: "linear-gradient(135deg, #533afd, #4434d4)",
+                  background: "linear-gradient(135deg, #1b4332, #2d6a4f)",
                 }}
               >
                 <UserPlus className="h-4 w-4" />

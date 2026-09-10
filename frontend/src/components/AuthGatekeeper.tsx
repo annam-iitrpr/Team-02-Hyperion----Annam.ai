@@ -8,19 +8,11 @@ import Link from "next/link";
 
 const PUBLIC_ROUTES = [
   "/",
-  "/dashboard",
-  "/closed-loop",
-  "/what-if",
   "/product",
-  "/journal",
+  "/how-it-works",
   "/impact",
   "/impact-story",
-  "/how-it-works",
   "/architecture",
-  "/plant-intelligence",
-  "/assistant",
-  "/fields",
-  "/settings",
   "/signup",
   "/login",
 ];

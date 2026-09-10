@@ -517,7 +517,7 @@ export default function LandingPage() {
                   href={isLoggedIn ? "/dashboard" : "/signup"}
                   className="px-7 py-3.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-sm sm:text-base font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2.5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
-                  <span>{isLoggedIn ? (isHindi ? "डैशबोर्ड खोलें" : "Open My Dashboard") : (isHindi ? "शुरू करें — मुफ़्त" : "Get Started Free")}</span>
+                  <span>{isLoggedIn ? (isHindi ? "डैशबोर्ड खोलें" : "Open My Dashboard") : (isHindi ? "ऐप खोलें — साइन अप करें" : "Open App — Sign Up")}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
@@ -1258,7 +1258,7 @@ export default function LandingPage() {
               href={isLoggedIn ? "/dashboard" : "/signup"}
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#52b788] hover:bg-[#40916c] text-[#0d2319] hover:text-white text-sm sm:text-base font-black shadow-xl transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
-              <span>{isLoggedIn ? (isHindi ? "डैशबोर्ड खोलें" : "Open My Dashboard") : (isHindi ? "शुरू करें — मुफ़्त" : "Get Started Free")}</span>
+              <span>{isLoggedIn ? (isHindi ? "डैशबोर्ड खोलें" : "Open My Dashboard") : (isHindi ? "ऐप खोलें — साइन अप करें" : "Open App — Sign Up")}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 

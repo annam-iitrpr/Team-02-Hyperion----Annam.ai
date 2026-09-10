@@ -203,7 +203,7 @@ export const KrishyantraNavbar: React.FC = () => {
             href={isLoggedIn ? "/dashboard" : "/signup"}
             className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-sm font-bold shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            <span>{isLoggedIn ? "Open App" : "Get Started"}</span>
+            <span>{isLoggedIn ? "Dashboard" : "Open App"}</span>
           </Link>
         </div>
 
@@ -213,7 +213,7 @@ export const KrishyantraNavbar: React.FC = () => {
             href={isLoggedIn ? "/dashboard" : "/signup"}
             className="px-3.5 py-1.5 rounded-full bg-[#1b4332] text-white text-xs font-bold shadow-xs"
           >
-            {isLoggedIn ? "App" : "Start"}
+            {isLoggedIn ? "Dashboard" : "Open App"}
           </Link>
           <button
             type="button"
@@ -303,7 +303,7 @@ export const KrishyantraNavbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="w-full py-3 rounded-full bg-[#1b4332] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md"
             >
-              <span>{isLoggedIn ? "Go to Dashboard" : "Get Started Free"}</span>
+              <span>{isLoggedIn ? "Go to Dashboard" : "Open App (Sign Up)"}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
