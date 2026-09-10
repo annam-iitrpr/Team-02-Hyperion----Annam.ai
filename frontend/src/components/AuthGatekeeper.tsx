@@ -8,10 +8,21 @@ import Link from "next/link";
 
 const PUBLIC_ROUTES = [
   "/",
-  "/signup",
-  "/login",
+  "/dashboard",
+  "/closed-loop",
+  "/what-if",
+  "/product",
+  "/journal",
+  "/impact",
+  "/impact-story",
   "/how-it-works",
   "/architecture",
+  "/plant-intelligence",
+  "/assistant",
+  "/fields",
+  "/settings",
+  "/signup",
+  "/login",
 ];
 
 export function AuthGatekeeper({ children }: { children: React.ReactNode }) {

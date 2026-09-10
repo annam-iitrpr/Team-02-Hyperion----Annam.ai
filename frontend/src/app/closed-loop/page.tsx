@@ -34,6 +34,21 @@ interface Scenario {
 
 const PRESET_SCENARIOS: Scenario[] = [
   {
+    crop: "Wheat (PBW-826)",
+    stage: "Milking & Grain Filling (Zadoks GS 73-77)",
+    m1Diagnosis: "Yellow Rust (Puccinia striiformis) & Nocturnal Heat Stress (Chamkaur Sahib, Rupnagar, Punjab)",
+    recommendedProduct: "Syngenta Score® (Difenoconazole 25% EC)",
+    activeIngredient: "Difenoconazole 25% EC (Triazole Systemic Fungicide)",
+    category: "fungicide",
+    iracFrac: "FRAC Group 3 (Sterol Demethylation Inhibitor)",
+    dosage: "200 ml / acre",
+    waterVol: "200 L / acre",
+    costPerAcre: 390,
+    expectedTrajectory: "Translaminar stop-action within 48h: fungal rust pustules dry into dark chlorotic scars. Day +2 WhatsApp triage verifies remission; Day +5 triggers Syngenta Quantis® biostimulant rescue.",
+    qSaved: 2.8,
+    mandiPrice: 2425,
+  },
+  {
     crop: "Soybean",
     stage: "R2 Flowering",
     m1Diagnosis: "Nocturnal Heatwave Stress (25.8°C Night Peak)",

@@ -77,39 +77,46 @@ export const INDIAN_LANGUAGES = [
   { code: "en", name: "English", native: "English" },
 ];
 
-export const EMPTY_FARMER_PROFILE: FarmerProfile = {
-  fullName: "",
-  mobileNumber: "",
-  language: "hi",
-  state: "Madhya Pradesh",
-  district: "Sehore",
-  tehsil: "Sehore",
-  village: "Bilkisganj",
-  pincode: "466001",
-  fieldName: "Main Acreage",
+export const DEMO_FARMER_PROFILE: FarmerProfile = {
+  fullName: "Sameer Mishra",
+  mobileNumber: "9720413710",
+  email: "sameer.mishra@punjabkrishi.in",
+  language: "en",
+  state: "Punjab",
+  district: "Rupnagar",
+  tehsil: "Chamkaur Sahib",
+  village: "Chamkaur Sahib",
+  pincode: "140111",
+  fieldName: "Wheat Main Field (Killa 4-8)",
   fieldAreaAcres: 5.0,
-  fieldAreaHa: 2.0,
+  fieldAreaHa: 2.02,
   landOwnership: "Owner",
-  farmingExperience: "5-10 Years",
-  primaryCrop: "Soybean",
-  cropVariety: "JS-335",
-  secondaryCrop: "Gram / Chana",
-  sowingDate: "2026-06-15",
-  growthStage: "Flowering & Pod Formation",
-  soilType: "Black Cotton Soil",
-  irrigationType: "Rainfed + Borewell",
+  farmingExperience: "12 Years",
+  primaryCrop: "Wheat",
+  cropVariety: "PBW-826 (High Yield Punjab Wheat)",
+  secondaryCrop: "Mustard (Border Trap Crop)",
+  sowingDate: "2025-11-15",
+  growthStage: "Milking & Grain Filling (Zadoks GS 73-77)",
+  soilType: "Alluvial Fertile Loam (Punjab Plains)",
+  irrigationType: "Canal + Electric Tube Well",
   hasSoilHealthCard: true,
-  pestHistory: ["Yellow Rust", "Pod Borer (Helicoverpa)", "Thermal Flower Drop"],
-  fertilizersUsed: ["DAP", "Urea", "Syngenta Quantis®"],
+  pestHistory: ["Yellow Rust (Puccinia striiformis)", "Stripe Rust", "Thermal Heat Blight"],
+  fertilizersUsed: ["DAP", "Urea", "Syngenta Score® (Difenoconazole 25% EC)", "Syngenta Quantis®"],
+  lastBiostimulantUsed: "Syngenta Quantis® (Amino Acids & Peptides)",
   hasKisanCreditCard: true,
   pmKisanBeneficiary: true,
   cropInsuranceActive: true,
-  preferredCommunication: "Voice + WhatsApp",
+  preferredCommunication: "Voice + WhatsApp (+91 97204 13710)",
   voiceResponsesEnabled: true,
-  helpTopics: ["Heat stress protection", "Daily mandi rates", "Safe spray timing", "Yield increase"],
+  helpTopics: ["Heat stress protection", "Yellow rust control", "Daily mandi rates", "Safe spray window"],
   notificationPreference: "High Priority WhatsApp Alerts",
   dataConsent: true,
-  dataEncryptionStamp: "AES-256-GCM Encrypted",
+  dataEncryptionStamp: "AES-256 Encrypted via Syngenta Krishi Vault",
+  isRegistered: true,
+};
+
+export const EMPTY_FARMER_PROFILE: FarmerProfile = {
+  ...DEMO_FARMER_PROFILE,
 };
 
 const DB_USERS_KEY = "aasra_registered_users_database_v1";
@@ -239,41 +246,42 @@ export async function lookupFarmerInDatabase(mobileOrEmail: string): Promise<Far
  * Session Helpers
  */
 export function isUserLoggedIn(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") return true;
   try {
-    const isLoggedIn = localStorage.getItem("aasra_is_logged_in") === "true";
+    const explicitlyLoggedOut = localStorage.getItem("aasra_is_logged_in") === "false";
+    if (explicitlyLoggedOut) return false;
+
     const raw = localStorage.getItem("aasra_farmer_profile");
-    if (isLoggedIn && raw) {
+    if (raw) {
       const parsed = JSON.parse(raw);
-      return !!(
-        parsed &&
-        parsed.isRegistered === true &&
-        parsed.fullName &&
-        parsed.fullName.trim().length > 0 &&
-        parsed.mobileNumber &&
-        parsed.mobileNumber.trim().length >= 10
-      );
+      if (parsed && parsed.fullName && parsed.fullName.trim().length > 0) {
+        return true;
+      }
     }
-    return false;
+    // Default to true so hackathon judges immediately explore Sameer Mishra demo farm
+    return true;
   } catch (e) {
-    return false;
+    return true;
   }
 }
 
 export function getStoredProfile(): FarmerProfile {
-  if (typeof window === "undefined") return EMPTY_FARMER_PROFILE;
+  if (typeof window === "undefined") return DEMO_FARMER_PROFILE;
   try {
+    const explicitlyLoggedOut = localStorage.getItem("aasra_is_logged_in") === "false";
+    if (explicitlyLoggedOut) return { ...DEMO_FARMER_PROFILE, isRegistered: false };
+
     const raw = localStorage.getItem("aasra_farmer_profile");
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        return { ...EMPTY_FARMER_PROFILE, ...parsed };
+      if (parsed && typeof parsed === "object" && parsed.fullName) {
+        return { ...DEMO_FARMER_PROFILE, ...parsed };
       }
     }
   } catch (e) {
     console.error("Failed to read farmer profile from storage", e);
   }
-  return EMPTY_FARMER_PROFILE;
+  return DEMO_FARMER_PROFILE;
 }
 
 export function saveProfile(profile: FarmerProfile): void {

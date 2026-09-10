@@ -43,7 +43,20 @@ import {
   Cpu,
 } from "lucide-react";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/how-it-works", "/impact-story", "/architecture"];
+const PUBLIC_PATHS = [
+  "/",
+  "/dashboard",
+  "/login",
+  "/signup",
+  "/how-it-works",
+  "/impact-story",
+  "/architecture",
+  "/closed-loop",
+  "/what-if",
+  "/product",
+  "/journal",
+  "/impact",
+];
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
@@ -309,6 +322,19 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <span>{t.navAdvisory || "Ask AI"}</span>
                 </Link>
 
+                <Link
+                  href="/closed-loop"
+                  className={`flex items-center gap-1.5 h-9 px-3 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
+                    pathname === "/closed-loop"
+                      ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100/80"
+                  }`}
+                >
+                  <Activity className="h-3.5 w-3.5 text-[#2d6a4f]" />
+                  <span>{language === "hi" ? "48h फॉलो-अप" : "Closed-Loop (48h)"}</span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                </Link>
+
                 {/* Clean Dropdown for Secondary Tools */}
                 <div className="relative shrink-0" ref={moreDropdownRef}>
                   <button
@@ -394,6 +420,31 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               </>
             ) : (
               <>
+                <Link
+                  href="/dashboard"
+                  className={`py-2 px-3 rounded-xl transition-all text-sm font-bold flex items-center gap-1.5 ${
+                    pathname === "/dashboard"
+                      ? "bg-[#e8f5e9] text-[#1b4332] font-extrabold border border-[#cbe5cb]"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100"
+                  }`}
+                >
+                  <LayoutDashboard className="h-4 w-4 text-[#2d6a4f]" />
+                  <span>{language === "hi" ? "डैशबोर्ड" : "Farm Dashboard"}</span>
+                </Link>
+
+                <Link
+                  href="/closed-loop"
+                  className={`py-2 px-3 rounded-xl transition-all text-sm font-bold flex items-center gap-1.5 ${
+                    pathname === "/closed-loop"
+                      ? "bg-[#e8f5e9] text-[#1b4332] font-extrabold border border-[#cbe5cb]"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-slate-100"
+                  }`}
+                >
+                  <Activity className="h-4 w-4 text-[#2d6a4f]" />
+                  <span>{language === "hi" ? "48h फॉलो-अप" : "Closed-Loop (48h)"}</span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                </Link>
+
                 <Link
                   href="/how-it-works"
                   className={`py-2 px-3 rounded-xl transition-all text-sm ${
@@ -652,12 +703,52 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </div>
             
             <div className="flex flex-col gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const demoProfile: any = {
+                    fullName: "Sameer Mishra",
+                    mobileNumber: "9720413710",
+                    language: "en",
+                    state: "Punjab",
+                    district: "Rupnagar",
+                    tehsil: "Chamkaur Sahib",
+                    village: "Chamkaur Sahib",
+                    pincode: "140111",
+                    fieldName: "Wheat Main Field",
+                    fieldAreaAcres: 5.0,
+                    primaryCrop: "Wheat",
+                    cropVariety: "PBW-826 (High Yield Punjab Wheat)",
+                    sowingDate: "2025-11-15",
+                    soilType: "Alluvial Fertile Loam (Punjab Plains)",
+                    irrigationType: "Canal + Electric Tube Well",
+                    hasKisanCreditCard: true,
+                    pmKisanBeneficiary: true,
+                    isRegistered: true,
+                  };
+                  saveProfile(demoProfile);
+                  setLoggedIn(true);
+                  setProfile(demoProfile);
+                }}
+                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#1b4332] to-[#2d6a4f] text-white font-bold text-xs shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                style={{
+                  boxShadow: "0 6px 18px rgba(27, 67, 50, 0.25)",
+                }}
+              >
+                <Sparkles className="h-4 w-4 text-emerald-300 animate-pulse" />
+                <span>{language === "hi" ? "🚀 लाइव डेमो फार्म खोलें (समीर मिश्रा · पंजाब)" : "🚀 Explore Live Demo Farm (Sameer Mishra · Punjab)"}</span>
+              </button>
+
+              <div className="relative flex items-center justify-center my-1">
+                <div className="border-t border-slate-200 w-full" />
+                <span className="bg-white px-2 text-[10px] font-mono text-slate-400 uppercase">or</span>
+              </div>
+
               <Link
                 href={`/signup?redirect=${encodeURIComponent(pathname || "/dashboard")}`}
-                className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] active-press cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98] active-press cursor-pointer"
                 style={{
                   background: "linear-gradient(135deg, #533afd, #4434d4)",
-                  boxShadow: "0 8px 20px rgba(83, 58, 253, 0.3)",
                 }}
               >
                 <UserPlus className="h-4 w-4" />
@@ -666,7 +757,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
               <Link
                 href={`/login?redirect=${encodeURIComponent(pathname || "/dashboard")}`}
-                className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-all border border-slate-200 flex items-center justify-center gap-2 active-press cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-all border border-slate-200 flex items-center justify-center gap-2 active-press cursor-pointer"
               >
                 <Lock className="h-4 w-4 text-[#533afd]" />
                 <span>{language === "hi" ? "पहले से पंजीकृत हैं? लॉगिन करें" : "Already Registered? Log In"}</span>
@@ -743,25 +834,46 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         ) : (
           <>
             <Link
-              href="/"
+              href="/dashboard"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/dashboard" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
-              <Home className="h-4 w-4" />
-              <span>{language === "hi" ? "होम" : "Home"}</span>
-              {pathname === "/" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
+              <LayoutDashboard className="h-4 w-4" />
+              <span>{language === "hi" ? "डैशबोर्ड" : "Dashboard"}</span>
+              {pathname === "/dashboard" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
-              href="/how-it-works"
+              href="/closed-loop"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/how-it-works" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/closed-loop" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
-              <Sparkles className="h-4 w-4" />
-              <span>{language === "hi" ? "प्रणाली" : "How it Works"}</span>
-              {pathname === "/how-it-works" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
+              <Activity className="h-4 w-4 text-[#2d6a4f]" />
+              <span>{language === "hi" ? "48h फॉलो-अप" : "48h Loop"}</span>
+              {pathname === "/closed-loop" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
+            </Link>
+
+            <Link
+              href="/assistant"
+              className="flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative"
+            >
+              <div className="h-10 w-10 -mt-5 rounded-full text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95" style={{ background: "linear-gradient(135deg, #1b4332, #2d6a4f)" }}>
+                <Mic className="h-4 w-4" />
+              </div>
+              <span className="text-[#1b4332] font-black">{language === "hi" ? "AI साथी" : "Ask AI"}</span>
+            </Link>
+
+            <Link
+              href="/plant-intelligence"
+              className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
+                pathname === "/plant-intelligence" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <Sprout className="h-4 w-4" />
+              <span>{language === "hi" ? "पौधा" : "Plant AI"}</span>
+              {pathname === "/plant-intelligence" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
@@ -771,16 +883,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               }`}
             >
               <TrendingUp className="h-4 w-4" />
-              <span>{language === "hi" ? "ROBI लाभ" : "ROBI Impact"}</span>
+              <span>{language === "hi" ? "प्रभाव" : "Impact"}</span>
               {pathname === "/impact" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
-            </Link>
-
-            <Link
-              href="/login"
-              className="flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold text-[#1b4332] active-press"
-            >
-              <User className="h-4 w-4" />
-              <span>{language === "hi" ? "लॉगिन" : "Login"}</span>
             </Link>
           </>
         )}
