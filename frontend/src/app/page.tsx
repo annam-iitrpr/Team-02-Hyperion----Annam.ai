@@ -127,6 +127,17 @@ export default function LandingPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [installModalOpen, setInstallModalOpen] = useState<boolean>(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [selectedFeature, setSelectedFeature] = useState<{
+    id: string;
+    icon: React.ReactNode;
+    iconBg: string;
+    title: string;
+    desc: string;
+    tag: string;
+    summary: string;
+    bullets: string[];
+    farmerImpact: string;
+  } | null>(null);
 
   useEffect(() => {
     setIsLoggedIn(isUserLoggedIn());
@@ -171,7 +182,7 @@ export default function LandingPage() {
 
   const isHindi = language === "hi";
 
-  // 6 Core Agricultural Features (Target Reference Faithful)
+  // 6 Core Agricultural Features (Target Reference Faithful — Zero external links, pure in-place short description)
   const features = [
     {
       id: "climate",
@@ -182,7 +193,23 @@ export default function LandingPage() {
         ? "नुकसान होने से पहले ही गर्मी, सूखे या भारी बारिश के जोखिम को जानें।"
         : "Know heat, drought or heavy rain risk before damage happens.",
       tag: isHindi ? "1 कदम आगे रहें" : "Stay 1 step ahead",
-      href: "/weather",
+      summary: isHindi
+        ? "उपग्रह और बायोफिजिकल मौसम मॉडल जो फसल में नुकसान होने से 48 से 72 घंटे पहले ही अत्यधिक लू, सूखा और भारी बारिश की सटीक पूर्व चेतावनी देते हैं।"
+        : "Advanced biophysical and satellite models that forecast extreme heatwaves, drought dry spells, and heavy rainstorms 48 to 72 hours before visible crop damage occurs.",
+      bullets: isHindi
+        ? [
+            "48-72 घंटे पहले लू (Heatwave) और सूखे का सटीक अलर्ट।",
+            "मिट्टी की नमी और वाष्प दबाव (VPD) की 24/7 स्वचालित निगरानी।",
+            "सेलुलर शॉक से पहले फसल सुरक्षात्मक स्प्रे की समयबद्ध सिफारिश।"
+          ]
+        : [
+            "48-72h predictive early warning for heatwaves, drought, and heavy downpours.",
+            "Monitors real-time soil moisture depletion & Vapor Pressure Deficit (VPD).",
+            "Recommends protective foliar osmoprotectants before cellular shock occurs."
+          ],
+      farmerImpact: isHindi
+        ? "फूल झड़ने और पत्तियों के जलने से बचाता है, फसल की 20-25% तक संभावित हानि रोकता है।"
+        : "Prevents sudden flower drop and leaf scorch, safeguarding up to 25% of potential harvest loss."
     },
     {
       id: "advisor",
@@ -193,7 +220,23 @@ export default function LandingPage() {
         ? "अपने खेत के लिए सही उत्पाद, सही मात्रा और सबसे उपयुक्त समय पाएं।"
         : "Get the right product, exact dosage, and best time for your field.",
       tag: isHindi ? "सही इनपुट, सही परिणाम" : "Right input, right result",
-      href: "/plant-intelligence",
+      summary: isHindi
+        ? "आपकी फसल, उसकी विकास अवस्था (वानस्पतिक/फूल/फल) और वर्तमान तनाव के अनुसार सिंजेंटा के प्रमाणित जैविक उत्पादों की सही मात्रा व उपयोग का समय बताता है।"
+        : "Matches verified Syngenta biological products (Quantis, Isabion, Megafol) specifically to your crop, developmental growth stage, and current abiotic stress levels.",
+      bullets: isHindi
+        ? [
+            "जड़ और पत्तियों के स्वास्थ्य के लिए सर्वोत्तम जैविक सक्रिय तत्वों की पहचान।",
+            "दवा की बर्बादी रोकने के लिए प्रति एकड़ और प्रति पंप सटीक पानी व घोल का अनुपात।",
+            "भारतीय खेतों और फसलों के लिए CIB&RC प्रमाणित सुरक्षित जैविक शेड्यूल।"
+          ]
+        : [
+            "Identifies optimal biological active ingredients for root and shoot health.",
+            "Specifies exact dilution ratio per pump and acre to eliminate input wastage.",
+            "CIB&RC approved bio-stimulant schedules verified on Indian farms."
+          ],
+      farmerImpact: isHindi
+        ? "सही समय पर सही जैविक दवा डालकर अनावश्यक खर्च घटाता है और फसल की प्रतिरोधक क्षमता बढ़ाता है।"
+        : "Saves input costs by applying bio-stimulants at the exact biological moment of maximum uptake."
     },
     {
       id: "diagnostics",
@@ -204,7 +247,23 @@ export default function LandingPage() {
         ? "एक फोटो लें और तुरंत जानें कि आपके पौधे में क्या समस्या हो सकती है।"
         : "Take a photo and know what might be wrong with your plant.",
       tag: isHindi ? "त्वरित पहचान" : "Instant diagnosis",
-      href: "/plant-intelligence",
+      summary: isHindi
+        ? "स्मार्टफोन से ली गई पत्ती या पौधे की फोटो का तुरंत AI विश्लेषण, जो सेकंडों में फफूंद, रस चूसक कीट, वायरस या पोषक तत्वों की कमी की पहचान करता है।"
+        : "Instant AI visual diagnosis from smartphone photos to detect fungal blights, viral mottling, pest attacks, and micronutrient deficiencies in seconds.",
+      bullets: isHindi
+        ? [
+            "किसी भी साधारण मोबाइल कैमरे से तुरंत तेज और सटीक रोग स्कैनिंग।",
+            "पूरे खेत में बीमारी फैलने से पहले शुरुआती दौर में ही सटीक पहचान।",
+            "स्थानीय भाषा में जैविक, घरेलू और रासायनिक उपचार के स्पष्ट निर्देश।"
+          ]
+        : [
+            "Instant scan from any mobile camera with high diagnostic accuracy.",
+            "Pinpoints early disease stages before widespread field infestation.",
+            "Provides immediate organic remedies, tank-mix guidance, and chemical options."
+          ],
+      farmerImpact: isHindi
+        ? "रोग को शुरुआती चरण में रोककर बेवजह कीटनाशक खर्च में ₹3,000–₹8,000 प्रति एकड़ की सीधी बचत।"
+        : "Stops pest and disease epidemics early, saving ₹3,000–₹8,000 per acre in unnecessary chemical sprays."
     },
     {
       id: "weather",
@@ -215,7 +274,23 @@ export default function LandingPage() {
         ? "14-दिन का सटीक खेत पूर्वानुमान और सुरक्षित छिड़काव/सिंचाई का समय।"
         : "Hyperlocal 14-day forecast and safe spray/irrigation timing.",
       tag: isHindi ? "खेत-स्तरीय मौसम" : "Field-level weather",
-      href: "/weather",
+      summary: isHindi
+        ? "14-दिन का सटीक खेत-स्तरीय मौसम पूर्वानुमान और डेल्टा-टी आधारित स्प्रे गेटिंग, जो बताता है कि कब छिड़काव करना सुरक्षित है और कब दवा बहने या उड़ने का खतरा है।"
+        : "Hyperlocal 14-day agricultural forecast combined with real-time biophysical Delta-T gating so you spray only when droplets absorb effectively.",
+      bullets: isHindi
+        ? [
+            "दवा उड़ने या वाष्पीकरण से बचाने के लिए डेल्टा-टी (°C) और हवा की गति की जांच।",
+            "तेज हवा (>15 किमी/घंटा) में ड्रिफ्ट और दवा बर्बादी रोकने का स्पष्ट अलर्ट।",
+            "48 घंटे की बारिश का सटीक पूर्वानुमान ताकि महंगी दवा पानी में न बहे।"
+          ]
+        : [
+            "Monitors live Delta-T (°C) to prevent droplet evaporation or high-humidity runoff.",
+            "Wind speed gating (<15 km/h) to eliminate spray drift to non-target areas.",
+            "48-hour rain washoff forecast guarantees your expensive sprays stay on the leaf."
+          ],
+      farmerImpact: isHindi
+        ? "छिड़काव का 100% पूरा असर मिलता है, दवा का एक भी रुपया बर्बाद नहीं होता और फसल जलने से बचती है।"
+        : "Zero wasted sprays: every rupee spent on foliar inputs delivers 100% absorption without chemical scorch."
     },
     {
       id: "yield",
@@ -226,7 +301,23 @@ export default function LandingPage() {
         ? "अपेक्षित पैदावार वृद्धि और वास्तविक लाभ प्रभाव का सटीक अनुमान देखें।"
         : "See expected yield improvement and profitability impact.",
       tag: isHindi ? "मुनाफे का सटीक हिसाब" : "Know your returns",
-      href: "/dashboard",
+      summary: isHindi
+        ? "माइक्रोसॉफ्ट EconML कॉज़ल डबल मशीन लर्निंग मॉडल जो आपकी फसल और खेत के आकार के आधार पर जैविक उपचार से होने वाले शुद्ध मुनाफे (ROBI) का रुपया-दर-रुपया हिसाब दिखाता है।"
+        : "Causal Double Machine Learning (Microsoft EconML) benchmarks your baseline yield and calculates the true net Return on Biological Investment (ROBI).",
+      bullets: isHindi
+        ? [
+            "सिंचाई के प्रकार, खेत के आकार और मिट्टी की बनावट के आधार पर सटीक विश्लेषण।",
+            "देश की 50+ प्रमुख कृषि मंडियों के वास्तविक लाइव भावों के साथ जुड़ाव।",
+            "प्रति एकड़ शुद्ध बचत (₹) और निवेश पर लाभ (ROBI मल्टीप्लायर) का पारदर्शी हिसाब।"
+          ]
+        : [
+            "Controls for irrigation, soil clay %, and farm size confounders.",
+            "Live Mandi price integration across 50+ APMC markets in India.",
+            "Shows transparent net profit projections (₹/acre) and benefit-to-cost multipliers."
+          ],
+      farmerImpact: isHindi
+        ? "कोई भी कृषि उत्पाद खरीदने से पहले ही किसान को उसके संभावित आर्थिक लाभ का स्पष्ट और प्रामाणिक भरोसा।"
+        : "Gives farmers confidence by showing verifiable economic returns before making any input purchase."
     },
     {
       id: "voice",
@@ -237,7 +328,23 @@ export default function LandingPage() {
         ? "हिंदी, मराठी, तेलुगु व अन्य भाषाओं में बोलकर खेती की सलाह लें।"
         : "Ask anything by voice in Hindi, Marathi, Telugu and more.",
       tag: isHindi ? "केवल बोलें, टाइपिंग नहीं" : "Just speak, no typing",
-      href: "/assistant",
+      summary: isHindi
+        ? "गूगल जेमिनी 2.5 और उच्च-गुणवत्ता वॉयस तकनीक से संचालित सहायक — बिना किसी टाइपिंग के सीधे अपनी स्थानीय मातृभाषा में बोलकर खेती के सभी सवालों के जवाब पाएं।"
+        : "Interactive multilingual voice AI powered by Google Gemini and Chirp speech technology — speak naturally in your mother tongue without typing.",
+      bullets: isHindi
+        ? [
+            "हिंदी, मराठी, पंजाबी, गुजराती, तेलुगु, तमिल सहित 12+ भाषाओं में स्वाभाविक बातचीत।",
+            "मंडी भाव, खाद-कीटनाशक की मात्रा, मौसम और रोग नियंत्रण का तुरंत बोलकर उत्तर।",
+            "खेत में काम करते हुए भी बिना हाथ रोके सुविधाजनक और सुलभ हैंड्स-फ्री उपयोग।"
+          ]
+        : [
+            "Conversational audio in Hindi, Marathi, Telugu, Punjabi, Gujarati, and 7+ more.",
+            "Ask about mandi prices, fertilizer doses, spray timing, or pest remedies.",
+            "Designed for hands-free convenience directly on the field."
+          ],
+      farmerImpact: isHindi
+        ? "हर किसान के लिए उन्नत कृषि विज्ञान को बिना किसी तकनीकी झंझट या टाइपिंग के बेहद सरल और सुलभ बनाता है।"
+        : "Makes cutting-edge agricultural science accessible to every farmer, regardless of literacy level or tech familiarity."
     },
   ];
 
@@ -460,12 +567,12 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* 6 Clean White Cards */}
+          {/* 6 Clean White Cards — Zero external links, in-place short description modal */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((item) => (
               <div
                 key={item.id}
-                onClick={(e) => handleActionClick(item.href, e)}
+                onClick={() => setSelectedFeature(item)}
                 className="rounded-3xl bg-white border border-[#e5e7eb] p-7 shadow-xs hover:shadow-xl hover:border-[#52b788] transition-all duration-300 flex flex-col justify-between group cursor-pointer"
               >
                 <div className="space-y-4">
@@ -494,10 +601,10 @@ export default function LandingPage() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleActionClick(item.href, e);
+                      setSelectedFeature(item);
                     }}
-                    className="text-slate-400 group-hover:text-[#1b4332] transition-colors cursor-pointer"
-                    aria-label={`Open ${item.title}`}
+                    className="text-slate-400 group-hover:text-[#1b4332] transition-colors cursor-pointer p-1"
+                    aria-label={`View short description for ${item.title}`}
                   >
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </button>
@@ -1119,6 +1226,87 @@ export default function LandingPage() {
                 className="w-full py-3 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-xs font-bold shadow-md cursor-pointer transition-colors"
               >
                 Got It
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ── Feature Short Description Modal (In-Place / Theme-Matched) ── */}
+      {selectedFeature && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setSelectedFeature(null)}
+        >
+          <div 
+            className="relative w-full max-w-lg rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-emerald-100 space-y-5 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with Icon, Tag and Close */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3.5">
+                <div className={`w-12 h-12 rounded-2xl ${selectedFeature.iconBg} flex items-center justify-center shrink-0`}>
+                  {selectedFeature.icon}
+                </div>
+                <div>
+                  <span className="inline-flex items-center text-[11px] font-bold text-[#2d6a4f] bg-[#e8f5e9] px-2.5 py-0.5 rounded-full mb-1">
+                    {selectedFeature.tag}
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-black text-[#111827] leading-snug">
+                    {selectedFeature.title}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedFeature(null)}
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors shrink-0"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Short Description Summary */}
+            <div className="p-4 rounded-2xl bg-[#f8faf8] border border-slate-200/80 text-sm text-slate-700 leading-relaxed font-normal">
+              {selectedFeature.summary}
+            </div>
+
+            {/* Practical Field Bullets */}
+            <div className="space-y-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+                {isHindi ? "मुख्य विशेषताएं" : "Key Highlights"}
+              </span>
+              <div className="space-y-2">
+                {selectedFeature.bullets.map((bullet, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600">
+                    <CheckCircle2 className="w-4 h-4 text-[#2d6a4f] shrink-0 mt-0.5" />
+                    <span>{bullet}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Farmer Impact Callout */}
+            <div className="p-3.5 rounded-2xl bg-[#e8f5e9]/70 border border-[#cbe5cb]/70 flex items-start gap-3">
+              <Sparkles className="w-4 h-4 text-[#2d6a4f] shrink-0 mt-0.5" />
+              <div className="text-xs text-[#1b4332] leading-relaxed">
+                <span className="font-bold block text-[11px] uppercase tracking-wide text-[#2d6a4f] mb-0.5">
+                  {isHindi ? "किसान लाभ (Farmer Impact)" : "Direct Farmer Impact"}
+                </span>
+                {selectedFeature.farmerImpact}
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setSelectedFeature(null)}
+                className="w-full py-3 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white text-sm font-bold shadow-md cursor-pointer transition-colors"
+              >
+                {isHindi ? "समझ गए" : "Got It"}
               </button>
             </div>
 
