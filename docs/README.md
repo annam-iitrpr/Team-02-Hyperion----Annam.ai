@@ -22,7 +22,7 @@ docs/
 
 | Document | Format | Description |
 | :--- | :--- | :--- |
-| [`ARCHITECTURE.txt`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/docs/architecture/ARCHITECTURE.txt) | Plain Text | Complete system architectural specification, end-to-end data pipelines, API contracts, and security models. |
+| [`ARCHITECTURE.txt`](architecture/ARCHITECTURE.txt) | Plain Text | Complete system architectural specification, end-to-end data pipelines, API contracts, and security models. |
 | `AASRA_Features_and_Architecture_Guide.pdf` | PDF | Executive overview of system features, user interfaces, and multi-tier cloud deployment. |
 | `AASRA_Technology_Stack_Specification.pdf` | PDF | Technical breakdown of Next.js 16, FastAPI, Vertex AI, Webhooks, and PostgreSQL/Firebase layers. |
 | `ASSARA_SYSTEM_ARCHITECTURE_AND_ALGORITHMS.pdf` | PDF | Detailed mathematical and algorithmic formulations for biophysical stress scoring and causal inference. |
@@ -42,7 +42,7 @@ docs/
 | `AASRA_Model_2_Biological_Readiness_Training_Manual.pdf` | **Model 2** | Delta-T and vapor pressure deficit (VPD) spray safety decision engine manual. |
 | `AASRA_Model_2_Executive_Checklist_and_Access_Directory.pdf` | **Model 2** | Operational parameters and chemical stability gates. |
 | `AASRA_Model_3_Product_Ranking_Master_Manual.pdf` | **Model 3** | Portfolio Ranker manual for matching Syngenta products to crops, stresses, and growth stages. |
-| [`AASRA_Model_3_Training_Google_Colab.ipynb`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/docs/ml-models/AASRA_Model_3_Training_Google_Colab.ipynb) | **Model 3** | Interactive Jupyter/Colab notebook for model training, validation, and evaluation. |
+| [`AASRA_Model_3_Training_Google_Colab.ipynb`](ml-models/AASRA_Model_3_Training_Google_Colab.ipynb) | **Model 3** | Interactive Jupyter/Colab notebook for model training, validation, and evaluation. |
 | `AASRA_Model_5_Field_Yield_Baseline_Training_Manual.pdf` | **Model 5** | Genetic yield potential and historical district baseline regression manual. |
 | `AASRA_6_Models_Linear_Input_Specification.pdf` | **Models 1–6** | Unified end-to-end vector pipeline schema linking all 6 models sequentially. |
 | `AASRA_ML_Models_and_Vertex_AI_Deployment_Guide.pdf` | **Vertex AI** | Step-by-step guide for containerizing and deploying models to GCP Vertex AI endpoints. |
@@ -56,7 +56,7 @@ docs/
 | `02-Concept note.pdf` | Initial project concept note framing the agricultural challenge and proposed AI solution. |
 | `AASRA_25_Page_Model_Master_Report.pdf` | Comprehensive 25-page research report detailing scientific methodology, datasets, and ICAR trials. |
 | `AASRA_Syngenta_50_Products_Full_Agronomic_Guide.pdf` | Complete agronomic field guide for 50 Syngenta biologicals, fungicides, and insecticides. |
-| [`syngenta_50_products.csv`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/docs/research/syngenta_50_products.csv) | Machine-readable CSV database of products, active ingredients, dosage rates, and compatibility. |
+| [`syngenta_50_products.csv`](research/syngenta_50_products.csv) | Machine-readable CSV database of products, active ingredients, dosage rates, and compatibility. |
 | `AASRA_Team_ML_Master_Training_Guide.pdf` | Developer training guide for building and evaluating agronomic models. |
 | `AASRA_TECHNICAL_RESEARCH.md` | Field notes and technical research summaries from Indian agricultural university publications. |
 | `ANNAM_AI_Technical_Documentation_PS02_PS03.md` | Multi-language agronomic triage research and integration findings. |

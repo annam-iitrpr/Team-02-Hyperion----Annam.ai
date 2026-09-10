@@ -50,15 +50,15 @@ KrishYantra/
 
 ### 1. Frontend (`/frontend`)
 The core farmer-facing web application. Built with Next.js 16 App Router and styled with the established `design-md-stripe` aesthetic (deep forest `#1b4332`, emerald `#2d6a4f`, ivory/sage neutrals `#fbfcf8`/`#f8faf7`).
-- [`frontend/src/app/plant-intelligence/prescription/page.tsx`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/frontend/src/app/plant-intelligence/prescription/page.tsx): The heart of the recommendation engine. Features:
+- [`frontend/src/app/plant-intelligence/prescription/page.tsx`](frontend/src/app/plant-intelligence/prescription/page.tsx): The heart of the recommendation engine. Features:
   - **The "Why" Box**: 3–4 lines of natural, accessible Hindi/English explaining why this product protects their harvest during the current stage and weather threat.
   - **The "How" Box**: 4 practical, step-by-step instructions on dilution, knapsack pump counts, and morning/evening spray windows.
   - **Personalized Dosage**: Dynamic calculations based on **Field Size (Acres)** and **Soil Type** (Black Vertisol, Alluvial Loam, Sandy Loam, Red Soil).
   - **Zero-Cost Cultural Advisory**: A dedicated square card providing free cultural farming practices (evening furrow cooling irrigation, surface hoeing, organic mulching, W-pattern scouting).
-- [`frontend/src/app/impact/page.tsx`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/frontend/src/app/impact/page.tsx): 3-Step Investment Story and Causal ROBI Calculator grounded in actual APMC Mandi benchmark rates (Sugarcane SAP @ ₹385/q, Cotton @ ₹7,450/q).
-- [`frontend/src/app/closed-loop/page.tsx`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/frontend/src/app/closed-loop/page.tsx): Closed-loop remission engine with 48h follow-up and rotational rescue chemistry.
-- [`frontend/src/lib/farmerAdvisoryEngine.ts`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/frontend/src/lib/farmerAdvisoryEngine.ts): Humanized advisory engine translating chemical formulations into plain language.
-- [`frontend/src/lib/usePipelinePrediction.ts`](file:///d:/Projects/DriveF-Projects/nibooz-whatup/frontend/src/lib/usePipelinePrediction.ts): Unified hook coordinating weather telemetry and ML inference with smart cache invalidation.
+- [`frontend/src/app/impact/page.tsx`](frontend/src/app/impact/page.tsx): 3-Step Investment Story and Causal ROBI Calculator grounded in actual APMC Mandi benchmark rates (Sugarcane SAP @ ₹385/q, Cotton @ ₹7,450/q).
+- [`frontend/src/app/closed-loop/page.tsx`](frontend/src/app/closed-loop/page.tsx): Closed-loop remission engine with 48h follow-up and rotational rescue chemistry.
+- [`frontend/src/lib/farmerAdvisoryEngine.ts`](frontend/src/lib/farmerAdvisoryEngine.ts): Humanized advisory engine translating chemical formulations into plain language.
+- [`frontend/src/lib/usePipelinePrediction.ts`](frontend/src/lib/usePipelinePrediction.ts): Unified hook coordinating weather telemetry and ML inference with smart cache invalidation.
 
 ### 2. Backend (`/backend`)
 Python FastAPI service orchestrating microclimate computation and Vertex AI cloud models:
