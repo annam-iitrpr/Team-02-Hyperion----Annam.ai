@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useLanguage } from "@/context/LanguageContext";
 import { useWeather, reverseGeocode } from "@/context/WeatherContext";
+import { useFarm } from "@/context/FarmContext";
+import { resolveDistrictCoordinatesAsync } from "@/lib/districtCoords";
 import {
   getStoredProfile,
   saveProfile,
@@ -30,7 +32,8 @@ import {
 
 export default function SettingsPage() {
   const { language, setLanguage, t } = useLanguage();
-  const { weather, refetch: refetchWeather } = useWeather();
+  const { weather, refetch: refetchWeather, setCustomCoordinates } = useWeather();
+  const { updateActiveFarm } = useFarm();
 
   const [profile, setProfile] = useState<FarmerProfile>({
     ...EMPTY_FARMER_PROFILE,
@@ -65,24 +68,68 @@ export default function SettingsPage() {
     }, 2800);
   };
 
-  const handleSaveAll = (e?: React.FormEvent) => {
+  const handleSaveAll = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    saveProfile(profile);
-    setLanguage(profile.language);
-    if (profile.gpsLocation) {
+    
+    let updatedProfile = { ...profile };
+
+    // Resolve real GPS coordinates for the selected district/state if user edited them
+    if (profile.district) {
+      try {
+        const coords = await resolveDistrictCoordinatesAsync(profile.district, profile.state);
+        if (coords) {
+          updatedProfile.gpsLocation = { lat: coords.lat, lon: coords.lon };
+          if (setCustomCoordinates) {
+            setCustomCoordinates(
+              coords.lat,
+              coords.lon,
+              profile.village || profile.district,
+              profile.district,
+              profile.state
+            );
+          }
+        }
+      } catch (err) {
+        console.warn("Failed resolving district coordinates on save:", err);
+      }
+    }
+
+    saveProfile(updatedProfile);
+    setProfile(updatedProfile);
+    setLanguage(updatedProfile.language);
+
+    // Update activeFarm in FarmContext
+    try {
+      if (updateActiveFarm) {
+        updateActiveFarm({
+          district: updatedProfile.district,
+          state: updatedProfile.state,
+          village: updatedProfile.village,
+          center: updatedProfile.gpsLocation ? [updatedProfile.gpsLocation.lat, updatedProfile.gpsLocation.lon] : undefined,
+          primaryCrop: updatedProfile.primaryCrop,
+          areaAcres: updatedProfile.fieldAreaAcres,
+        });
+      }
+    } catch (_) {}
+
+    if (updatedProfile.gpsLocation) {
       try {
         const rawFields = localStorage.getItem("aasra_farmer_fields_v3");
         if (rawFields) {
           const fields = JSON.parse(rawFields);
           if (Array.isArray(fields) && fields.length > 0) {
-            fields[0].center = [profile.gpsLocation.lat, profile.gpsLocation.lon];
-            fields[0].crop = profile.primaryCrop || fields[0].crop;
-            fields[0].areaAcres = profile.fieldAreaAcres || fields[0].areaAcres;
+            fields[0].center = [updatedProfile.gpsLocation.lat, updatedProfile.gpsLocation.lon];
+            fields[0].crop = updatedProfile.primaryCrop || fields[0].crop;
+            fields[0].areaAcres = updatedProfile.fieldAreaAcres || fields[0].areaAcres;
+            fields[0].district = updatedProfile.district;
+            fields[0].state = updatedProfile.state;
+            fields[0].village = updatedProfile.village;
             localStorage.setItem("aasra_farmer_fields_v3", JSON.stringify(fields));
+            window.dispatchEvent(new Event("aasra_fields_updated"));
           }
         }
       } catch (_) {}
-      refetchWeather(true);
+      refetchWeather(false);
     }
     showSaveNotification();
   };
@@ -96,14 +143,27 @@ export default function SettingsPage() {
           const lon = pos.coords.longitude;
           const geo = await reverseGeocode(lat, lon);
 
-          setProfile((prev) => ({
-            ...prev,
+          const updated = {
+            ...profile,
             gpsLocation: { lat, lon },
-            state: geo.state || prev.state || "State",
-            district: geo.district || prev.district || "Field District",
-            village: geo.village || prev.village || "Local Village",
+            state: geo.state || profile.state || "State",
+            district: geo.district || profile.district || "Field District",
+            village: geo.village || profile.village || "Local Village",
             fieldName: `${geo.district || "My"} Farm Plot`,
-          }));
+          };
+          setProfile(updated);
+          saveProfile(updated);
+          if (setCustomCoordinates) {
+            setCustomCoordinates(lat, lon, geo.village || geo.district, geo.district, geo.state);
+          }
+          if (updateActiveFarm) {
+            updateActiveFarm({
+              district: updated.district,
+              state: updated.state,
+              village: updated.village,
+              center: [lat, lon],
+            });
+          }
           setLoadingGps(false);
           showSaveNotification();
         },

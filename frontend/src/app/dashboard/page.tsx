@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
-import { FarmerProfile, getStoredProfile } from "@/lib/userStore";
+import { FarmerProfile, getStoredProfile, saveProfile } from "@/lib/userStore";
 import { useLanguage } from "@/context/LanguageContext";
-import { useWeather } from "@/context/WeatherContext";
+import { useWeather, reverseGeocode } from "@/context/WeatherContext";
 import { getTranslation } from "@/lib/translations";
 import { SyngentaDealerLocator } from "@/components/SyngentaDealerLocator";
 import { RealtimePermissionsHub } from "@/components/RealtimePermissionsHub";
@@ -14,17 +14,19 @@ import { FieldAgroTelemetryGrid } from "@/components/FieldAgroTelemetryGrid";
 import { useFarm } from "@/context/FarmContext";
 import { calculateDeterministicROI } from "@/lib/calculations/roiEngine";
 import { findCropMandiRate } from "@/lib/mandiEngine";
+import { resolveDistrictCoordinatesAsync } from "@/lib/districtCoords";
 import {
   Sparkles, ArrowRight, Sun, RefreshCw, Edit3, Sprout, CheckCircle2, Mic, TrendingUp, MapPin
 } from "lucide-react";
 
 export default function DashboardPage() {
   const { language } = useLanguage();
-  const { weather, refetch } = useWeather();
+  const { weather, refetch, setCustomCoordinates } = useWeather();
   const { activeFarm, updateActiveFarm } = useFarm();
   const t = getTranslation(language);
 
   const [profile, setProfile] = useState<FarmerProfile>(() => getStoredProfile());
+  const [isSyncingGps, setIsSyncingGps] = useState<boolean>(false);
 
   useEffect(() => {
     const p = getStoredProfile();
@@ -42,6 +44,80 @@ export default function DashboardPage() {
   const currentDistrict = profile.district || activeFarm.district || weather.district || "Ajmer";
   const currentState = profile.state || activeFarm.state || weather.state || "Rajasthan";
 
+  // Format dynamic location display from stored profile and live GPS
+  const locationDisplay = profile.village
+    ? `${profile.village}, ${profile.district || currentDistrict}, ${profile.state || currentState}, India`
+    : (weather.locationName || `${currentDistrict}, ${currentState}, India`);
+
+  // Auto-sync real Open-Meteo telemetry whenever the farm's district or state changes
+  useEffect(() => {
+    let isCancelled = false;
+    async function syncWeatherToCurrentDistrict() {
+      if (!currentDistrict) return;
+      const coords = await resolveDistrictCoordinatesAsync(currentDistrict, currentState);
+      if (!coords || !coords.lat || !coords.lon) return;
+
+      const cleanCurrent = currentDistrict.trim().toLowerCase();
+      const cleanWeather = (weather.district || "").trim().toLowerCase();
+      const isCoordMismatched =
+        Math.abs(weather.lat - coords.lat) > 0.4 ||
+        Math.abs(weather.lon - coords.lon) > 0.4;
+
+      if (cleanCurrent !== cleanWeather || isCoordMismatched || weather.lat === 20.5937) {
+        if (!isCancelled) {
+          await setCustomCoordinates(
+            coords.lat,
+            coords.lon,
+            locationDisplay,
+            currentDistrict,
+            currentState
+          );
+        }
+      }
+    }
+    syncWeatherToCurrentDistrict();
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentDistrict, currentState, locationDisplay, setCustomCoordinates, weather.district, weather.lat, weather.lon]);
+
+  const handleSyncGps = () => {
+    setIsSyncingGps(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const geo = await reverseGeocode(lat, lon);
+          const updated: FarmerProfile = {
+            ...profile,
+            gpsLocation: { lat, lon },
+            district: geo.district || profile.district,
+            state: geo.state || profile.state,
+            village: geo.village || profile.village,
+          };
+          saveProfile(updated);
+          setProfile(updated);
+          updateActiveFarm({
+            district: geo.district || profile.district,
+            state: geo.state || profile.state,
+            center: [lat, lon],
+          });
+          await setCustomCoordinates(lat, lon, geo.locationName, geo.district, geo.state);
+          setIsSyncingGps(false);
+        },
+        () => {
+          refetch(true);
+          setIsSyncingGps(false);
+        },
+        { timeout: 8000 }
+      );
+    } else {
+      refetch(true);
+      setIsSyncingGps(false);
+    }
+  };
+
   const mandiRateObj = findCropMandiRate(currentCrop, currentDistrict, currentState);
   const currentMandiPrice = mandiRateObj?.modalPrice || 2150;
 
@@ -55,11 +131,6 @@ export default function DashboardPage() {
   });
 
   const netProfitEst = roi.totalFieldNetProfit;
-
-  // Format dynamic location display from stored profile and live GPS
-  const locationDisplay = profile.village
-    ? `${profile.village}, ${profile.district || currentDistrict}, ${profile.state || currentState}, India`
-    : (weather.locationName || `${currentDistrict}, ${currentState}, India`);
 
   return (
     <AppShell>
@@ -135,11 +206,12 @@ export default function DashboardPage() {
             </div>
 
             <button
-              onClick={() => refetch(true)}
-              className="w-full sm:w-auto min-h-[40px] px-3.5 py-2 text-xs font-mono font-bold text-[#1b4332] bg-[#f0f5ee] hover:bg-[#e3ede0] border border-[#d9e6d4] rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-98"
+              onClick={handleSyncGps}
+              disabled={isSyncingGps}
+              className="w-full sm:w-auto min-h-[40px] px-3.5 py-2 text-xs font-mono font-bold text-[#1b4332] bg-[#f0f5ee] hover:bg-[#e3ede0] border border-[#d9e6d4] rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-98 disabled:opacity-60"
             >
-              <RefreshCw className="h-3.5 w-3.5 text-[#2d6a4f]" />
-              <span>Sync GPS</span>
+              <RefreshCw className={`h-3.5 w-3.5 text-[#2d6a4f] ${isSyncingGps ? "animate-spin" : ""}`} />
+              <span>{isSyncingGps ? (language === "hi" ? "जीपीएस सिंक हो रहा है..." : "Syncing GPS...") : "Sync GPS"}</span>
             </button>
           </div>
 

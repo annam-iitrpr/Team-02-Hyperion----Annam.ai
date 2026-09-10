@@ -56,6 +56,8 @@ export const DISTRICT_COORDINATES: Record<string, DistrictCoord> = {
   nanded: { lat: 19.1383, lon: 77.3210, state: "Maharashtra" },
 
   // Punjab
+  rupnagar: { lat: 30.9664, lon: 76.5331, state: "Punjab" },
+  ropar: { lat: 30.9664, lon: 76.5331, state: "Punjab" },
   ludhiana: { lat: 30.9010, lon: 75.8573, state: "Punjab" },
   patiala: { lat: 30.3398, lon: 76.3869, state: "Punjab" },
   jalandhar: { lat: 31.3260, lon: 75.5762, state: "Punjab" },
@@ -68,8 +70,21 @@ export const DISTRICT_COORDINATES: Record<string, DistrictCoord> = {
   muktsar: { lat: 30.4762, lon: 74.5168, state: "Punjab" },
   barnala: { lat: 30.3819, lon: 75.5468, state: "Punjab" },
   mansa: { lat: 29.9884, lon: 75.3934, state: "Punjab" },
+  mohali: { lat: 30.7046, lon: 76.7179, state: "Punjab" },
+  sas_nagar: { lat: 30.7046, lon: 76.7179, state: "Punjab" },
+  hoshiarpur: { lat: 31.5273, lon: 75.9149, state: "Punjab" },
+  gurdaspur: { lat: 32.0419, lon: 75.4053, state: "Punjab" },
+  kapurthala: { lat: 31.3802, lon: 75.3815, state: "Punjab" },
+  fazilka: { lat: 30.4037, lon: 74.0254, state: "Punjab" },
+  pathankot: { lat: 32.2684, lon: 75.6499, state: "Punjab" },
+  tarn_taran: { lat: 31.4520, lon: 74.9255, state: "Punjab" },
+  fatehgarh_sahib: { lat: 30.6499, lon: 76.3983, state: "Punjab" },
+  malerkotla: { lat: 30.5256, lon: 75.8901, state: "Punjab" },
 
   // Haryana
+  faridabad: { lat: 28.4089, lon: 77.3178, state: "Haryana" },
+  gurugram: { lat: 28.4595, lon: 77.0266, state: "Haryana" },
+  gurgaon: { lat: 28.4595, lon: 77.0266, state: "Haryana" },
   karnal: { lat: 29.6857, lon: 76.9905, state: "Haryana" },
   hisar: { lat: 29.1492, lon: 75.7217, state: "Haryana" },
   ambala: { lat: 30.3782, lon: 76.7767, state: "Haryana" },
@@ -79,6 +94,19 @@ export const DISTRICT_COORDINATES: Record<string, DistrictCoord> = {
   sonipat: { lat: 28.9931, lon: 77.0151, state: "Haryana" },
   fatehabad: { lat: 29.5147, lon: 75.4547, state: "Haryana" },
   panipat: { lat: 29.3909, lon: 76.9635, state: "Haryana" },
+  palwal: { lat: 28.1447, lon: 77.3260, state: "Haryana" },
+  nuh: { lat: 28.1065, lon: 77.0067, state: "Haryana" },
+  mewat: { lat: 28.1065, lon: 77.0067, state: "Haryana" },
+  rewari: { lat: 28.1833, lon: 76.6167, state: "Haryana" },
+  jhajjar: { lat: 28.6063, lon: 76.6565, state: "Haryana" },
+  bhiwani: { lat: 28.7833, lon: 76.1333, state: "Haryana" },
+  charkhi_dadri: { lat: 28.5921, lon: 76.2654, state: "Haryana" },
+  mahendragarh: { lat: 28.2819, lon: 76.1500, state: "Haryana" },
+  narnaul: { lat: 28.0444, lon: 76.1072, state: "Haryana" },
+  jind: { lat: 29.3167, lon: 76.3167, state: "Haryana" },
+  kaithal: { lat: 29.8000, lon: 76.4000, state: "Haryana" },
+  yamunanagar: { lat: 30.1333, lon: 77.2833, state: "Haryana" },
+  panchkula: { lat: 30.6942, lon: 76.8606, state: "Haryana" },
 
   // Rajasthan
   kota: { lat: 25.2138, lon: 75.8648, state: "Rajasthan" },
@@ -269,3 +297,66 @@ export function getDistrictCoordinates(districtName: string, stateName?: string)
 
   return { lat: 23.2030, lon: 77.0840 }; // MP default
 }
+
+/**
+ * Asynchronously resolves coordinates for any Indian district/town.
+ * Checks local dictionary first, then falls back to Open-Meteo Geocoding API if not found.
+ */
+export async function resolveDistrictCoordinatesAsync(
+  districtName: string,
+  stateName?: string
+): Promise<{ lat: number; lon: number }> {
+  if (!districtName) return getDistrictCoordinates("", stateName);
+
+  const clean = districtName.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, "_");
+  if (DISTRICT_COORDINATES[clean]) {
+    return { lat: DISTRICT_COORDINATES[clean].lat, lon: DISTRICT_COORDINATES[clean].lon };
+  }
+
+  // Fast substring match in memory
+  for (const [key, val] of Object.entries(DISTRICT_COORDINATES)) {
+    if (clean.includes(key) || key.includes(clean)) {
+      return { lat: val.lat, lon: val.lon };
+    }
+  }
+
+  // Try Open-Meteo Geocoding API for exact coordinates
+  try {
+    const q = `${districtName}${stateName ? `, ${stateName}` : ""}, India`;
+    const res = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(districtName)}&country=India&count=3`,
+      { cache: "force-cache" }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.results) && data.results.length > 0) {
+        // Find best match matching state if state provided
+        let match = data.results[0];
+        if (stateName) {
+          const sLower = stateName.toLowerCase();
+          const stateMatch = data.results.find(
+            (r: any) =>
+              (r.admin1 && r.admin1.toLowerCase().includes(sLower)) ||
+              (r.admin2 && r.admin2.toLowerCase().includes(sLower))
+          );
+          if (stateMatch) match = stateMatch;
+        }
+
+        const resolved = { lat: match.latitude, lon: match.longitude };
+        // Cache in memory for subsequent 0ms lookups
+        DISTRICT_COORDINATES[clean] = {
+          lat: resolved.lat,
+          lon: resolved.lon,
+          state: match.admin1 || stateName || "India",
+        };
+        return resolved;
+      }
+    }
+  } catch (_) {
+    // Network fallback
+  }
+
+  // Final fallback to state centroid
+  return getDistrictCoordinates(districtName, stateName);
+}
+

@@ -7,6 +7,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { getDistrictCoordinates, resolveDistrictCoordinatesAsync } from "@/lib/districtCoords";
 
 export interface WeatherData {
   lat: number;
@@ -41,7 +42,14 @@ export interface WeatherData {
 interface WeatherContextType {
   weather: WeatherData;
   refetch: (forceGps?: boolean) => void;
-  setCustomCoordinates: (lat: number, lon: number, customName?: string) => Promise<void>;
+  setCustomCoordinates: (
+    lat: number,
+    lon: number,
+    customName?: string,
+    overrideDistrict?: string,
+    overrideState?: string
+  ) => Promise<void>;
+  setCustomLocation: (district: string, state?: string, village?: string) => Promise<void>;
 }
 
 const WMO_DESCRIPTIONS: Record<number, { desc: string; emoji: string }> = {
@@ -166,18 +174,27 @@ const WeatherContext = createContext<WeatherContextType>({
   weather: DEFAULT_WEATHER,
   refetch: () => {},
   setCustomCoordinates: async () => {},
+  setCustomLocation: async () => {},
 });
 
 export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [weather, setWeather] = useState<WeatherData>({ ...DEFAULT_WEATHER, isLoading: true });
 
-  const fetchWeather = useCallback(async (lat: number, lon: number, customLocationLabel?: string) => {
+  const fetchWeather = useCallback(async (
+    lat: number,
+    lon: number,
+    customLocationLabel?: string,
+    overrideDistrict?: string,
+    overrideState?: string
+  ) => {
     setWeather((prev) => ({ ...prev, isLoading: true }));
     try {
       const geo = await reverseGeocode(lat, lon);
       const displayLocationName = customLocationLabel || geo.locationName;
+      const effectiveDistrict = overrideDistrict || geo.district || (displayLocationName.split(",")[0] || "Local District");
+      const effectiveState = overrideState || geo.state || "India";
 
-      // Fetch Real Telemetry from Open-Meteo
+      // Fetch Real Telemetry from Open-Meteo with live cache-busting
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,soil_temperature_0cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=2`;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error("Open-Meteo fetch failed");
@@ -199,7 +216,6 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const timePart = hourlyTimes[i].split("T")[1];
         if (timePart) {
           const hour = parseInt(timePart.split(":")[0], 10);
-          // 8 night hours: 22h, 23h, 00h, 01h, 02h, 03h, 04h, 05h
           if ([22, 23, 0, 1, 2, 3, 4, 5].includes(hour) && nightHoursTemps.length < 8) {
             const tempVal = hourlyTemps[i] ?? c.temperature_2m;
             nightHoursTemps.push(tempVal);
@@ -223,15 +239,15 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Calibrated Nocturnal Respiration Thermal Stress Index (CWSI)
       let stressPercent: number;
       if (realNightMean <= 20) {
-        stressPercent = Math.max(12, Math.round(15 + (realNightMean - 15) * 2)); // 12% - 25% (Optimal)
+        stressPercent = Math.max(12, Math.round(15 + (realNightMean - 15) * 2));
       } else if (realNightMean <= 24) {
-        stressPercent = Math.round(25 + (realNightMean - 20) * 5); // 25% - 45% (Normal)
+        stressPercent = Math.round(25 + (realNightMean - 20) * 5);
       } else if (realNightMean <= 27) {
-        stressPercent = Math.round(48 + (realNightMean - 24) * 8 + (totalDegreeHours / 8) * 1.5); // 48% - 72% (Mild Stress)
+        stressPercent = Math.round(48 + (realNightMean - 24) * 8 + (totalDegreeHours / 8) * 1.5);
       } else if (realNightMean <= 30) {
-        stressPercent = Math.round(73 + (realNightMean - 27) * 5 + (totalDegreeHours / 8) * 1.5); // 73% - 88% (High Thermal Stress)
+        stressPercent = Math.round(73 + (realNightMean - 27) * 5 + (totalDegreeHours / 8) * 1.5);
       } else {
-        stressPercent = Math.min(96, Math.round(88 + (realNightMean - 30) * 2.5)); // 88% - 96% (Extreme Heatwave)
+        stressPercent = Math.min(96, Math.round(88 + (realNightMean - 30) * 2.5));
       }
 
       const soilMoistureVal = hourlySoilM.length > 0
@@ -275,8 +291,8 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         precipitationProbability: precipProbVal,
         locationName: displayLocationName,
         village: geo.village,
-        district: geo.district || (displayLocationName.split(",")[0] || "Local District"),
-        state: geo.state || "India",
+        district: effectiveDistrict,
+        state: effectiveState,
         lastUpdated: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
         isLoading: false,
         hasError: false,
@@ -287,19 +303,44 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, []);
 
-  const setCustomCoordinates = useCallback(async (lat: number, lon: number, customName?: string) => {
-    await fetchWeather(lat, lon, customName);
+  const setCustomCoordinates = useCallback(async (
+    lat: number,
+    lon: number,
+    customName?: string,
+    overrideDistrict?: string,
+    overrideState?: string
+  ) => {
+    await fetchWeather(lat, lon, customName, overrideDistrict, overrideState);
   }, [fetchWeather]);
 
-  const getLocationAndFetch = useCallback((forceGps = false) => {
+  const setCustomLocation = useCallback(async (
+    district: string,
+    state?: string,
+    village?: string
+  ) => {
+    const coords = await resolveDistrictCoordinatesAsync(district, state);
+    const lat = coords?.lat || DEFAULT_WEATHER.lat;
+    const lon = coords?.lon || DEFAULT_WEATHER.lon;
+    const label = `${village ? village + ", " : ""}${district}${state ? ", " + state : ""}, India`;
+    await fetchWeather(lat, lon, label, district, state);
+  }, [fetchWeather]);
+
+  const getLocationAndFetch = useCallback(async (forceGps = false) => {
     if (typeof window === "undefined") return;
 
-    let targetLat = DEFAULT_WEATHER.lat;
-    let targetLon = DEFAULT_WEATHER.lon;
+    let targetLat: number | null = null;
+    let targetLon: number | null = null;
+    let targetDistrict = "";
+    let targetState = "";
+    let targetVillage = "";
+
     try {
       const raw = localStorage.getItem("aasra_farmer_profile");
       if (raw) {
         const parsed = JSON.parse(raw);
+        if (parsed.district) targetDistrict = parsed.district;
+        if (parsed.state) targetState = parsed.state;
+        if (parsed.village) targetVillage = parsed.village;
         if (parsed.gpsLocation?.lat && parsed.gpsLocation?.lon) {
           targetLat = parsed.gpsLocation.lat;
           targetLon = parsed.gpsLocation.lon;
@@ -307,38 +348,117 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     } catch (_) {}
 
-    const hasDeniedGps = localStorage.getItem("aasra_gps_denied") === "true";
+    // Also check farm context storage
+    try {
+      const rawFarms = localStorage.getItem("nimbooz_farms_v5");
+      if (rawFarms) {
+        const farms = JSON.parse(rawFarms);
+        if (Array.isArray(farms) && farms.length > 0) {
+          const activeId = localStorage.getItem("nimbooz_active_farm_id_v5");
+          const active = farms.find((f: any) => f.id === activeId) || farms[0];
+          if (active) {
+            if (active.district) targetDistrict = active.district;
+            if (active.state) targetState = active.state;
+            if (active.center && active.center[0] && active.center[1]) {
+              if (!targetLat) {
+                targetLat = active.center[0];
+                targetLon = active.center[1];
+              }
+            }
+          }
+        }
+      }
+    } catch (_) {}
 
-    if (hasDeniedGps && !forceGps) {
-      fetchWeather(targetLat, targetLon);
-      return;
+    // Resolve coordinates from district dynamically and guarantee no stale coordinates
+    if (targetDistrict) {
+      const resolved = await resolveDistrictCoordinatesAsync(targetDistrict, targetState);
+      if (resolved) {
+        const isStaleOrFar =
+          !targetLat ||
+          !targetLon ||
+          Math.abs(targetLat - resolved.lat) > 0.8 ||
+          Math.abs(targetLon - resolved.lon) > 0.8;
+
+        if (isStaleOrFar) {
+          targetLat = resolved.lat;
+          targetLon = resolved.lon;
+        }
+      }
     }
 
-    if ("geolocation" in navigator) {
+    // Force GPS requested by explicit user action (e.g. Sync GPS button)
+    if (forceGps && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
           localStorage.removeItem("aasra_gps_denied");
-          fetchWeather(pos.coords.latitude, pos.coords.longitude);
+          const geo = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+          fetchWeather(pos.coords.latitude, pos.coords.longitude, geo.locationName, geo.district, geo.state);
         },
         (err) => {
           if (err.code === 1) {
             localStorage.setItem("aasra_gps_denied", "true");
           }
-          fetchWeather(targetLat, targetLon);
+          fetchWeather(
+            targetLat || DEFAULT_WEATHER.lat,
+            targetLon || DEFAULT_WEATHER.lon,
+            targetDistrict ? `${targetVillage ? targetVillage + ", " : ""}${targetDistrict}, ${targetState}, India` : undefined,
+            targetDistrict || undefined,
+            targetState || undefined
+          );
+        },
+        { timeout: 8000, maximumAge: 300000 }
+      );
+      return;
+    }
+
+    // Standard load: prioritize the farmer's configured farm location!
+    if (targetLat && targetLon) {
+      const label = targetDistrict
+        ? `${targetVillage ? targetVillage + ", " : ""}${targetDistrict}, ${targetState || "India"}, India`
+        : undefined;
+      fetchWeather(targetLat, targetLon, label, targetDistrict || undefined, targetState || undefined);
+      return;
+    }
+
+    // If no location configured at all, fallback to device geolocation or default
+    const hasDeniedGps = localStorage.getItem("aasra_gps_denied") === "true";
+    if (!hasDeniedGps && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const geo = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+          fetchWeather(pos.coords.latitude, pos.coords.longitude, geo.locationName, geo.district, geo.state);
+        },
+        () => {
+          fetchWeather(DEFAULT_WEATHER.lat, DEFAULT_WEATHER.lon);
         },
         { timeout: 6000, maximumAge: 300000 }
       );
     } else {
-      fetchWeather(targetLat, targetLon);
+      fetchWeather(DEFAULT_WEATHER.lat, DEFAULT_WEATHER.lon);
     }
   }, [fetchWeather]);
 
   useEffect(() => {
     getLocationAndFetch();
+
+    const handleLocationUpdate = () => {
+      getLocationAndFetch(false);
+    };
+
+    window.addEventListener("aasra-profile-updated", handleLocationUpdate);
+    window.addEventListener("aasra_fields_updated", handleLocationUpdate);
+    window.addEventListener("storage", handleLocationUpdate);
+
+    return () => {
+      window.removeEventListener("aasra-profile-updated", handleLocationUpdate);
+      window.removeEventListener("aasra_fields_updated", handleLocationUpdate);
+      window.removeEventListener("storage", handleLocationUpdate);
+    };
   }, [getLocationAndFetch]);
 
   return (
-    <WeatherContext.Provider value={{ weather, refetch: getLocationAndFetch, setCustomCoordinates }}>
+    <WeatherContext.Provider value={{ weather, refetch: getLocationAndFetch, setCustomCoordinates, setCustomLocation }}>
       {children}
     </WeatherContext.Provider>
   );

@@ -245,7 +245,13 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Also trigger Weather sync if active farm has coordinates
       const currentActive = loadedFarms.find((f) => f.id === activeId) || loadedFarms[0];
       if (currentActive && currentActive.center && setCustomCoordinates) {
-        setCustomCoordinates(currentActive.center[0], currentActive.center[1], currentActive.name);
+        setCustomCoordinates(
+          currentActive.center[0],
+          currentActive.center[1],
+          currentActive.name,
+          currentActive.district,
+          currentActive.state
+        );
       }
     } catch (e) {
       console.error("[FarmContext] sync error:", e);
@@ -292,7 +298,7 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Update WeatherContext GPS and telemetry immediately
         if (setCustomCoordinates && target.center) {
-          setCustomCoordinates(target.center[0], target.center[1], target.name);
+          setCustomCoordinates(target.center[0], target.center[1], target.name, target.district, target.state);
         }
 
         // Update profile store for legacy compatibility
@@ -367,7 +373,7 @@ export const FarmProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (_) {}
 
       if (setCustomCoordinates) {
-        setCustomCoordinates(lat, lon, newFarm.name);
+        setCustomCoordinates(lat, lon, newFarm.name, newFarm.district, newFarm.state);
       }
 
       return newFarm;
