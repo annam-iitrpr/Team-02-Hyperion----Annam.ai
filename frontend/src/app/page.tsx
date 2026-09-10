@@ -1,495 +1,1203 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { AppShell } from "@/components/AppShell";
-import { useLanguage } from "@/context/LanguageContext";
-import { isUserLoggedIn } from "@/lib/userStore";
+import { useRouter } from "next/navigation";
+import { getLandingTranslation, LandingTranslation } from "@/lib/landingTranslations";
 import {
+  Sprout,
   ArrowRight,
-  Mic,
-  ChevronDown,
-  CloudSun,
-  Store,
-  Leaf,
-  ShieldAlert,
-  Camera,
+  Globe,
+  Smartphone,
   CheckCircle2,
-  Sparkles,
-  UserPlus,
+  CloudRain,
+  Camera,
+  Sun,
+  BarChart3,
+  Mic,
+  Settings,
   ShieldCheck,
-  TrendingUp,
+  Check,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  X,
+  ChevronDown,
+  Download,
+  Share2,
   Layers,
-  FileText,
+  MapPin,
+  Clock,
+  Wind,
+  Droplets,
+  Thermometer,
+  Shield,
+  HelpCircle,
+  ExternalLink,
   MessageCircle,
+  Sparkles,
+  Zap,
+  Building2,
+  FileCheck
 } from "lucide-react";
 
-import { DynamicHeroHeadline } from "@/components/DynamicHeroHeadline";
-import { LiveFarmSimulator } from "@/components/LiveFarmSimulator";
-
-// Scroll reveal hook for buttery smooth entry animations
-function useScrollReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(true);
-  useEffect(() => {
-    if (typeof window !== "undefined" && "IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setVisible(true);
-            observer.disconnect();
-          }
-        },
-        { threshold }
-      );
-      if (ref.current) observer.observe(ref.current);
-      return () => observer.disconnect();
-    }
-  }, [threshold]);
-  return { ref, visible };
-}
-
-// Count-up hook for high-impact metric digits
-function useCountUp(target: number, duration = 1000) {
-  const [count, setCount] = useState(target);
-  useEffect(() => {
-    let start = 0;
-    const step = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  return count;
-}
+// 12 Supported Indian Languages
+const INDIAN_LANGUAGES = [
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
+  { code: "mr", name: "Marathi", nativeName: "मराठी" },
+  { code: "pa", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ" },
+  { code: "gu", name: "Gujarati", nativeName: "ગુજરાતી" },
+  { code: "bn", name: "Bengali", nativeName: "বাংলা" },
+  { code: "te", name: "Telugu", nativeName: "తెలుగు" },
+  { code: "ta", name: "Tamil", nativeName: "தமிழ்" },
+  { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ" },
+  { code: "ml", name: "Malayalam", nativeName: "മലയാളം" },
+  { code: "or", name: "Odia", nativeName: "ଓଡ଼ିଆ" },
+  { code: "as", name: "Assamese", nativeName: "অসমীয়া" },
+];
 
 export default function LandingPage() {
-  const { language } = useLanguage();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const router = useRouter();
+
+  // 12-Language state (persisted in localStorage if available)
+  const [language, setLanguage] = useState<string>("en");
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const langDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Translation bundle
+  const t: LandingTranslation = getLandingTranslation(language);
+
+  // Video State for the farmer problem video
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoPlaying, setVideoPlaying] = useState(true);
+  const [videoMuted, setVideoMuted] = useState(true);
+
+  // Install WebApp / PWA Modal state
+  const [installModalOpen, setInstallModalOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
+  // Phone Mockup Active Tab simulation
+  const [phoneActiveTab, setPhoneActiveTab] = useState<"check" | "weather" | "ask" | "mandi">("check");
+  const [phoneScanActive, setPhoneScanActive] = useState(true);
+
+  // Load language preference & listen for PWA prompt
   useEffect(() => {
-    setIsLoggedIn(isUserLoggedIn());
+    try {
+      const savedLang = localStorage.getItem("preferred_language");
+      if (savedLang && INDIAN_LANGUAGES.some((l) => l.code === savedLang)) {
+        setLanguage(savedLang);
+      }
+    } catch {}
+
+    const checkMobile = () => {
+      const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
+      setIsMobile(/android|iphone|ipad|ipod/i.test(ua));
+    };
+    checkMobile();
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Close language dropdown on outside click
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+        setLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
-  const statsReveal = useScrollReveal();
-  const simReveal = useScrollReveal();
-  const toolsReveal = useScrollReveal();
+  const handleLanguageChange = (code: string) => {
+    setLanguage(code);
+    setLangDropdownOpen(false);
+    try {
+      localStorage.setItem("preferred_language", code);
+    } catch {}
+  };
 
-  const mandis = useCountUp(140, 900);
-  const crops = useCountUp(60, 800);
-  const languages = useCountUp(12, 700);
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        setDeferredPrompt(null);
+      }
+    } else {
+      setInstallModalOpen(true);
+    }
+  };
 
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const toggleVideoPlay = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setVideoPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setVideoPlaying(false);
+    }
+  };
 
-  // 4 Streamlined Core Tools (Stripe Design System: High Contrast, Minimal Text)
-  const coreTools = [
-    {
-      id: "weather",
-      icon: <CloudSun className="h-6 w-6 text-[#533afd]" />,
-      iconBg: "bg-indigo-50",
-      badge: "Open-Meteo GPS",
-      badgeCls: "bg-indigo-50 text-[#533afd] border-indigo-200/70",
-      title: isHindi ? "सूक्ष्म-मौसम रडार" : "Hyperlocal Weather Radar",
-      desc: isHindi
-        ? "14-दिन का बारिश, तापमान व सुरक्षित स्प्रे विंडो समय।"
-        : "14-day agrometeorological forecast, humidity, and safe spray timing.",
-      cta: isHindi ? "मौसम देखें" : "Open Weather",
-      href: "/weather",
-      ctaCls: "text-[#533afd] bg-indigo-50 hover:bg-indigo-100",
-    },
-    {
-      id: "mandi",
-      icon: <Store className="h-6 w-6 text-emerald-600" />,
-      iconBg: "bg-emerald-50",
-      badge: "Agmarknet Live",
-      badgeCls: "bg-emerald-50 text-emerald-700 border-emerald-200/70",
-      title: isHindi ? "APMC मंडी भाव नेटवर्क" : "140+ Mandi Price Network",
-      desc: isHindi
-        ? "140+ सरकारी मंडियों के ताजा भाव व सबसे फायदेमंद मंडी।"
-        : "Live verified modal rates across 140+ mandis with MSP tracking.",
-      cta: isHindi ? "मंडी भाव देखें" : "Check Rates",
-      href: "/dashboard",
-      ctaCls: "text-emerald-700 bg-emerald-50 hover:bg-emerald-100",
-    },
-    {
-      id: "vision",
-      icon: <ShieldAlert className="h-6 w-6 text-violet-600" />,
-      iconBg: "bg-violet-50",
-      badge: "Gemini 2.5 Vision",
-      badgeCls: "bg-violet-50 text-violet-700 border-violet-200/70",
-      title: isHindi ? "AI पत्ती रोग पहचान" : "Instant Leaf Disease Scan",
-      desc: isHindi
-        ? "कैमरे से फोटो लें और 2 सेकंड में पक्का इलाज पाएं।"
-        : "Snap a leaf photo for instant lesion diagnosis and certified cure.",
-      cta: isHindi ? "पत्ती स्कैन करें" : "Scan Leaf",
-      href: "/plant-intelligence",
-      ctaCls: "text-violet-700 bg-violet-50 hover:bg-violet-100",
-    },
-    {
-      id: "voice",
-      icon: <Mic className="h-6 w-6 text-amber-600" />,
-      iconBg: "bg-amber-50",
-      badge: "Voice & WhatsApp",
-      badgeCls: "bg-amber-50 text-amber-700 border-amber-200/70",
-      title: isHindi ? "वॉइस व व्हाट्सएप किसान सहायक" : "Voice & WhatsApp Assistant",
-      desc: isHindi
-        ? "अपनी भाषा में बोलकर या व्हाट्सएप पर 24/7 सलाह लें।"
-        : "Speak naturally in 12 languages or message 24/7 on WhatsApp.",
-      cta: isHindi ? "व्हाट्सएप चैट" : "Chat on WhatsApp",
-      href: "https://wa.me/15556694548?text=Namaste",
-      ctaCls: "text-amber-700 bg-amber-50 hover:bg-amber-100",
-      isExternal: true,
-    },
+  const toggleVideoMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoMuted;
+    setVideoMuted(!videoMuted);
+  };
+
+  const currentLangObj = INDIAN_LANGUAGES.find((l) => l.code === language) || INDIAN_LANGUAGES[0];
+
+  const faqs = [
+    { q: t.faq.q1, a: t.faq.a1 },
+    { q: t.faq.q2, a: t.faq.a2 },
+    { q: t.faq.q3, a: t.faq.a3 },
+    { q: t.faq.q4, a: t.faq.a4 },
+    { q: t.faq.q5, a: t.faq.a5 },
   ];
 
   return (
-    <AppShell>
-      <div className="bg-[#ffffff] text-[#0d253d] min-h-screen">
-        {/* Dynamic Hero Section with 4 Interactive Buttons & Modal Popup */}
-        <DynamicHeroHeadline />
-
-        {/* ── 1. Clean High-Impact Metric Numbers ─────────────────────────────── */}
-        <section
-          ref={statsReveal.ref}
-          className="border-y border-[#e3e8ee] bg-[#f6f9fc] py-8 transition-all duration-700"
-          style={{
-            opacity: statsReveal.visible ? 1 : 0,
-            transform: statsReveal.visible ? "translateY(0)" : "translateY(12px)",
-          }}
-        >
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
-              <div className="p-4 rounded-2xl bg-white border border-[#e3e8ee] shadow-xs">
-                <p className="text-3xl sm:text-4xl font-black text-[#533afd] font-mono tracking-tight">
-                  {mandis}+
-                </p>
-                <p className="text-xs font-bold text-[#0d253d] mt-1">
-                  {isHindi ? "लाइव APMC मंडियां" : "Live APMC Mandis"}
-                </p>
-                <p className="text-[11px] text-[#64748d]">
-                  {isHindi ? "दैनिक सत्यापित भाव" : "Daily Verified Rates"}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-white border border-[#e3e8ee] shadow-xs">
-                <p className="text-3xl sm:text-4xl font-black text-emerald-600 font-mono tracking-tight">
-                  {crops}+
-                </p>
-                <p className="text-xs font-bold text-[#0d253d] mt-1">
-                  {isHindi ? "समर्थित फसलें" : "Supported Crops"}
-                </p>
-                <p className="text-[11px] text-[#64748d]">
-                  {isHindi ? "अनाज, दलहन, तिलहन" : "Cereals, Pulses & Cash"}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-white border border-[#e3e8ee] shadow-xs">
-                <p className="text-3xl sm:text-4xl font-black text-amber-600 font-mono tracking-tight">
-                  {languages}
-                </p>
-                <p className="text-xs font-bold text-[#0d253d] mt-1">
-                  {isHindi ? "भारतीय भाषाएं" : "Indian Languages"}
-                </p>
-                <p className="text-[11px] text-[#64748d]">
-                  {isHindi ? "आवाज व टेक्स्ट दोनों में" : "Voice STT & TTS"}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-white border border-[#e3e8ee] shadow-xs">
-                <p className="text-3xl sm:text-4xl font-black text-violet-600 font-mono tracking-tight">
-                  100%
-                </p>
-                <p className="text-xs font-bold text-[#0d253d] mt-1">
-                  {isHindi ? "निःशुल्क सेवा" : "Free for Farmers"}
-                </p>
-                <p className="text-[11px] text-[#64748d]">
-                  {isHindi ? "सार्वजनिक कृषि नवाचार" : "Public Good Platform"}
-                </p>
-              </div>
+    <div className="min-h-screen bg-[#FBFDF9] text-[#111827] selection:bg-[#15803d] selection:text-white flex flex-col font-sans">
+      
+      {/* ═══════════════════════════════════════════════════════════════════════
+          HEADER & NAVIGATION BAR
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+          
+          {/* Logo & Slogan */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-lg bg-[#15803d]/10 flex items-center justify-center text-[#15803d]">
+              <Sprout className="w-5 h-5 text-[#15803d]" />
             </div>
-          </div>
-        </section>
-
-        {/* ── 2. Interactive Live Farm Simulator (Zero Bars, Minimal Text) ────── */}
-        <section
-          ref={simReveal.ref}
-          className="py-12 sm:py-16 bg-[#ffffff] border-b border-[#e3e8ee]"
-          style={{
-            opacity: simReveal.visible ? 1 : 0,
-            transform: simReveal.visible ? "translateY(0)" : "translateY(16px)",
-            transition: "opacity 600ms ease, transform 600ms ease",
-          }}
-        >
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div className="text-center max-w-xl mx-auto space-y-2">
-              <span className="inline-flex items-center gap-1.5 bg-[#533afd]/10 text-[#533afd] border border-[#533afd]/20 rounded-full px-3.5 py-1 text-xs font-bold font-mono uppercase tracking-wider">
-                {isHindi ? "सजीव फसल विकास" : "Crop Growth Stages"}
+            <div>
+              <div className="text-xl font-extrabold tracking-tight text-[#111827] leading-none flex items-center gap-1">
+                <span>krishyantra</span>
+              </div>
+              <span className="text-[10px] font-medium text-[#6B7280] leading-none tracking-wide">
+                Saath Har Kisan Ke Liye
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#0d253d] font-display tracking-tight">
-                {isHindi
-                  ? "फसल की हर अवस्था का सजीव विकास सिमुलेशन"
-                  : "Watch Your Crop Grow Across Every Lifecycle Phase"}
-              </h2>
-              <p className="text-xs sm:text-sm text-[#64748d]">
-                {isHindi
-                  ? "अंकुरण से लेकर सुनहरी कटाई तक—प्रत्येक चरण में पौधे का विकास और सुरक्षा:"
-                  : "From germination to golden harvest—see what happens to the plant at every stage:"}
-              </p>
             </div>
+          </Link>
 
-            {/* Zero-Bars Visual Live Farm Simulator Component */}
-            <LiveFarmSimulator />
-          </div>
-        </section>
+          {/* Desktop Nav Links */}
+          <nav className="hidden lg:flex items-center gap-7 text-[14px] font-medium text-[#374151]">
+            <a href="#hero" className="text-[#15803d] font-semibold transition-colors">
+              {t.nav.home}
+            </a>
+            <a href="#features" className="hover:text-[#15803d] transition-colors">
+              {t.nav.features}
+            </a>
+            <a href="#how-it-works" className="hover:text-[#15803d] transition-colors">
+              {t.nav.howItWorks}
+            </a>
+            <a href="#in-action" className="hover:text-[#15803d] transition-colors">
+              {t.nav.forFarmers}
+            </a>
+            <a href="#video-story" className="hover:text-[#15803d] transition-colors">
+              {t.nav.successStories}
+            </a>
+            <a href="#faq" className="hover:text-[#15803d] transition-colors">
+              {t.nav.faq}
+            </a>
+          </nav>
 
-        {/* ── 3. Four Core Farmer Action Tools (Minimal Text & Clean Cards) ───── */}
-        <section
-          ref={toolsReveal.ref}
-          className="py-12 sm:py-16 bg-[#f6f9fc] border-b border-[#e3e8ee]"
-          style={{
-            opacity: toolsReveal.visible ? 1 : 0,
-            transform: toolsReveal.visible ? "translateY(0)" : "translateY(16px)",
-            transition: "opacity 600ms ease, transform 600ms ease",
-          }}
-        >
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div className="text-center max-w-xl mx-auto space-y-2">
-              <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3.5 py-1 text-xs font-bold font-mono uppercase tracking-wider">
-                {isHindi ? "मुख्य सुविधाएं" : "Essential Tools"}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#0d253d] font-display tracking-tight">
-                {isHindi ? "किसान के लिए 4 मुख्य उपकरण" : "Four Everyday Field Tools"}
-              </h2>
-              <p className="text-xs sm:text-sm text-[#64748d]">
-                {isHindi
-                  ? "सभी सुविधाएं सीधे आपके मोबाइल पर तुरंत काम करती हैं:"
-                  : "Fast, accurate, and completely free on any smartphone:"}
-              </p>
-            </div>
+          {/* Right Controls: 12-Language Selector & Get Started */}
+          <div className="flex items-center gap-3">
+            
+            {/* 12-Language Dropdown */}
+            <div className="relative" ref={langDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#D1D5DB] bg-white text-xs font-semibold text-[#374151] hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+                title="Change Website Language (12 Languages)"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#15803d]" />
+                <span>{currentLangObj.nativeName}</span>
+                <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${langDropdownOpen ? "rotate-180" : ""}`} />
+              </button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {coreTools.map((tool) => (
-                <div
-                  key={tool.id}
-                  className="bg-white border border-[#e3e8ee] rounded-2xl p-5 sm:p-6 shadow-xs hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className={`p-3 rounded-xl ${tool.iconBg} shrink-0`}>
-                        {tool.icon}
-                      </div>
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${tool.badgeCls}`}>
-                        {tool.badge}
-                      </span>
-                    </div>
-
-                    <h3 className="text-base sm:text-lg font-bold text-[#0d253d] font-display">
-                      {tool.title}
-                    </h3>
-
-                    <p className="text-xs sm:text-sm text-[#64748d] leading-relaxed">
-                      {tool.desc}
-                    </p>
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95">
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                    Choose Language (12 Languages)
                   </div>
-
-                  <div className="pt-5 mt-4 border-t border-slate-100">
-                    {tool.isExternal ? (
-                      <a
-                        href={tool.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center justify-between w-full px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${tool.ctaCls}`}
-                      >
-                        <span>{tool.cta}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </a>
-                    ) : (
-                      <Link
-                        href={isLoggedIn ? tool.href : "/signup"}
-                        className={`inline-flex items-center justify-between w-full px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${tool.ctaCls}`}
-                      >
-                        <span>{tool.cta}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── 4. Quick Platform Navigation Links ─────────────────────────────── */}
-        <section className="py-10 bg-[#ffffff] border-b border-[#e3e8ee]">
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-              {[
-                { href: "/how-it-works", label: isHindi ? "हाउ इट वर्क्स" : "How It Works", desc: isHindi ? "प्लेटफॉर्म कार्यप्रणाली" : "Step-by-step tour", icon: Sparkles },
-                { href: "/product", label: isHindi ? "उत्पाद विशेषताएँ" : "Product Features", desc: isHindi ? "तकनीकी क्षमताएं" : "System capabilities", icon: Layers },
-                { href: "/impact-story", label: isHindi ? "सफलता की कहानियाँ" : "Farmer Stories", desc: isHindi ? "किसानों के अनुभव" : "Attributed field ROI", icon: TrendingUp },
-                { href: "/plant-intelligence", label: isHindi ? "पादप बुद्धिमत्ता (5 मॉडल)" : "Plant Intelligence (5 Models)", desc: isHindi ? "वर्टेक्स AI इंजन" : "Vertex AI Models", icon: FileText },
-              ].map((m) => {
-                const Icon = m.icon;
-                return (
-                  <Link
-                    key={m.href}
-                    href={m.href}
-                    className="p-4 rounded-xl bg-[#f8fafc] border border-[#e3e8ee] hover:border-[#533afd]/40 shadow-xs hover:shadow-sm transition-all duration-200 flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2 rounded-lg bg-white border border-slate-200 text-[#533afd] shrink-0">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="truncate">
-                        <div className="text-xs font-bold text-[#0d253d] group-hover:text-[#533afd] transition-colors truncate">
-                          {m.label}
-                        </div>
-                        <div className="text-[10px] text-slate-400 font-mono truncate">
-                          {m.desc}
-                        </div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#533afd] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ── 5. Minimal 3-Question Farmer FAQ ─────────────────────────────────── */}
-        <section className="py-12 sm:py-16 bg-[#f6f9fc] border-b border-[#e3e8ee]">
-          <div className="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div className="text-center space-y-1">
-              <span className="text-xs font-mono font-bold text-[#533afd] uppercase tracking-wider">
-                {isHindi ? "स्पष्ट जवाब" : "Quick Answers"}
-              </span>
-              <h3 className="text-xl sm:text-2xl font-bold text-[#0d253d] font-display">
-                {isHindi ? "किसान भाईयों के 3 मुख्य सवाल" : "Frequently Asked Questions"}
-              </h3>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                {
-                  qHi: "1. क्या AASRA पूरी तरह निःशुल्क है?",
-                  qEn: "1. Is AASRA completely free for farmers?",
-                  aHi: "हाँ! 14-दिन का मौसम रडार, 140+ सरकारी मंडियों के भाव, पत्ती रोग स्कैनर और वॉइस AI सभी किसानों के लिए आजीवन 100% निःशुल्क हैं।",
-                  aEn: "Yes! The 14-day weather radar, 140+ mandi prices, leaf disease scanner, and voice AI are 100% free forever for all farmers.",
-                },
-                {
-                  qHi: "2. क्या खेत में इंटरनेट कमजोर होने पर भी यह काम करता है?",
-                  qEn: "2. Does it work with low internet connectivity?",
-                  aHi: "हाँ! यह कमजोर इंटरनेट पर भी तेजी से खुलता है और आप हमारे आधिकारिक व्हाट्सएप (+1 555-669-4548) पर 2G/3G में भी मौसम व भाव पा सकते हैं।",
-                  aEn: "Yes! It is lightweight and works seamlessly on 2G/3G networks and via direct WhatsApp chat (+1 555-669-4548).",
-                },
-                {
-                  qHi: "3. क्या AI द्वारा बताई गई दवा और मात्रा सुरक्षित है?",
-                  qEn: "3. Are the AI chemical doses safe for my crops?",
-                  aHi: "हाँ, केवल सरकारी ICAR प्रमाणित दवाइयां और आपके खेत के तापमान-नमी के अनुसार सुरक्षित मात्रा ही बताई जाती है ताकि फसल को कोई नुकसान न हो।",
-                  aEn: "Yes, every advisory is strictly bound to certified ICAR agricultural thresholds and current field temperature to prevent scorching.",
-                },
-              ].map((faq, idx) => {
-                const isOpen = openFaqIndex === idx;
-                return (
-                  <div
-                    key={idx}
-                    className="border border-[#e3e8ee] rounded-2xl overflow-hidden bg-white shadow-xs transition-all"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                      className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors cursor-pointer"
-                    >
-                      <span className="text-sm font-bold text-[#0d253d] font-display">
-                        {isHindi ? faq.qHi : faq.qEn}
-                      </span>
-                      <div
-                        className={`p-1.5 rounded-full transition-transform duration-200 shrink-0 ${
-                          isOpen
-                            ? "rotate-180 bg-indigo-50 text-[#533afd]"
-                            : "bg-slate-100 text-slate-500"
+                  <div className="max-h-64 overflow-y-auto py-1">
+                    {INDIAN_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => handleLanguageChange(lang.code)}
+                        className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
+                          language === lang.code ? "font-bold text-[#15803d] bg-green-50/70" : "text-[#374151]"
                         }`}
                       >
-                        <ChevronDown className="h-4 w-4" />
-                      </div>
-                    </button>
-                    {isOpen && (
-                      <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs sm:text-sm text-[#64748d] leading-relaxed border-t border-slate-100 pt-3">
-                        {isHindi ? faq.aHi : faq.aEn}
-                      </div>
-                    )}
+                        <span>{lang.nativeName}</span>
+                        <span className="text-[10px] text-slate-400">{lang.name}</span>
+                      </button>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              )}
+            </div>
+
+            {/* Get Started Button */}
+            <button
+              onClick={() => router.push("/signup")}
+              className="px-5 py-2 rounded-full bg-[#166534] hover:bg-[#14532d] text-white text-xs sm:text-sm font-semibold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>{t.nav.getStarted}</span>
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 1: HERO SECTION matching the reference image
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <section id="hero" className="relative pt-8 pb-16 lg:pt-14 lg:pb-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            
+            {/* Left Column: Headlines & Call to Actions */}
+            <div className="lg:col-span-6 space-y-6">
+              
+              {/* Handwritten Script Tag */}
+              <div className="inline-block transform -rotate-2">
+                <span className="font-handwriting text-xl sm:text-2xl text-[#166534] font-bold block whitespace-pre-line leading-tight">
+                  {t.hero.scriptAnnotation}
+                </span>
+              </div>
+
+              {/* Main 3-line Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827] leading-[1.08]">
+                <span className="block">{t.hero.headlineLine1}</span>
+                <span className="block">{t.hero.headlineLine2}</span>
+                <span className="block text-[#166534]">{t.hero.headlineLine3}</span>
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-base sm:text-lg text-[#4B5563] max-w-xl leading-relaxed">
+                {t.hero.subtitle}
+              </p>
+
+              {/* 5 Feature Badges Row */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2">
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E5E7EB] shadow-2xs text-[11px] font-semibold text-[#374151]">
+                  <Sprout className="w-4 h-4 text-[#15803d] shrink-0" />
+                  <span>{t.hero.badge1}</span>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E5E7EB] shadow-2xs text-[11px] font-semibold text-[#374151]">
+                  <Smartphone className="w-4 h-4 text-[#15803d] shrink-0" />
+                  <span>{t.hero.badge2}</span>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E5E7EB] shadow-2xs text-[11px] font-semibold text-[#374151]">
+                  <FileCheck className="w-4 h-4 text-[#15803d] shrink-0" />
+                  <span>{t.hero.badge3}</span>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E5E7EB] shadow-2xs text-[11px] font-semibold text-[#374151]">
+                  <Globe className="w-4 h-4 text-[#15803d] shrink-0" />
+                  <span>{t.hero.badge4}</span>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E5E7EB] shadow-2xs text-[11px] font-semibold text-[#374151]">
+                  <ShieldCheck className="w-4 h-4 text-[#15803d] shrink-0" />
+                  <span>{t.hero.badge5}</span>
+                </div>
+              </div>
+
+              {/* Buttons Row: Get Started + Install WebApp */}
+              <div className="pt-3 flex flex-wrap items-center gap-3.5">
+                
+                {/* Get Started Free */}
+                <button
+                  onClick={() => router.push("/signup")}
+                  className="px-6 py-3 rounded-full bg-[#166534] hover:bg-[#14532d] text-white text-sm sm:text-base font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
+                >
+                  <span>{t.hero.ctaPrimary}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                {/* Install WebApp (replacing Watch 1 min video per instruction) */}
+                <button
+                  onClick={handleInstallClick}
+                  className="px-5 py-3 rounded-full bg-white hover:bg-slate-50 text-[#166534] border-2 border-[#166534] text-sm sm:text-base font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+                  title="Install WebApp on your phone"
+                >
+                  <Download className="w-4 h-4 text-[#166534]" />
+                  <span>{t.hero.ctaInstallApp || "Install WebApp"}</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* Right Column: Smiling Farmer + Animated Phone Mockup */}
+            <div className="lg:col-span-6 relative flex items-center justify-center min-h-[460px] sm:min-h-[520px]">
+              
+              {/* Background Farmer Image */}
+              <div className="relative w-full h-[380px] sm:h-[480px] rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+                <Image
+                  src="/images/krishyantra_hero_farmer.jpg"
+                  alt="Indian Farmer in field using Krishyantra"
+                  fill
+                  priority
+                  className="object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              </div>
+
+              {/* Floating Animated Phone Mockup */}
+              <div className="absolute -right-2 sm:right-4 md:right-8 -bottom-6 sm:bottom-0 w-[240px] sm:w-[270px] bg-white rounded-[36px] p-2.5 shadow-2xl border-4 border-slate-900 animate-phone-float z-20">
+                
+                {/* Phone Speaker & Dynamic Island */}
+                <div className="w-16 h-3 bg-slate-900 rounded-full mx-auto mb-1.5" />
+
+                {/* Inner Phone Screen */}
+                <div className="bg-[#F8FAFC] rounded-[28px] p-3 text-slate-800 space-y-2.5 text-xs font-sans border border-slate-100 overflow-hidden relative">
+                  
+                  {/* Phone Header */}
+                  <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+                    <div className="flex items-center gap-1">
+                      <Sprout className="w-3.5 h-3.5 text-[#15803d]" />
+                      <span className="font-extrabold text-[11px] text-slate-900 tracking-tight">krishyantra</span>
+                    </div>
+                    <span className="text-[9px] font-mono text-slate-400">11:51</span>
+                  </div>
+
+                  {/* Farmer Greeting */}
+                  <div>
+                    <h5 className="font-extrabold text-[12px] text-slate-900 leading-tight">
+                      {t.phone.greeting}
+                    </h5>
+                    <div className="flex items-center gap-1 text-[9px] text-slate-500">
+                      <MapPin className="w-2.5 h-2.5 text-[#15803d]" />
+                      <span>{t.phone.location}</span>
+                    </div>
+                  </div>
+
+                  {/* Crop Health Card with Scan Animation */}
+                  <div className="p-2 rounded-xl bg-white border border-green-200 shadow-2xs relative overflow-hidden">
+                    {phoneScanActive && (
+                      <div className="absolute inset-x-0 h-0.5 bg-green-400/80 animate-scan z-10" />
+                    )}
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-green-100 flex items-center justify-center text-green-700 shrink-0">
+                        <Sprout className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[9px] text-slate-500 block truncate">{t.phone.cropName}</span>
+                        <span className="text-[11px] font-bold text-green-700 block truncate leading-none">
+                          {t.phone.cropStatus}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[8px] text-slate-400 block mt-1">
+                      {t.phone.cropChecked}
+                    </span>
+                  </div>
+
+                  {/* Today's Advice Widget */}
+                  <div className="p-2 rounded-xl bg-amber-50/80 border border-amber-200">
+                    <span className="text-[9px] font-bold text-amber-900 block">
+                      {t.phone.adviceHeader}
+                    </span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Sun className="w-4 h-4 text-amber-600 shrink-0 animate-spin-slow" />
+                      <div>
+                        <span className="text-[10px] font-extrabold text-slate-900 block leading-tight">
+                          {t.phone.adviceAction}
+                        </span>
+                        <span className="text-[8px] text-slate-600 block">
+                          {t.phone.adviceWindow} · {t.phone.adviceMetrics}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4 Interactive App Buttons */}
+                  <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setPhoneActiveTab("check")}
+                      className={`p-1.5 rounded-lg border text-center transition-all ${
+                        phoneActiveTab === "check" ? "bg-green-50 border-green-300 font-bold" : "bg-white border-slate-200"
+                      }`}
+                    >
+                      <Camera className="w-3 h-3 text-green-600 mx-auto mb-0.5" />
+                      <span className="text-[8px] text-slate-700 block">{t.phone.btnCheckPlant}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPhoneActiveTab("weather")}
+                      className={`p-1.5 rounded-lg border text-center transition-all ${
+                        phoneActiveTab === "weather" ? "bg-amber-50 border-amber-300 font-bold" : "bg-white border-slate-200"
+                      }`}
+                    >
+                      <Sun className="w-3 h-3 text-amber-500 mx-auto mb-0.5" />
+                      <span className="text-[8px] text-slate-700 block">{t.phone.btnWeather}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPhoneActiveTab("ask")}
+                      className={`p-1.5 rounded-lg border text-center transition-all ${
+                        phoneActiveTab === "ask" ? "bg-indigo-50 border-indigo-300 font-bold" : "bg-white border-slate-200"
+                      }`}
+                    >
+                      <Mic className="w-3 h-3 text-indigo-500 mx-auto mb-0.5" />
+                      <span className="text-[8px] text-slate-700 block">{t.phone.btnAsk}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPhoneActiveTab("mandi")}
+                      className={`p-1.5 rounded-lg border text-center transition-all ${
+                        phoneActiveTab === "mandi" ? "bg-emerald-50 border-emerald-300 font-bold" : "bg-white border-slate-200"
+                      }`}
+                    >
+                      <Building2 className="w-3 h-3 text-emerald-600 mx-auto mb-0.5" />
+                      <span className="text-[8px] text-slate-700 block">{t.phone.btnMandi}</span>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Handwritten Note pointing to Phone */}
+              <div className="absolute -right-4 sm:-right-8 top-12 hidden md:block transform rotate-6 z-30">
+                <span className="font-handwriting text-xl text-slate-800 font-bold block max-w-[130px] leading-tight drop-shadow-sm">
+                  {t.hero.pocketAnnotation}
+                </span>
+                <span className="text-2xl text-slate-800 block text-right -mt-1">⤵</span>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 2: "Everything you need for your farm, in one place"
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <section id="features" className="py-16 bg-white border-t border-[#E5E7EB]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-14 space-y-2">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#111827]">
+              {t.features.title}
+            </h2>
+            <p className="text-sm sm:text-base text-[#4B5563]">
+              {t.features.subtitle}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Card 1 */}
+            <div className="p-6 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#15803d]/40 transition-all hover:shadow-md flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                  <CloudRain className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111827]">
+                  {t.features.card1Title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  {t.features.card1Desc}
+                </p>
+              </div>
+              <div className="pt-4">
+                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  {t.features.card1Badge}
+                </span>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="p-6 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#15803d]/40 transition-all hover:shadow-md flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center text-green-700">
+                  <Sprout className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111827]">
+                  {t.features.card2Title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  {t.features.card2Desc}
+                </p>
+              </div>
+              <div className="pt-4">
+                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  {t.features.card2Badge}
+                </span>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="p-6 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#15803d]/40 transition-all hover:shadow-md flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                  <Camera className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111827]">
+                  {t.features.card3Title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  {t.features.card3Desc}
+                </p>
+              </div>
+              <div className="pt-4">
+                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  {t.features.card3Badge}
+                </span>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="p-6 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#15803d]/40 transition-all hover:shadow-md flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+                  <Sun className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111827]">
+                  {t.features.card4Title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  {t.features.card4Desc}
+                </p>
+              </div>
+              <div className="pt-4">
+                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  {t.features.card4Badge}
+                </span>
+              </div>
+            </div>
+
+            {/* Card 5 */}
+            <div className="p-6 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#15803d]/40 transition-all hover:shadow-md flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center text-teal-700">
+                  <BarChart3 className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111827]">
+                  {t.features.card5Title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  {t.features.card5Desc}
+                </p>
+              </div>
+              <div className="pt-4">
+                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  {t.features.card5Badge}
+                </span>
+              </div>
+            </div>
+
+            {/* Card 6 */}
+            <div className="p-6 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#15803d]/40 transition-all hover:shadow-md flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700">
+                  <Mic className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111827]">
+                  {t.features.card6Title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+                  {t.features.card6Desc}
+                </p>
+              </div>
+              <div className="pt-4">
+                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                  {t.features.card6Badge}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 3: "How Krishyantra Works"
+      ═════════════════════════════════════════════ */}
+      <section id="how-it-works" className="py-16 bg-[#FBFDF9] border-t border-[#E5E7EB]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex flex-wrap items-center justify-between mb-12 gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#111827]">
+                {t.howItWorks.title}
+              </h2>
+              <p className="text-sm sm:text-base text-[#4B5563] mt-1">
+                {t.howItWorks.subtitle}
+              </p>
+            </div>
+
+            <div className="transform -rotate-2 hidden sm:block">
+              <span className="font-handwriting text-2xl text-[#166534] font-bold">
+                {t.howItWorks.scriptBadge}
+              </span>
             </div>
           </div>
-        </section>
 
-        {/* ── 6. Clean High-Impact Final CTA Showcase ─────────────────────────── */}
-        <section className="py-12 sm:py-16 bg-[#ffffff]">
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative rounded-3xl bg-gradient-to-br from-[#0d253d] via-[#112d4e] to-[#0d253d] border border-indigo-500/30 text-white p-7 sm:p-12 text-center space-y-6 shadow-xl overflow-hidden">
-              <div className="space-y-2 max-w-2xl mx-auto">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-mono font-bold text-emerald-300 border border-white/15">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{isHindi ? "निःशुल्क डिजिटल कृषि सेवा" : "Public Good Platform"}</span>
+          {/* 5 Connected Steps */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative">
+            
+            {/* Step 1 */}
+            <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs space-y-3 relative">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center text-xs font-bold">
+                  1
+                </div>
+                <Smartphone className="w-5 h-5 text-[#15803d]" />
+              </div>
+              <h4 className="text-sm font-bold text-[#111827]">
+                {t.howItWorks.step1Title}
+              </h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                {t.howItWorks.step1Desc}
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs space-y-3 relative">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center text-xs font-bold">
+                  2
+                </div>
+                <Shield className="w-5 h-5 text-[#15803d]" />
+              </div>
+              <h4 className="text-sm font-bold text-[#111827]">
+                {t.howItWorks.step2Title}
+              </h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                {t.howItWorks.step2Desc}
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs space-y-3 relative">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center text-xs font-bold">
+                  3
+                </div>
+                <Sprout className="w-5 h-5 text-[#15803d]" />
+              </div>
+              <h4 className="text-sm font-bold text-[#111827]">
+                {t.howItWorks.step3Title}
+              </h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                {t.howItWorks.step3Desc}
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs space-y-3 relative">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center text-xs font-bold">
+                  4
+                </div>
+                <Settings className="w-5 h-5 text-[#15803d]" />
+              </div>
+              <h4 className="text-sm font-bold text-[#111827]">
+                {t.howItWorks.step4Title}
+              </h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                {t.howItWorks.step4Desc}
+              </p>
+            </div>
+
+            {/* Step 5 */}
+            <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs space-y-3 relative">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center text-xs font-bold">
+                  5
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#15803d]" />
+              </div>
+              <h4 className="text-sm font-bold text-[#111827]">
+                {t.howItWorks.step5Title}
+              </h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                {t.howItWorks.step5Desc}
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 4: "See Krishyantra in Action"
+      ═════════════════════════════════════════════ */}
+      <section id="in-action" className="py-16 bg-white border-t border-[#E5E7EB]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#111827]">
+              {t.inAction.title}
+            </h2>
+            <p className="text-sm sm:text-base text-[#4B5563] mt-1">
+              {t.inAction.subtitle}
+            </p>
+          </div>
+
+          {/* 5-Step Workflow Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            
+            {/* Step 1: Upload Photo */}
+            <div className="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900">{t.inAction.step1Title}</span>
+                <Camera className="w-4 h-4 text-slate-500" />
+              </div>
+              <div className="w-full h-36 rounded-xl overflow-hidden border border-slate-200">
+                <img
+                  src="/images/krishyantra_leaf_spot.jpg"
+                  alt="Soybean crop leaf with spot"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Step 2: Get Diagnosis */}
+            <div className="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] space-y-3">
+              <span className="text-xs font-bold text-slate-900 block">{t.inAction.step2Title}</span>
+              <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200">
+                <span className="text-xs font-bold text-amber-900 block">
+                  {t.inAction.leafSpotDetected}
                 </span>
-                <h2 className="text-2xl sm:text-4xl font-black font-display tracking-tight text-white">
-                  {isHindi
-                    ? "आज ही अपने खेत को दें वैज्ञानिक सुरक्षा और अधिक मुनाफा"
-                    : "Protect Your Crops & Maximize Mandi Realizations Today"}
+                <span className="text-[10px] text-amber-700 font-mono">
+                  {t.inAction.confidence}
+                </span>
+              </div>
+              <div className="space-y-1.5 text-xs text-slate-600">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>{t.inAction.whatMeans}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>{t.inAction.whyHappened}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>{t.inAction.whatNext}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3: Check Spray Window */}
+            <div className="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] space-y-3">
+              <span className="text-xs font-bold text-slate-900 block">{t.inAction.step3Title}</span>
+              <div className="p-2.5 rounded-xl bg-green-50 border border-green-200">
+                <span className="text-xs font-bold text-green-900 block">
+                  {t.inAction.sprayWindow}
+                </span>
+                <span className="text-[10px] text-green-700 block mt-0.5">
+                  {t.inAction.safeToSpray}
+                </span>
+              </div>
+              <div className="space-y-1 text-xs text-slate-600">
+                <div>{t.inAction.temp}</div>
+                <div>{t.inAction.wind}</div>
+                <div>{t.inAction.rain}</div>
+              </div>
+            </div>
+
+            {/* Step 4: Product & Dosage */}
+            <div className="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] space-y-3">
+              <span className="text-xs font-bold text-slate-900 block">{t.inAction.step4Title}</span>
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+                <span className="text-xs font-bold text-slate-900 block">{t.inAction.productName}</span>
+                <span className="text-[10px] text-slate-500 block">{t.inAction.productCategory}</span>
+              </div>
+              <div className="space-y-1 text-xs text-slate-600">
+                <div>{t.inAction.dosageLabel}: {t.inAction.dosageVal}</div>
+                <div>{t.inAction.mixLabel}: {t.inAction.mixVal}</div>
+                <div>{t.inAction.appLabel}: {t.inAction.appVal}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push("/signup")}
+                className="w-full py-1 text-[11px] font-semibold text-[#15803d] border border-[#15803d]/30 rounded-lg hover:bg-green-50 transition-colors"
+              >
+                {t.inAction.viewGuide}
+              </button>
+            </div>
+
+            {/* Step 5: Expected Impact */}
+            <div className="p-4 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] space-y-3">
+              <span className="text-xs font-bold text-slate-900 block">{t.inAction.step5Title}</span>
+              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                <span className="text-xs font-extrabold text-emerald-800 block">
+                  {t.inAction.yieldUplift}
+                </span>
+                <span className="text-xs font-extrabold text-[#111827] block mt-0.5">
+                  {t.inAction.netBenefit}
+                </span>
+              </div>
+              <div className="space-y-1.5 text-xs text-slate-600">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>{t.inAction.whyWorks}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>{t.inAction.whatExpect}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  <span>{t.inAction.trackResults}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 5: REAL FARMER CHALLENGE VIDEO SECTION
+          (Replaces "Trusted by Farmers" per user request with video from F:\Downloads\FARMER_HAS_A_PROBLEM_...mp4)
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <section id="video-story" className="py-16 bg-[#FBFDF9] border-t border-[#E5E7EB]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            
+            {/* Left: Custom Video Player playing farmer video */}
+            <div className="lg:col-span-8 space-y-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#15803d]">
+                  {language === "hi" ? "जमीनी हकीकत" : "Field Reality"}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827] mt-1">
+                  {language === "hi" ? "किसान की वास्तविक समस्या — कृषि यंत्र क्यों जरूरी है" : "The Farmer's Challenge — Why Krishyantra Exists"}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-                  {isHindi
-                    ? "मौसम रडार, 140+ सरकारी मंडियों के भाव और 6-मॉडल AI सलाहकार से अपनी पैदावार सुरक्षित करें।"
-                    : "Deploy live weather telemetry, certified mandi price discovery, and multi-crop AI advisory in seconds."}
+                <p className="text-xs sm:text-sm text-[#4B5563] mt-1">
+                  {language === "hi" 
+                    ? "देखें कैसे गलत समय पर छिड़काव और जलवायु तनाव से फसल का नुकसान होता है।"
+                    : "Watch how untimely chemical spraying and unpredicted climate shocks damage crops without real telemetry."}
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                <Link
-                  href={isLoggedIn ? "/dashboard" : "/signup"}
-                  className="px-7 py-3.5 rounded-2xl text-white font-bold text-xs sm:text-sm shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                  style={{
-                    background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-                    boxShadow: "0 8px 25px rgba(83, 58, 253, 0.4)",
-                  }}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  <span>
-                    {isLoggedIn
-                      ? isHindi
-                        ? "डैशबोर्ड खोलें"
-                        : "Open Dashboard"
-                      : isHindi
-                      ? "निःशुल्क खाता बनाएं (Free)"
-                      : "Create Free Farmer Account"}
-                  </span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+              {/* Video Player Frame */}
+              <div className="relative rounded-3xl overflow-hidden bg-black shadow-2xl border-4 border-white aspect-video max-h-[440px]">
+                <video
+                  ref={videoRef}
+                  src="/videos/farmer_problem.mp4"
+                  autoPlay
+                  loop
+                  muted={videoMuted}
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
 
-                <a
-                  href="https://wa.me/15556694548?text=Namaste"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3.5 rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-emerald-900/30"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>{isHindi ? "व्हाट्सएप पर पूछें" : "Chat on WhatsApp"}</span>
-                </a>
+                {/* Floating Video Controls */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 transition-opacity flex flex-col justify-between p-4 sm:p-6">
+                  
+                  {/* Top Bar */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full border border-white/20">
+                      Real Field Documentation
+                    </span>
+                    <button
+                      onClick={toggleVideoMute}
+                      className="p-2 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-colors cursor-pointer"
+                      title={videoMuted ? "Unmute Audio" : "Mute Audio"}
+                    >
+                      {videoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Bottom Bar: Play/Pause button */}
+                  <div className="flex items-center justify-between gap-4">
+                    <button
+                      onClick={toggleVideoPlay}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                    >
+                      {videoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      <span>{videoPlaying ? "Pause Video" : "Play Story"}</span>
+                    </button>
+
+                    <button
+                      onClick={() => router.push("/signup")}
+                      className="text-xs font-semibold text-white/90 hover:text-white underline"
+                    >
+                      {language === "hi" ? "अपनी फसल बचाएं →" : "Protect Your Crop →"}
+                    </button>
+                  </div>
+
+                </div>
               </div>
             </div>
+
+            {/* Right: "Stronger Farmers. Greener Tomorrow." manifesto card */}
+            <div className="lg:col-span-4 p-8 rounded-3xl bg-white border border-[#E5E7EB] shadow-md space-y-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center text-green-700">
+                  <Sprout className="w-8 h-8" />
+                </div>
+
+                <h3 className="text-2xl font-extrabold text-[#111827] leading-tight">
+                  {t.testimonials.sideCardTitle}
+                </h3>
+
+                <p className="text-sm text-[#4B5563] leading-relaxed">
+                  {t.testimonials.sideCardDesc}
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-[#E5E7EB]">
+                <button
+                  onClick={() => router.push("/signup")}
+                  className="w-full py-3 rounded-full bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>{t.nav.getStarted}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
           </div>
-        </section>
-      </div>
-    </AppShell>
+
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 6: FAQ ACCORDION
+      ═════════════════════════════════════════════ */}
+      <section id="faq" className="py-16 bg-white border-t border-[#E5E7EB]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-12 space-y-2">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#111827]">
+              {t.faq.title}
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              {t.faq.subtitle}
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-[#E5E7EB] bg-[#FBFDF9] overflow-hidden transition-all"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full text-left p-5 flex items-center justify-between gap-4 cursor-pointer"
+                  >
+                    <span className="text-sm sm:text-base font-bold text-[#111827]">
+                      {faq.q}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-slate-500 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-[#4B5563] leading-relaxed border-t border-[#E5E7EB] pt-3">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 7: CTA BANNER with sunset farm background & WhatsApp redirect
+      ═════════════════════════════════════════════ */}
+      <section className="relative py-20 overflow-hidden text-white">
+        
+        {/* Background Sunset Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/krishyantra_sunset_banner.jpg"
+            alt="Sunset over lush green farm"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/70" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          
+          <div className="max-w-3xl mx-auto space-y-3">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+              {t.ctaBanner.title}
+            </h2>
+            <p className="text-base sm:text-lg text-slate-200">
+              {t.ctaBanner.subtitle}
+            </p>
+          </div>
+
+          {/* Action Buttons: Get Started + Chat on WhatsApp (redirects to signup per user instruction) */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            
+            <button
+              onClick={() => router.push("/signup")}
+              className="px-8 py-3.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white text-sm sm:text-base font-bold transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+            >
+              <span>{t.ctaBanner.btnGetStarted}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            {/* WhatsApp button redirects to signup/login per user instruction */}
+            <button
+              onClick={() => router.push("/signup")}
+              className="px-7 py-3.5 rounded-full bg-white hover:bg-slate-100 text-[#111827] text-sm sm:text-base font-bold transition-all shadow-lg flex items-center gap-2.5 cursor-pointer"
+              title="Connect via WhatsApp (Redirects to Login/Signup)"
+            >
+              <MessageCircle className="w-5 h-5 text-emerald-600 fill-emerald-500" />
+              <span>{t.ctaBanner.btnWhatsApp}</span>
+            </button>
+
+          </div>
+
+          {/* 4 Trust Badges */}
+          <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-left sm:text-center">
+            
+            <div className="p-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/15">
+              <span className="text-xl sm:text-2xl font-black text-white block">140+</span>
+              <span className="text-xs text-slate-300">{t.ctaBanner.stat1Label}</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/15">
+              <span className="text-xl sm:text-2xl font-black text-white block">60+</span>
+              <span className="text-xs text-slate-300">{t.ctaBanner.stat2Label}</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/15">
+              <span className="text-xl sm:text-2xl font-black text-white block">12+</span>
+              <span className="text-xs text-slate-300">{t.ctaBanner.stat3Label}</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/15">
+              <span className="text-xl sm:text-2xl font-black text-white block">100%</span>
+              <span className="text-xs text-slate-300">{t.ctaBanner.stat4Label}</span>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FOOTER matching reference screenshot
+      ═══════════════════════════════════════════════════════════════════════ */}
+      <footer className="bg-white border-t border-[#E5E7EB] py-8 text-xs text-[#6B7280]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          <div className="flex items-center gap-2">
+            <Sprout className="w-4 h-4 text-[#15803d]" />
+            <span className="font-extrabold text-slate-900">krishyantra</span>
+            <span className="text-slate-400">·</span>
+            <span>Saath Har Kisan Ke Liye</span>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 font-medium">
+            <a href="#hero" className="hover:text-[#15803d]">About</a>
+            <a href="#features" className="hover:text-[#15803d]">Features</a>
+            <a href="#how-it-works" className="hover:text-[#15803d]">How It Works</a>
+            <a href="#in-action" className="hover:text-[#15803d]">For Farmers</a>
+            <a href="#faq" className="hover:text-[#15803d]">FAQ</a>
+            <a href="#video-story" className="hover:text-[#15803d]">Privacy</a>
+            <a href="#video-story" className="hover:text-[#15803d]">Terms</a>
+            <a href="#video-story" className="hover:text-[#15803d]">Contact</a>
+          </div>
+
+          <div>
+            © {new Date().getFullYear()} krishyantra. All rights reserved.
+          </div>
+
+        </div>
+      </footer>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          PWA INSTALL MODAL (Guides user when clicking "Install WebApp")
+      ═══════════════════════════════════════════════════════════════════════ */}
+      {installModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+            <button
+              onClick={() => setInstallModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-500 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center text-green-700 mx-auto">
+                <Smartphone className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">
+                Install Krishyantra WebApp
+              </h3>
+              <p className="text-xs text-slate-500">
+                Open in 1-tap from your home screen. No App Store or APK download needed!
+              </p>
+            </div>
+
+            <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs text-slate-700">
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-[#166534] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  1
+                </div>
+                <span>Tap the <strong>Share</strong> or <strong>Three Dots ⋮</strong> icon in your mobile browser.</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-[#166534] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  2
+                </div>
+                <span>Select <strong>Add to Home Screen</strong> or <strong>Install App</strong>.</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="w-5 h-5 rounded-full bg-[#166534] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                  3
+                </div>
+                <span>Krishyantra icon will appear on your phone like a native app!</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setInstallModalOpen(false)}
+              className="w-full py-3 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-sm transition-colors cursor-pointer"
+            >
+              Got It!
+            </button>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 }

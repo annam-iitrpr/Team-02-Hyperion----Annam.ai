@@ -1,80 +1,124 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useLanguage } from "@/context/LanguageContext";
-import { getTranslation } from "@/lib/translations";
-import { Sprout } from "lucide-react";
 
-export const Footer: React.FC = () => {
-  const { language } = useLanguage();
-  const t = getTranslation(language);
-
+export function Footer() {
   return (
-    <footer className="bg-[#0B0F17] text-slate-400 border-t border-slate-800/80 py-14 px-4 sm:px-6 font-sans">
-      <div className="max-w-[1240px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-10 border-b border-slate-800/80">
+    <footer className="bg-[#ffffff] border-t border-[#e3e8ee] pt-16 pb-12 text-[#64748d] text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-[#e3e8ee]">
           
-          {/* Brand Column */}
-          <div className="space-y-4 md:col-span-1">
-            <Link href="/" className="inline-block">
-              <div className="relative h-9 w-9 rounded-xl overflow-hidden border border-indigo-500/30 bg-white/10">
-                <Image src="/images/aasra_logo.png" alt="AASRA Logo" fill sizes="36px" className="object-contain p-1" />
-              </div>
-            </Link>
-            <div>
-              <p className="font-extrabold text-white text-sm font-display tracking-tight">AASRA</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">{language === "hi" ? "आपकी खेती का सच्चा साथी" : "Your Field's Intelligent Companion"}</p>
+          {/* Col 1: Brand & Manifesto */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-xl tracking-tight text-[#0d253d]">
+                krishyantra
+              </span>
+              <span className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-[#533afd]/10 text-[#533afd]">
+                AASRA
+              </span>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed max-w-xs">
-              {t.brandName} — {t.tagline}
+            <p className="text-xs leading-relaxed text-[#64748d]">
+              Evidence-based precision agriculture intelligence. Replacing speculative advice with deterministic biophysical modeling, satellite indices, and localized climate stress prediction.
             </p>
-            {/* Tech badge */}
-            <div className="inline-flex items-center gap-1.5 bg-indigo-950/60 border border-indigo-500/30 rounded-full px-3 py-1.5 text-[10px] font-bold text-indigo-300">
-              <Sprout className="h-3 w-3 text-emerald-400" />
-              Google Gemini 2.5 Flash
+            <div className="flex items-center gap-2 text-xs text-[#0d253d] font-medium pt-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>All 6 Machine Learning Services Operational</span>
             </div>
           </div>
 
-          {/* Platform Links */}
-          <div className="space-y-3.5">
-            <span className="text-[10px] font-mono font-black text-indigo-400 uppercase tracking-widest block">{t.footerPlatform || "Platform"}</span>
-            <ul className="space-y-2.5 text-xs font-medium">
-              <li><Link href="/assistant" className="hover:text-white transition-colors">{t.navAdvisory || "Voice AI Advisory"}</Link></li>
-              <li><Link href="/impact" className="hover:text-white transition-colors">{t.navRobi || "ROBI Causal Impact"}</Link></li>
-              <li><Link href="/mandi" className="hover:text-white transition-colors">Mandi Prices</Link></li>
-              <li><Link href="/plant-intelligence" className="hover:text-white transition-colors">Plant Health AI</Link></li>
+          {/* Col 2: Core Intelligence */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#0d253d]">
+              Intelligence Models
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <a href="#models" className="hover:text-[#533afd] transition-colors">
+                  PS-02: Climate Stress Classifier
+                </a>
+              </li>
+              <li>
+                <a href="#models" className="hover:text-[#533afd] transition-colors">
+                  PS-03: Biological Readiness Engine
+                </a>
+              </li>
+              <li>
+                <a href="#models" className="hover:text-[#533afd] transition-colors">
+                  PS-04: Syngenta Biological Matcher
+                </a>
+              </li>
+              <li>
+                <a href="#models" className="hover:text-[#533afd] transition-colors">
+                  PS-07: Field Yield Baseline & ROI
+                </a>
+              </li>
+              <li>
+                <a href="#models" className="hover:text-[#533afd] transition-colors">
+                  Deterministic Verification Bridge
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Farmers Links */}
-          <div className="space-y-3.5">
-            <span className="text-[10px] font-mono font-black text-amber-400 uppercase tracking-widest block">{t.footerFarmers || "For Farmers"}</span>
-            <ul className="space-y-2.5 text-xs font-medium">
-              <li><Link href="/dashboard" className="hover:text-white transition-colors">{t.navDashboard || "Dashboard"}</Link></li>
-              <li><Link href="/fields" className="hover:text-white transition-colors">Field Management</Link></li>
-              <li><Link href="/journal" className="hover:text-white transition-colors">{t.navJournal || "Farm Journal"}</Link></li>
-              <li><Link href="/architecture" className="hover:text-white transition-colors">Concept Note &amp; Spec</Link></li>
+          {/* Col 3: Technical Foundation */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#0d253d]">
+              Architecture & Telemetry
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <span className="text-[#273951]">Google Vertex AI Pipelines</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">Copernicus Sentinel-2 Satellite Feed</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">Open-Meteo Precision Telemetry</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">Deterministic Soil Chemical Kinetics</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">FastAPI High-Throughput Microservices</span>
+              </li>
             </ul>
           </div>
 
-          {/* Account Links */}
-          <div className="space-y-3.5">
-            <span className="text-[10px] font-mono font-black text-blue-400 uppercase tracking-widest block">{t.footerAccount || "Account"}</span>
-            <ul className="space-y-2.5 text-xs font-medium">
-              <li><Link href="/login" className="hover:text-white transition-colors">{t.navLogin || "Log In"}</Link></li>
-              <li><Link href="/signup" className="hover:text-white transition-colors">{t.navGetStarted || "Get Started"}</Link></li>
+          {/* Col 4: Platform & Compliance */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#0d253d]">
+              Governance & Proof
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <span className="text-[#273951]">Zero Hallucination Agronomic Guardrail</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">Local Agro-Climatic Zone Calibration</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">Real-time Mandi Price Ingestion</span>
+              </li>
+              <li>
+                <span className="text-[#273951]">Peer-reviewed Biophysical Baseline</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-slate-500">
-          <p>{t.footerRights || "© 2026 AASRA · All Rights Reserved · Team-2 Hackathon"}</p>
-          <p className="text-indigo-400 font-bold">{t.heroBadge || "Google Gemini · Open-Meteo · APMC Data"}</p>
+        {/* Bottom row */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748d]">
+          <p>© {new Date().getFullYear()} krishyantra (AASRA System Architecture). All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <span className="hover:text-[#0d253d] transition-colors">
+              ISO-Calibrated Agronomic Standards
+            </span>
+            <span className="hover:text-[#0d253d] transition-colors">
+              Privacy & Telemetry Safe
+            </span>
+          </div>
         </div>
       </div>
     </footer>
   );
-};
+}
