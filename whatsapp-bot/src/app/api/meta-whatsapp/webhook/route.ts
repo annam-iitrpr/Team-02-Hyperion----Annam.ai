@@ -1852,7 +1852,7 @@ async function handleWebsiteAndRegionalQuery(
         `6️⃣ *Model 6: Causal Double ML & ROBI Attribution (PS-07)* — Quantifies direct rupees-and-paise financial gain per acre.
 
 ` +
-        `🌐 *Live Portal:* https://nibooz-whatup.vercel.app`
+        `🌐 *Live Portal:* https://krishyantra.vercel.app`
       );
     }
     return (
@@ -1876,7 +1876,7 @@ async function handleWebsiteAndRegionalQuery(
       `6️⃣ *मॉडल 6: कॉजल डबल एमएल व ROBI (PS-07)* — दवा पर लगे प्रत्येक ₹1 पर किसान को होने वाले शुद्ध मुनाफे का हिसाब।
 
 ` +
-      `🌐 *वेबसाइट:* https://nibooz-whatup.vercel.app`
+      `🌐 *वेबसाइट:* https://krishyantra.vercel.app`
     );
   }
 

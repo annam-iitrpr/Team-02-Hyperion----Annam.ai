@@ -2,7 +2,7 @@
 ### *Autonomous Agri-Intelligence, Biophysical Weather Gating & Causal ROBI Platform*
 > **"Saath Har Kisan Ke Liye"** — Transforming Smallholder Agriculture from Reactive Crisis Management to Verifiable, Science-Backed Harvest Wealth.
 
-[![Live Production](https://img.shields.io/badge/Live%20Platform-nibooz--whatup.vercel.app-emerald?style=for-the-badge&logo=vercel)](https://nibooz-whatup.vercel.app)
+[![Live Production](https://img.shields.io/badge/Live%20Platform-krishyantra.vercel.app-emerald?style=for-the-badge&logo=vercel)](https://krishyantra.vercel.app)
 [![Repository](https://img.shields.io/badge/GitHub-IshaanYK%2FKrishYantra-blue?style=for-the-badge&logo=github)](https://github.com/IshaanYK/KrishYantra)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3%20(Turbopack)-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-teal?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -13,11 +13,11 @@
 ---
 
 ## 🌐 Live Production Links
-- **Primary Live Web Application:** [https://nibooz-whatup.vercel.app](https://nibooz-whatup.vercel.app)
-- **Plant Intelligence & Prescription Engine:** [https://nibooz-whatup.vercel.app/plant-intelligence/prescription](https://nibooz-whatup.vercel.app/plant-intelligence/prescription)
-- **Economic ROBI Impact Calculator:** [https://nibooz-whatup.vercel.app/impact](https://nibooz-whatup.vercel.app/impact)
-- **Interactive Closed-Loop Audit Simulator:** [https://nibooz-whatup.vercel.app/closed-loop](https://nibooz-whatup.vercel.app/closed-loop)
-- **Interactive What-If Timing Simulator:** [https://nibooz-whatup.vercel.app/what-if](https://nibooz-whatup.vercel.app/what-if)
+- **Primary Live Web Application:** [https://krishyantra.vercel.app](https://krishyantra.vercel.app)
+- **Plant Intelligence & Prescription Engine:** [https://krishyantra.vercel.app/plant-intelligence/prescription](https://krishyantra.vercel.app/plant-intelligence/prescription)
+- **Economic ROBI Impact Calculator:** [https://krishyantra.vercel.app/impact](https://krishyantra.vercel.app/impact)
+- **Interactive Closed-Loop Audit Simulator:** [https://krishyantra.vercel.app/closed-loop](https://krishyantra.vercel.app/closed-loop)
+- **Interactive What-If Timing Simulator:** [https://krishyantra.vercel.app/what-if](https://krishyantra.vercel.app/what-if)
 
 ---
 
@@ -198,4 +198,4 @@ npm run build
 ```
 
 Deployment to Vercel is fully automated via GitHub CI/CD integration and verified live on production at:
-👉 **[https://nibooz-whatup.vercel.app](https://nibooz-whatup.vercel.app)**
+👉 **[https://krishyantra.vercel.app](https://krishyantra.vercel.app)**

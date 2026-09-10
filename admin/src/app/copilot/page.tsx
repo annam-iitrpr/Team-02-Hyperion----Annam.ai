@@ -172,7 +172,7 @@ export default function AdminCopilotPage() {
             category: "broadcast",
             latencyMs: latency,
             status: "success",
-            summary: "Active broadcast published live to https://nibooz-whatup.vercel.app/plant-intelligence.",
+            summary: "Active broadcast published live to https://krishyantra.vercel.app/plant-intelligence.",
             whatWasDone: [
               `Published message: "${alertMessage}".`,
               "Updated /api/settings configuration object on production CDN.",

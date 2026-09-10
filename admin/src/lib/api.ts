@@ -2,7 +2,7 @@
 export const MAIN_SITE_URL =
   process.env.NEXT_PUBLIC_MAIN_API_URL && process.env.NEXT_PUBLIC_MAIN_API_URL.startsWith("http")
     ? process.env.NEXT_PUBLIC_MAIN_API_URL
-    : "https://nibooz-whatup.vercel.app";
+    : "https://krishyantra.vercel.app";
 
 export const CLOUD_RUN_URL =
   process.env.NEXT_PUBLIC_CLOUD_RUN_URL || "https://aasra-backend-wognmk3jfq-el.a.run.app";
