@@ -351,17 +351,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                         </div>
                       </Link>
 
-                      <Link
-                        href="/what-if"
-                        onClick={() => setMoreDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
-                      >
-                        <Sparkles className="h-4 w-4 text-purple-600" />
-                        <div>
-                          <span className="font-bold block">What-If Simulator</span>
-                          <span className="text-[10px] text-slate-500">Counterfactual Stress Modeling</span>
-                        </div>
-                      </Link>
+
 
                       <Link
                         href="/journal"

@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
         destination: "/dashboard",
         permanent: false,
       },
+      {
+        source: "/what-if",
+        destination: "/dashboard",
+        permanent: false,
+      },
     ];
   },
 };
