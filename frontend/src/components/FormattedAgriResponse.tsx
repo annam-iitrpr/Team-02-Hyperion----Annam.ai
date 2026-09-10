@@ -30,6 +30,7 @@ interface FormattedAgriResponseProps {
   language: string;
   isSpeaking?: boolean;
   onToggleSpeech?: () => void;
+  hideExtraActions?: boolean;
   telemetryUsed?: {
     location?: string;
     temp?: number;
@@ -151,6 +152,7 @@ export const FormattedAgriResponse: React.FC<FormattedAgriResponseProps> = ({
   language,
   isSpeaking = false,
   onToggleSpeech,
+  hideExtraActions = false,
   telemetryUsed,
   mandiRecord,
   matchedField,
@@ -316,90 +318,93 @@ export const FormattedAgriResponse: React.FC<FormattedAgriResponseProps> = ({
       )}
 
       {/* 4. Action Deck: Audio, Copy, Add to Journal, Grounding Accordion */}
-      <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-        
-        {/* Left Actions: Copy & Save to Journal */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Copy Button */}
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="px-2.5 py-1 rounded-lg border border-[#e3e8ee] hover:bg-slate-50 text-slate-600 hover:text-[#0d253d] font-semibold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-            title="Copy advisory"
-          >
-            {copied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-            <span>{copied ? "Copied" : "Copy"}</span>
-          </button>
+      {!hideExtraActions && (
+        <>
+          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+            {/* Left Actions: Copy & Save to Journal */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {/* Copy Button */}
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="px-2.5 py-1 rounded-lg border border-[#e3e8ee] hover:bg-slate-50 text-slate-600 hover:text-[#0d253d] font-semibold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                title="Copy advisory"
+              >
+                {copied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                <span>{copied ? "Copied" : "Copy"}</span>
+              </button>
 
-          {/* Add to Farm Journal */}
-          <button
-            type="button"
-            onClick={handleSaveToJournal}
-            className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 shadow-2xs ${
-              savedToJournal
-                ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-bold"
-                : "border-[#e3e8ee] hover:bg-indigo-50 hover:border-indigo-200 text-slate-600 hover:text-[#533afd] font-semibold"
-            }`}
-            title="Log this recommendation in your Farm Journal"
-          >
-            {savedToJournal ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : <BookOpen className="h-3 w-3" />}
-            <span>{savedToJournal ? "Saved in Journal!" : "Log to Journal"}</span>
-          </button>
+              {/* Add to Farm Journal */}
+              <button
+                type="button"
+                onClick={handleSaveToJournal}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 shadow-2xs ${
+                  savedToJournal
+                    ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-bold"
+                    : "border-[#e3e8ee] hover:bg-indigo-50 hover:border-indigo-200 text-slate-600 hover:text-[#533afd] font-semibold"
+                }`}
+                title="Log this recommendation in your Farm Journal"
+              >
+                {savedToJournal ? <CheckCircle2 className="h-3 w-3 text-emerald-600" /> : <BookOpen className="h-3 w-3" />}
+                <span>{savedToJournal ? "Saved in Journal!" : "Log to Journal"}</span>
+              </button>
 
-          {/* Provenance Dropdown Trigger */}
-          <button
-            type="button"
-            onClick={() => setShowProvenance(!showProvenance)}
-            className="px-2.5 py-1 rounded-lg border border-[#e3e8ee] hover:bg-slate-50 text-slate-600 hover:text-[#0d253d] font-semibold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-          >
-            <Sparkles className="h-3 w-3 text-[#533afd]" />
-            <span>Telemetry Source</span>
-            {showProvenance ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          </button>
-        </div>
+              {/* Provenance Dropdown Trigger */}
+              <button
+                type="button"
+                onClick={() => setShowProvenance(!showProvenance)}
+                className="px-2.5 py-1 rounded-lg border border-[#e3e8ee] hover:bg-slate-50 text-slate-600 hover:text-[#0d253d] font-semibold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+              >
+                <Sparkles className="h-3 w-3 text-[#533afd]" />
+                <span>Telemetry Source</span>
+                {showProvenance ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+              </button>
+            </div>
 
-        {/* Right Action: Neural Audio Playback */}
-        {onToggleSpeech && (
-          <button
-            type="button"
-            onClick={onToggleSpeech}
-            className={`px-3 py-1.5 rounded-xl border font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
-              isSpeaking
-                ? "bg-[#533afd] text-white border-[#533afd] shadow-sm animate-pulse-ring"
-                : "bg-[#f6f9fc] text-slate-700 hover:text-[#533afd] hover:bg-indigo-50 border-[#e3e8ee]"
-            }`}
-          >
-            {isSpeaking ? (
-              <div className="flex items-center gap-0.5 h-3.5 px-0.5">
-                <div className="w-0.5 bg-white rounded-full animate-soundwave-1" />
-                <div className="w-0.5 bg-white rounded-full animate-soundwave-2" />
-                <div className="w-0.5 bg-white rounded-full animate-soundwave-3" />
-                <div className="w-0.5 bg-white rounded-full animate-soundwave-4" />
-              </div>
-            ) : (
-              <Volume2 className="h-3.5 w-3.5 text-[#533afd]" />
+            {/* Right Action: Neural Audio Playback */}
+            {onToggleSpeech && (
+              <button
+                type="button"
+                onClick={onToggleSpeech}
+                className={`px-3 py-1.5 rounded-xl border font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                  isSpeaking
+                    ? "bg-[#533afd] text-white border-[#533afd] shadow-sm animate-pulse-ring"
+                    : "bg-[#f6f9fc] text-slate-700 hover:text-[#533afd] hover:bg-indigo-50 border-[#e3e8ee]"
+                }`}
+              >
+                {isSpeaking ? (
+                  <div className="flex items-center gap-0.5 h-3.5 px-0.5">
+                    <div className="w-0.5 bg-white rounded-full animate-soundwave-1" />
+                    <div className="w-0.5 bg-white rounded-full animate-soundwave-2" />
+                    <div className="w-0.5 bg-white rounded-full animate-soundwave-3" />
+                    <div className="w-0.5 bg-white rounded-full animate-soundwave-4" />
+                  </div>
+                ) : (
+                  <Volume2 className="h-3.5 w-3.5 text-[#533afd]" />
+                )}
+                <span>{isSpeaking ? "Playing Voice" : "Listen (बोलकर सुनें)"}</span>
+              </button>
             )}
-            <span>{isSpeaking ? "Playing Voice" : "Listen (बोलकर सुनें)"}</span>
-          </button>
-        )}
-      </div>
+          </div>
 
-      {/* Provenance Details Drawer */}
-      {showProvenance && (
-        <div className="p-3 bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl text-xs text-slate-600 font-mono space-y-1.5 animate-in fade-in duration-150 shadow-inner">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-1">
-            <span className="font-bold text-[#0d253d]">Sensor Provenance:</span>
-            <span className="text-[10px] font-bold text-[#533afd]">
-              {provider} · Confidence {confidenceScore}%
-            </span>
-          </div>
-          <p className="text-[11px] leading-relaxed text-slate-500 font-sans">
-            {whyRecommendation || `Verified hyper-local weather & APMC Agmarknet price matrix.`}
-          </p>
-          <div className="text-[10px] text-slate-400">
-            Open-Meteo GPS Engine · Syngenta Certified Agronomic Knowledge Graph
-          </div>
-        </div>
+          {/* Provenance Details Drawer */}
+          {showProvenance && (
+            <div className="p-3 bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl text-xs text-slate-600 font-mono space-y-1.5 animate-in fade-in duration-150 shadow-inner">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+                <span className="font-bold text-[#0d253d]">Sensor Provenance:</span>
+                <span className="text-[10px] font-bold text-[#533afd]">
+                  {provider} · Confidence {confidenceScore}%
+                </span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-slate-500 font-sans">
+                {whyRecommendation || `Verified hyper-local weather & APMC Agmarknet price matrix.`}
+              </p>
+              <div className="text-[10px] text-slate-400">
+                Open-Meteo GPS Engine · Syngenta Certified Agronomic Knowledge Graph
+              </div>
+            </div>
+          )}
+        </>
       )}
 
     </div>

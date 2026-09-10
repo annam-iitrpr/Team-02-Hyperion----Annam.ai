@@ -191,18 +191,20 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const hourlySoilT: number[] = h.soil_temperature_0cm || [];
       const hourlyPrecipProb: number[] = h.precipitation_probability || [];
 
+      // Extract the 8-hour agricultural nocturnal respiration window (22:00 - 06:00)
       const nightHoursTemps: number[] = [];
       let totalDegreeHours = 0;
 
-      for (let i = 0; i < Math.min(hourlyTimes.length, 36); i++) {
+      for (let i = 0; i < Math.min(hourlyTimes.length, 24); i++) {
         const timePart = hourlyTimes[i].split("T")[1];
         if (timePart) {
           const hour = parseInt(timePart.split(":")[0], 10);
-          if ([20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6].includes(hour)) {
+          // 8 night hours: 22h, 23h, 00h, 01h, 02h, 03h, 04h, 05h
+          if ([22, 23, 0, 1, 2, 3, 4, 5].includes(hour) && nightHoursTemps.length < 8) {
             const tempVal = hourlyTemps[i] ?? c.temperature_2m;
             nightHoursTemps.push(tempVal);
-            if (tempVal > 25.0) {
-              totalDegreeHours += (tempVal - 25.0);
+            if (tempVal > 24.0) {
+              totalDegreeHours += (tempVal - 24.0);
             }
           }
         }
@@ -210,16 +212,27 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       const realNightMean = nightHoursTemps.length > 0
         ? Math.round((nightHoursTemps.reduce((a, b) => a + b, 0) / nightHoursTemps.length) * 10) / 10
-        : Math.round((c.temperature_2m - 1.8) * 10) / 10;
+        : Math.round((c.temperature_2m - 2.5) * 10) / 10;
 
       const realNightMin = nightHoursTemps.length > 0
         ? Math.round(Math.min(...nightHoursTemps) * 10) / 10
-        : Math.round((c.temperature_2m - 3.5) * 10) / 10;
+        : Math.round((c.temperature_2m - 4.5) * 10) / 10;
 
-      const isNightStress = realNightMean > 25.0 || totalDegreeHours > 2.0;
-      const stressPercent = isNightStress
-        ? Math.min(99, Math.max(35, Math.round(40 + (realNightMean - 25.0) * 12 + totalDegreeHours * 1.5)))
-        : Math.max(10, Math.round(25 - (25.0 - realNightMean) * 4));
+      const isNightStress = realNightMean > 24.5;
+      
+      // Calibrated Nocturnal Respiration Thermal Stress Index (CWSI)
+      let stressPercent: number;
+      if (realNightMean <= 20) {
+        stressPercent = Math.max(12, Math.round(15 + (realNightMean - 15) * 2)); // 12% - 25% (Optimal)
+      } else if (realNightMean <= 24) {
+        stressPercent = Math.round(25 + (realNightMean - 20) * 5); // 25% - 45% (Normal)
+      } else if (realNightMean <= 27) {
+        stressPercent = Math.round(48 + (realNightMean - 24) * 8 + (totalDegreeHours / 8) * 1.5); // 48% - 72% (Mild Stress)
+      } else if (realNightMean <= 30) {
+        stressPercent = Math.round(73 + (realNightMean - 27) * 5 + (totalDegreeHours / 8) * 1.5); // 73% - 88% (High Thermal Stress)
+      } else {
+        stressPercent = Math.min(96, Math.round(88 + (realNightMean - 30) * 2.5)); // 88% - 96% (Extreme Heatwave)
+      }
 
       const soilMoistureVal = hourlySoilM.length > 0
         ? Math.round(hourlySoilM[0] * 100)

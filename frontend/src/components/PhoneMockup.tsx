@@ -165,7 +165,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
       {/* ── Ultra-Realistic Smartphone Hardware Container ────────────── */}
       <div
         className="relative rounded-[3.2rem] p-[10px] bg-gradient-to-b from-slate-700 via-slate-800 to-slate-950 shadow-[0_25px_60px_-15px_rgba(27,67,50,0.32),0_15px_30px_-10px_rgba(0,0,0,0.22),0_0_0_1px_rgba(255,255,255,0.18)] transition-transform duration-500 hover:scale-[1.01]"
-        style={{ width: "330px", maxWidth: "100%" }}
+        style={{ width: "320px", maxWidth: "calc(100vw - 32px)" }}
       >
         {/* Realistic Physical Hardware Buttons (Left Side) */}
         {/* Action Button */}

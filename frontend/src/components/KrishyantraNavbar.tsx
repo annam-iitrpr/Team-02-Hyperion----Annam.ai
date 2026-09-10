@@ -49,7 +49,7 @@ export const KrishyantraNavbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e5e7eb] shadow-xs transition-all">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-[1240px] mx-auto px-3.5 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Left: Krishyantra Brand Logo */}
         <Link
@@ -58,9 +58,9 @@ export const KrishyantraNavbar: React.FC = () => {
             e.preventDefault();
             handleNavClick("home");
           }}
-          className="flex items-center gap-3 shrink-0 group focus:outline-hidden"
+          className="flex items-center gap-2 sm:gap-3 shrink-0 group focus:outline-hidden"
         >
-          <div className="relative h-11 w-48 sm:w-52">
+          <div className="relative h-8.5 sm:h-11 w-36 sm:w-52">
             <Image
               src="/images/krishyantra_logo.svg"
               alt="Krishyantra — Saath Har Kisan Ke Liye"
@@ -153,8 +153,8 @@ export const KrishyantraNavbar: React.FC = () => {
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <Globe className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0" />
-                <span className="notranslate font-semibold text-slate-800" translate="no">
-                  Language
+                <span className="notranslate font-bold text-slate-800 truncate text-xs" translate="no">
+                  {currentLangObj.native}
                 </span>
               </div>
               <ChevronDown className={`h-3 w-3 text-slate-400 shrink-0 transition-transform ${langDropdownOpen ? "rotate-180" : ""}`} />
@@ -162,9 +162,9 @@ export const KrishyantraNavbar: React.FC = () => {
 
             {langDropdownOpen && (
               <div className="notranslate absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-2xl py-2 z-50 text-xs text-slate-700 font-medium animate-in fade-in zoom-in-95" translate="no">
-                <div className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between">
-                  <span>Choose Language</span>
-                  <span className="font-mono text-[9px] text-[#2d6a4f]">12+ Languages</span>
+                <div className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between" translate="no">
+                  <span className="notranslate" translate="no">Choose Language</span>
+                  <span className="font-mono text-[9px] text-[#2d6a4f] notranslate" translate="no">12+ Languages</span>
                 </div>
                 <div className="py-1 max-h-60 overflow-y-auto">
                   {INDIAN_LANGUAGES.map((l) => {
@@ -177,13 +177,14 @@ export const KrishyantraNavbar: React.FC = () => {
                           setLanguage(l.code);
                           setLangDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3.5 py-2 hover:bg-[#e8f5e9] hover:text-[#1b4332] flex items-center justify-between transition-colors cursor-pointer ${
+                        className={`w-full text-left px-3.5 py-2 hover:bg-[#e8f5e9] hover:text-[#1b4332] flex items-center justify-between transition-colors cursor-pointer notranslate ${
                           isSelected ? "bg-[#e8f5e9] text-[#1b4332] font-bold" : ""
                         }`}
+                        translate="no"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="notranslate text-xs" translate="no">{l.native}</span>
-                          <span className="text-[10.5px] text-slate-400 font-normal">({l.name})</span>
+                        <div className="flex items-center gap-2 min-w-0 notranslate" translate="no">
+                          <span className="notranslate text-xs font-bold" translate="no" lang={l.code}>{l.native}</span>
+                          <span className="text-[10.5px] text-slate-400 font-normal notranslate" translate="no" lang="en">({l.name})</span>
                         </div>
                         {isSelected && (
                           <span className="w-2 h-2 rounded-full bg-[#2d6a4f] shrink-0" />
@@ -276,18 +277,19 @@ export const KrishyantraNavbar: React.FC = () => {
           </div>
 
           {/* Language Selector (Mobile) */}
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-2">
-            <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-2 notranslate" translate="no">
+            <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5 notranslate" translate="no">
               <Globe className="h-3.5 w-3.5 text-[#2d6a4f]" /> Language
             </span>
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
               aria-label="Select Language"
-              className="text-xs font-bold text-[#1b4332] bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 focus:outline-hidden"
+              className="text-xs font-bold text-[#1b4332] bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 focus:outline-hidden notranslate"
+              translate="no"
             >
               {INDIAN_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>
+                <option key={l.code} value={l.code} className="notranslate" translate="no" lang={l.code}>
                   {l.native} ({l.name})
                 </option>
               ))}

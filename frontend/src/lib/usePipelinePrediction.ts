@@ -40,8 +40,23 @@ export function usePipelinePrediction() {
   // Track the last farm+crop key to detect real changes and force-fresh fetches
   const prevFarmCropKeyRef = useRef<string>("");
 
+  // Keep profile in reactive state so user login immediately recalculates
+  const [profile, setProfile] = useState<any>(() => typeof window !== "undefined" ? getStoredProfile() : null);
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      const p = getStoredProfile();
+      setProfile(p);
+    };
+    window.addEventListener("aasra-profile-updated", handleProfileUpdate);
+    window.addEventListener("storage", handleProfileUpdate);
+    return () => {
+      window.removeEventListener("aasra-profile-updated", handleProfileUpdate);
+      window.removeEventListener("storage", handleProfileUpdate);
+    };
+  }, []);
+
   // Compute active farm grounding parameters (prioritizing activeFarm for multi-crop switching)
-  const profile = typeof window !== "undefined" ? getStoredProfile() : null;
   const farmId = activeFarm?.id || "default_farm";
   const farmName = activeFarm?.name || profile?.fieldName || "Primary Field";
   const crop = (activeFarm?.primaryCrop || profile?.primaryCrop || "Soybean").toLowerCase();
@@ -135,7 +150,11 @@ export function usePipelinePrediction() {
       setTimeout(() => fetchPrediction(true), 100);
     };
     window.addEventListener("aasra_fields_updated", handleFieldsUpdated);
-    return () => window.removeEventListener("aasra_fields_updated", handleFieldsUpdated);
+    window.addEventListener("aasra-profile-updated", handleFieldsUpdated);
+    return () => {
+      window.removeEventListener("aasra_fields_updated", handleFieldsUpdated);
+      window.removeEventListener("aasra-profile-updated", handleFieldsUpdated);
+    };
   }, [fetchPrediction]);
 
   // Dynamic 14-Day Stress Horizon calculated on user location & crop
@@ -163,12 +182,12 @@ export function usePipelinePrediction() {
       const rainProb = Math.max(5, Math.min(85, Math.round(15 + Math.cos(i) * 20)));
 
       let stressType = "Optimal Weather Window";
-      let stressTypeHi = "अनुकूल मौसम अवधि";
-      let riskPct = 25;
+      let stressTypeHi = "अनुकूल मौसम अवधि (फसल सुरक्षित)";
+      let riskPct = 15;
       let severity: "critical" | "warning" | "moderate" | "safe" = "safe";
-      let whatWillBeLostEn = "Weather within safe biophysical thresholds. Canopy cellular respiration active with <2% yield penalty.";
-      let whatWillBeLostHi = "मौसम सुरक्षित सीमाओं में है। फसल श्वसन सामान्य है और 2% से कम नुकसान का अनुमान है।";
-      let lossQtlAcre = 0.1;
+      let whatWillBeLostEn = "Weather is within safe biophysical thresholds. Canopy cellular respiration is active with zero yield loss expected.";
+      let whatWillBeLostHi = "मौसम पूरी तरह अनुकूल और सुरक्षित सीमाओं में है। फसल की वृद्धि सामान्य रहेगी और शून्य उपज हानि का अनुमान है।";
+      let lossQtlAcre = 0.0;
 
       if (tMin >= 25.0 && tMax >= 34.0) {
         stressType = "Nocturnal Heat Shock";
@@ -176,24 +195,24 @@ export function usePipelinePrediction() {
         riskPct = Math.min(96, Math.round(84 + (tMin - 25) * 6));
         severity = "critical";
         lossQtlAcre = +(1.2 + (tMin - 24.5) * 0.3).toFixed(2);
-        whatWillBeLostEn = `Night temperatures exceed 25°C during flowering. Pollen sterility and dark respiration burn causes -${lossQtlAcre} Q/acre irreversible loss.`;
-        whatWillBeLostHi = `फूल आने के समय रात का तापमान 25°C से अधिक है। पराग बाँझपन और श्वसन जलने से प्रति एकड़ -${lossQtlAcre} क्विंटल फसल का स्थायी नुकसान।`;
+        whatWillBeLostEn = `Night temperatures exceed 25°C during flowering. Pollen sterility and dark respiration burn causes estimated ~${lossQtlAcre} Q/acre loss if untreated.`;
+        whatWillBeLostHi = `फूल आने के समय रात का तापमान 25°C से अधिक होने पर पराग बांझपन व श्वसन जलने से लगभग ${lossQtlAcre} क्विंटल/एकड़ के नुकसान का जोखिम है।`;
       } else if (tMax >= 36.0) {
         stressType = "Peak Day Heat Scorch";
         stressTypeHi = "दोपहर की भीषण गर्मी व लू";
         riskPct = Math.min(90, Math.round(78 + (tMax - 35) * 5));
         severity = "warning";
         lossQtlAcre = 0.95;
-        whatWillBeLostEn = `Canopy temperature surpasses 36°C, inducing stomatal closure and membrane leakage (-${lossQtlAcre} Q/acre loss).`;
-        whatWillBeLostHi = `दोपहर का तापमान 36°C पार करने से रंध्र बंद हो जाएंगे और -${lossQtlAcre} क्विंटल प्रति एकड़ उपज का नुकसान होगा।`;
+        whatWillBeLostEn = `Canopy temperature surpasses 36°C, inducing stomatal closure and membrane leakage (~0.95 Q/acre estimated risk).`;
+        whatWillBeLostHi = `दोपहर का तापमान 36°C पार करने से पौधों के रंध्र बंद होने और झुलसने से लगभग 0.95 क्विंटल प्रति एकड़ नुकसान का जोखिम है।`;
       } else if (vpd >= 2.2) {
         stressType = "Atmospheric Vapor Deficit";
         stressTypeHi = "हवा में नमी की अत्यधिक कमी (VPD)";
         riskPct = 68;
         severity = "moderate";
         lossQtlAcre = 0.65;
-        whatWillBeLostEn = `High VPD creates extreme transpirational demand, causing flower drop and moisture loss (-${lossQtlAcre} Q/acre).`;
-        whatWillBeLostHi = `हवा में अत्यधिक सूखापन फूलों को झुलसाकर गिरा देगा (-${lossQtlAcre} क्विंटल/एकड़ नुकसान)।`;
+        whatWillBeLostEn = `High VPD creates extreme transpirational demand, causing flower drop and moisture loss (~0.65 Q/acre estimated risk).`;
+        whatWillBeLostHi = `हवा में अत्यधिक सूखापन फूलों को झुलसाकर गिराने का जोखिम पैदा करता है (~0.65 क्विंटल/एकड़)।`;
       }
 
       const lossInrAcre = Math.round(lossQtlAcre * mandiRate);

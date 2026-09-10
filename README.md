@@ -2,7 +2,7 @@
 
 [![Repository](https://img.shields.io/badge/GitHub-nibooz--whatup--blue?style=for-the-badge&logo=github)](https://github.com/IshaanYK/nibooz-whatup-)
 [![AASRA Master Guide](https://img.shields.io/badge/ML%20Playbook-Models%201%2C%202%2C%203%2C%205-purple?style=for-the-badge)](https://github.com/IshaanYK/nibooz-whatup-)
-[![Hackathon](https://img.shields.io/badge/Hack%20Core%202026-PS--02%20%7C%20PS--03%20%7C%20PS--07-emerald?style=for-the-badge)](/pipeline)
+[![Hackathon](https://img.shields.io/badge/Hack%20Core%202026-PS--02%20%7C%20PS--03%20%7C%20PS--07-emerald?style=for-the-badge)](/plant-intelligence)
 
 > **AASRA v2** integrates the 4 official machine learning champion models into a unified real-time pipeline:
 > - **Model 1 (PS-02 Risk)**: Climate Stress Early Warning XGBoost Classifier (7 Stress Classes)

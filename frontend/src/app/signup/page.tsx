@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
@@ -215,6 +215,12 @@ export default function SignupPage() {
   const [farmingExperience, setFarmingExperience] = useState<string>("5-10 Years");
   const [selectedLanguage, setSelectedLanguage] = useState<string>(language || "hi");
 
+  useEffect(() => {
+    if (language) {
+      setSelectedLanguage(language);
+    }
+  }, [language]);
+
   // OTP Verification States
   const [generatedOtp, setGeneratedOtp] = useState<string>("");
   const [enteredOtp, setEnteredOtp] = useState<string>("");
@@ -233,6 +239,10 @@ export default function SignupPage() {
   const [irrigationType, setIrrigationType] = useState<string>("Borewell + Rainfed");
   
   const [mapCenter, setMapCenter] = useState<{ lat: number; lon: number }>({ lat: 23.2032, lon: 77.0844 });
+  const mapCenterTuple = useMemo<[number, number]>(
+    () => [mapCenter.lat, mapCenter.lon],
+    [mapCenter.lat, mapCenter.lon]
+  );
   const [searchLocationQuery, setSearchLocationQuery] = useState<string>("");
   const [isSearchingLocation, setIsSearchingLocation] = useState<boolean>(false);
   const [drawnPolygon, setDrawnPolygon] = useState<Array<[number, number]>>([]);
@@ -687,8 +697,7 @@ export default function SignupPage() {
   return (
     <div
       suppressHydrationWarning
-      translate="no"
-      className="notranslate min-h-screen bg-[#fcfdfa] text-[#1c2e24] font-sans pb-20 select-none relative overflow-hidden flex flex-col justify-between selection:bg-[#2d6a4f] selection:text-white"
+      className="min-h-screen bg-[#fcfdfa] text-[#1c2e24] font-sans pb-20 select-none relative overflow-hidden flex flex-col justify-between selection:bg-[#2d6a4f] selection:text-white"
     >
       {/* ── Atmospheric Ambient Agricultural Radial Glows & Dot Grid ───────────────────────── */}
       <div
@@ -708,9 +717,9 @@ export default function SignupPage() {
       />
 
       {/* Top Header */}
-      <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-5 sm:p-6 relative z-10">
+      <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-3.5 sm:p-6 relative z-10">
         <Link href="/" className="flex items-center gap-3 group focus:outline-hidden">
-          <div className="relative h-10 w-44 sm:w-52">
+          <div className="relative h-8 sm:h-10 w-36 sm:w-52">
             <Image
               src="/images/krishyantra_logo.svg"
               alt="Krishyantra"
@@ -722,29 +731,29 @@ export default function SignupPage() {
         </Link>
 
         {/* Minimalist Language Selector & Log In */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="relative">
             <select
-              value={selectedLanguage}
+              value={language || selectedLanguage}
               onChange={(e) => {
                 setSelectedLanguage(e.target.value);
                 setLanguage(e.target.value);
               }}
-              className="pl-3 pr-8 py-2 rounded-xl bg-white border border-[#e2e8df] text-xs font-bold text-[#1c2e24] shadow-2xs focus:outline-none focus:border-[#2d6a4f] cursor-pointer appearance-none notranslate"
+              className="pl-2.5 pr-7 sm:pl-3 sm:pr-8 py-1.5 sm:py-2 rounded-xl bg-white border border-[#e2e8df] text-[11px] sm:text-xs font-bold text-[#1c2e24] shadow-2xs focus:outline-none focus:border-[#2d6a4f] cursor-pointer appearance-none notranslate"
               translate="no"
             >
               {INDIAN_LANGUAGES.map((l) => (
                 <option key={l.code} value={l.code} className="notranslate" translate="no">
-                  {l.name} ({l.native})
+                  {l.native}
                 </option>
               ))}
             </select>
-            <Globe className="h-3.5 w-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Globe className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400 absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           <Link
             href="/login"
-            className="px-4 py-2 rounded-xl bg-white hover:bg-[#f4f7f2] border border-[#e2e8df] text-[#1c2e24] text-xs font-bold transition-all shadow-2xs"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white hover:bg-[#f4f7f2] border border-[#e2e8df] text-[#1c2e24] text-[11px] sm:text-xs font-bold transition-all shadow-2xs shrink-0"
           >
             <span>{isHindi ? "लॉगिन करें" : "Log In"}</span>
           </Link>
@@ -752,8 +761,8 @@ export default function SignupPage() {
       </header>
 
       {/* ── Main Registration Multi-Step Card ──────────────────────── */}
-      <main className="max-w-4xl mx-auto w-full my-4 px-4 sm:px-6 relative z-10">
-        <div className="bg-white border border-[#e8ede4] shadow-[0_20px_60px_-15px_rgba(27,67,50,0.08)] rounded-3xl p-6 sm:p-10 space-y-8">
+      <main className="max-w-4xl mx-auto w-full my-2 sm:my-4 px-3 sm:px-6 relative z-10">
+        <div className="bg-white border border-[#e8ede4] shadow-[0_20px_60px_-15px_rgba(27,67,50,0.08)] rounded-2xl sm:rounded-3xl p-4 sm:p-10 space-y-6 sm:space-y-8">
           
           {/* Top Stage Indicator (4 Steps) */}
           <div className="space-y-2">
@@ -963,7 +972,9 @@ export default function SignupPage() {
             {/* State & District Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#1c2e24]">State (राज्य) *</label>
+                <label className="text-xs font-bold text-[#1c2e24]">
+                  <span>{isHindi ? "राज्य *" : "State *"}</span>
+                </label>
                 <select
                   value={selectedState}
                   onChange={(e) => handleStateChange(e.target.value)}
@@ -979,7 +990,9 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#1c2e24]">District (जिला) *</label>
+                <label className="text-xs font-bold text-[#1c2e24]">
+                  <span>{isHindi ? "जिला *" : "District *"}</span>
+                </label>
                 <select
                   value={selectedDistrict}
                   onChange={(e) => handleDistrictChange(e.target.value)}
@@ -1046,10 +1059,17 @@ export default function SignupPage() {
             {/* ── REAL GOOGLE SATELLITE FIELD BOUNDARY MAP ──────── */}
             <div className="space-y-2">
               <RealBoundaryMap
-                center={[mapCenter.lat, mapCenter.lon]}
+                center={mapCenterTuple}
                 zoom={16}
                 initialPoints={drawnPolygon.length >= 3 ? drawnPolygon : undefined}
-                onCenterChange={(newC) => setMapCenter({ lat: newC[0], lon: newC[1] })}
+                onCenterChange={(newC) => {
+                  setMapCenter((prev) => {
+                    if (Math.abs(prev.lat - newC[0]) < 0.0003 && Math.abs(prev.lon - newC[1]) < 0.0003) {
+                      return prev;
+                    }
+                    return { lat: newC[0], lon: newC[1] };
+                  });
+                }}
                 onBoundaryChange={(pts, calculatedAcres) => {
                   setTimeout(() => {
                     setDrawnPolygon(pts);

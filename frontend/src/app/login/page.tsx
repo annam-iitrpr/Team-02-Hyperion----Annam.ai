@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   loginUser,
   saveProfile,
+  saveRegisteredUser,
   getStoredProfile,
   findRegisteredUser,
   lookupFarmerInDatabase,
@@ -185,6 +186,17 @@ export default function LoginPage() {
 
       loginUser();
       saveProfile(activeProfile);
+      saveRegisteredUser(activeProfile);
+
+      // Write-through to Firebase Realtime Database
+      try {
+        fetch("/api/farmers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(activeProfile),
+        }).catch(() => {});
+      } catch {}
+
       setLanguage(activeProfile.language || selectedLanguage);
       setLoading(false);
       let target = "/dashboard";
@@ -256,6 +268,17 @@ export default function LoginPage() {
 
       loginUser();
       saveProfile(activeProfile);
+      saveRegisteredUser(activeProfile);
+
+      // Write-through to Firebase Realtime Database
+      try {
+        fetch("/api/farmers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(activeProfile),
+        }).catch(() => {});
+      } catch {}
+
       setLanguage(activeProfile.language || selectedLanguage);
       setLoading(false);
       let target = "/dashboard";
@@ -292,50 +315,50 @@ export default function LoginPage() {
       />
 
       {/* Top Header */}
-      <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-6 relative z-10">
+      <header className="max-w-6xl mx-auto w-full flex items-center justify-between p-3.5 sm:p-6 relative z-10">
         <Link href="/" className="flex items-center gap-3 group">
           <Image
             src="/images/krishyantra_logo.svg"
             alt="Krishyantra"
             width={160}
             height={36}
-            className="h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+            className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
             priority
           />
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="relative">
             <select
               value={language}
               onChange={(e) => handleLanguageChange(e.target.value)}
-              className="appearance-none bg-white border border-[#e8ede4] hover:border-[#2d6a4f] px-3.5 py-1.5 pr-8 rounded-full text-xs font-semibold text-[#1b4332] shadow-2xs focus:outline-none transition-colors cursor-pointer"
+              className="appearance-none bg-white border border-[#e8ede4] hover:border-[#2d6a4f] px-2.5 sm:px-3.5 py-1.5 pr-7 sm:pr-8 rounded-full text-[11px] sm:text-xs font-semibold text-[#1b4332] shadow-2xs focus:outline-none transition-colors cursor-pointer"
             >
               {INDIAN_LANGUAGES.map((lang) => (
                 <option key={lang.code} value={lang.code}>
-                  {lang.native} ({lang.name})
+                  {lang.native}
                 </option>
               ))}
             </select>
-            <Globe className="h-3.5 w-3.5 text-[#2d6a4f] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Globe className="h-3.5 w-3.5 text-[#2d6a4f] absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           <Link
             href="/signup"
-            className="px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 hover:scale-105"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-white text-[11px] sm:text-xs font-bold transition-all shadow-sm flex items-center gap-1 sm:gap-1.5 hover:scale-105 shrink-0"
             style={{
               background: "linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)",
               boxShadow: "0 4px 14px rgba(27, 67, 50, 0.2)",
             }}
           >
             <UserPlus className="h-3.5 w-3.5" />
-            <span>{isHindi ? "नया किसान? खाता बनाएं" : "New Farmer? Sign Up"}</span>
+            <span>{isHindi ? "खाता बनाएं" : "Sign Up"}</span>
           </Link>
         </div>
       </header>
 
       {/* Main Login Form Container */}
-      <main className="max-w-5xl mx-auto w-full my-4 px-4 sm:px-6 relative z-10">
+      <main className="max-w-5xl mx-auto w-full my-2 sm:my-4 px-3 sm:px-6 relative z-10">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
@@ -386,7 +409,7 @@ export default function LoginPage() {
 
           {/* Right Column: Interactive Login Form Card (7 Cols) */}
           <div className="lg:col-span-7">
-            <div className="bg-white border border-[#e8ede4] shadow-[0_20px_60px_-15px_rgba(27,67,50,0.08)] rounded-3xl p-6 sm:p-9 space-y-6">
+            <div className="bg-white border border-[#e8ede4] shadow-[0_20px_60px_-15px_rgba(27,67,50,0.08)] rounded-2xl sm:rounded-3xl p-4 sm:p-9 space-y-5 sm:space-y-6">
               
               <div className="text-center space-y-1">
                 <span className="text-[10px] font-mono font-bold text-[#1b4332] bg-[#e8f5e9] px-3 py-0.5 rounded-full border border-[#c8e6c9] uppercase tracking-wider">

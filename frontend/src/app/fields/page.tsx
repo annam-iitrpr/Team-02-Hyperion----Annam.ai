@@ -445,6 +445,22 @@ export default function MyFieldsPage() {
       setProfile(getStoredProfile());
     }
 
+    try {
+      fetch("/api/fields", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: updatedField.id,
+          polygon: currentPolygon,
+          area_acres: calculatedAcres,
+          lat: mapCenter[0],
+          lon: mapCenter[1],
+        }),
+      }).catch(() => {});
+    } catch {
+      // non-blocking fallback
+    }
+
     bustPredictionCache();
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("aasra_fields_updated"));
@@ -777,323 +793,330 @@ export default function MyFieldsPage() {
 
   return (
     <AppShell>
-      <main id="main-content" role="main" className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 py-8 space-y-8 font-sans">
-        
-        {/* ── Top Header with Clean Greeting & Action Buttons ────────────────── */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap mb-1.5">
-              <span className="text-xs font-bold text-[#533afd] bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 flex items-center gap-1.5">
-                <MapPin className="h-3 w-3 text-[#533afd]" />
-                <span className="notranslate" translate="no">
-                  {(profile.district || activeFarm.district || "Bhopal").toUpperCase()}, {(profile.state || activeFarm.state || "Madhya Pradesh")}
-                </span>
-              </span>
-              <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
-                {savedFields.length} {savedFields.length === 1 ? (isHindi ? "खेत पंजीकृत" : "Plot Registered") : (isHindi ? "खेत पंजीकृत" : "Plots Registered")}
-              </span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-[#0d253d] tracking-tight">
-              {isHindi ? `नमस्ते, ${profile.fullName || "किसान साथी"} 👋` : `Hello, ${profile.fullName || "Farmer Friend"} 👋`}
-            </h1>
-            <p className="text-sm text-slate-500 font-medium max-w-3xl mt-1">
-              {isHindi
-                ? "यहाँ से आप अपने सभी खेतों को प्रबंधित करें, नया खेत जोड़ें, नक्शे पर सीमा बनाएं और अपनी किसान प्रोफ़ाइल अपडेट करें।"
-                : "Manage your registered field plots, draw satellite boundaries, and update your farmer profile settings."}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Edit Profile Button */}
-            <button
-              type="button"
-              id="btn-edit-farmer-profile"
-              onClick={() => setShowProfileModal(true)}
-              aria-label="Edit Profile Information"
-              className="px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs shadow-2xs transition-all flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <User className="h-4 w-4 text-[#533afd]" />
-              <span>{isHindi ? "किसान प्रोफ़ाइल बदलें" : "Edit Profile Info"}</span>
-            </button>
-
-            {/* Register New Field Button (Opens Signup-Grade Experience) */}
-            <button
-              type="button"
-              id="btn-register-new-field"
-              onClick={openCreateFieldWizard}
-              aria-label="Register New Field Plot"
-              className="px-4 py-2.5 rounded-2xl bg-[#533afd] hover:bg-[#4434d4] text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Plus className="h-4 w-4" />
-              <span>{isHindi ? "नया खेत जोड़ें" : "Register New Field"}</span>
-            </button>
-          </div>
-        </header>
-
-        {/* ── 1. Interactive Satellite Map & Boundary Editor ──────────────── */}
-        <section aria-labelledby="heading-boundary-editor" className="bg-white border border-[#e3e8ee] rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      <div className="min-h-screen bg-[#fbfcf8] bg-[radial-gradient(#1b4332_0.75px,transparent_0.75px)] [background-size:24px_24px] text-slate-900 pb-20">
+        <main id="main-content" role="main" className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 py-8 space-y-8 font-sans">
+          
+          {/* ── Top Header with Clean Greeting & Action Buttons ────────────────── */}
+          <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e8ede4] pb-6">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 uppercase">
-                  ACTIVE PLOT: {currentField.name}
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                <span className="text-xs font-bold text-[#1b4332] bg-[#e8f5e9] px-3 py-1 rounded-full border border-[#c8e6c9] flex items-center gap-1.5">
+                  <MapPin className="h-3 w-3 text-emerald-700" />
+                  <span className="notranslate" translate="no">
+                    {(profile.district || activeFarm.district || "Bhopal").toUpperCase()}, {(profile.state || activeFarm.state || "Madhya Pradesh")}
+                  </span>
                 </span>
-                <span className="text-xs text-slate-500 font-medium">
-                  {currentField.crop} ({currentField.growthStage})
+                <span className="text-xs font-mono font-bold text-slate-700 bg-white border border-[#e8ede4] px-3 py-1 rounded-full shadow-2xs">
+                  {savedFields.length} {savedFields.length === 1 ? (isHindi ? "खेत पंजीकृत" : "Plot Registered") : (isHindi ? "खेत पंजीकृत" : "Plots Registered")}
                 </span>
               </div>
-              <h2 id="heading-boundary-editor" className="text-xl font-bold text-[#0d253d] font-display">
-                {isHindi ? "सैटेलाइट मैप पर खेत की सीमा निर्धारण" : "Interactive Field Perimeter & Boundary Editor"}
-              </h2>
-              <p className="text-xs text-slate-500">
+
+              <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-[#11261f] tracking-tight">
+                {isHindi ? `नमस्ते, ${profile.fullName || "किसान साथी"} 👋` : `Hello, ${profile.fullName || "Farmer Friend"} 👋`}
+              </h1>
+              <p className="text-sm text-slate-600 font-medium max-w-3xl mt-1">
                 {isHindi
-                  ? "सफेद कोनों को खींचकर अपने खेत की वास्तविक बाड़ से मिलाएं — एकड़ की गणना स्वतः अपडेट होगी।"
-                  : "Drag the white corner pins to match your real field boundary. Acreage is calculated automatically."}
+                  ? "यहाँ से आप अपने सभी खेतों को प्रबंधित करें, नया खेत जोड़ें, नक्शे पर सीमा बनाएं और अपनी किसान प्रोफ़ाइल अपडेट करें।"
+                  : "Manage your registered field plots, draw satellite boundaries, and update your farmer profile settings."}
               </p>
             </div>
 
-            {/* Search location or auto GPS */}
-            <div className="flex items-center gap-2 relative w-full sm:w-auto">
-              <div className="relative w-full sm:w-72">
-                <input
-                  type="text"
-                  id="input-search-location-main"
-                  name="searchLocation"
-                  value={searchQuery}
-                  onChange={(e) => handleLocationSearch(e.target.value)}
-                  onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
-                  placeholder="Search village or district..."
-                  aria-label="Search village or district"
-                  className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-[#e3e8ee] bg-[#f6f9fc] text-[#0d253d] font-bold focus:bg-white focus:outline-none focus:border-[#533afd]"
-                />
-                <Search className="h-3.5 w-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
-                {isSearching && (
-                  <RefreshCw className="h-3.5 w-3.5 text-slate-400 absolute right-2.5 top-2.5 animate-spin" />
-                )}
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Edit Profile Button */}
+              <button
+                type="button"
+                id="btn-edit-farmer-profile"
+                onClick={() => setShowProfileModal(true)}
+                aria-label="Edit Profile Information"
+                className="px-4 py-2.5 rounded-2xl bg-white hover:bg-[#f2f5f0] text-[#1b4332] border border-[#e8ede4] font-bold text-xs shadow-2xs transition-all flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <User className="h-4 w-4 text-emerald-700" />
+                <span>{isHindi ? "किसान प्रोफ़ाइल बदलें" : "Edit Profile Info"}</span>
+              </button>
 
-                {/* Dropdown Results */}
-                {showDropdown && searchResults.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-48 overflow-y-auto divide-y divide-slate-100">
-                    {searchResults.map((res) => (
-                      <button
-                        key={res.id}
-                        type="button"
-                        onClick={() => handleSelectLocation(res)}
-                        className="w-full text-left px-3 py-2 text-xs hover:bg-emerald-50 text-slate-800 font-medium flex items-center justify-between cursor-pointer"
-                      >
-                        <span className="truncate font-bold">{res.name}</span>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">
-                          {Number(res.lat).toFixed(2)}°N, {Number(res.lon).toFixed(2)}°E
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+              {/* Register New Field Button (Opens Signup-Grade Experience) */}
+              <button
+                type="button"
+                id="btn-register-new-field"
+                onClick={openCreateFieldWizard}
+                aria-label="Register New Field Plot"
+                className="px-4 py-2.5 rounded-2xl bg-[#1b4332] hover:bg-[#143326] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Plus className="h-4 w-4" />
+                <span>{isHindi ? "नया खेत जोड़ें" : "Register New Field"}</span>
+              </button>
+            </div>
+          </header>
+
+          {/* ── 1. Interactive Satellite Map & Boundary Editor ──────────────── */}
+          <section aria-labelledby="heading-boundary-editor" className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-6 sm:p-7 shadow-[0_10px_30px_rgba(27,67,50,0.04)] space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e8ede4] pb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-mono font-bold text-emerald-900 bg-[#e8f5e9] px-2.5 py-0.5 rounded-full border border-[#c8e6c9] uppercase">
+                    ACTIVE PLOT: {currentField.name}
+                  </span>
+                  <span className="text-xs text-slate-600 font-medium">
+                    {currentField.crop} ({currentField.growthStage})
+                  </span>
+                </div>
+                <h2 id="heading-boundary-editor" className="text-xl font-bold text-[#11261f] font-display">
+                  {isHindi ? "सैटेलाइट मैप पर खेत की सीमा निर्धारण" : "Interactive Field Perimeter & Boundary Editor"}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  {isHindi
+                    ? "सफेद कोनों को खींचकर अपने खेत की वास्तविक बाड़ से मिलाएं — एकड़ की गणना स्वतः अपडेट होगी।"
+                    : "Drag the white corner pins to match your real field boundary. Acreage is calculated automatically."}
+                </p>
+              </div>
+
+              {/* Search location or auto GPS */}
+              <div className="flex items-center gap-2 relative w-full sm:w-auto">
+                <div className="relative w-full sm:w-72">
+                  <input
+                    type="text"
+                    id="input-search-location-main"
+                    name="searchLocation"
+                    value={searchQuery}
+                    onChange={(e) => handleLocationSearch(e.target.value)}
+                    onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+                    placeholder="Search village or district..."
+                    aria-label="Search village or district"
+                    className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-[#e8ede4] bg-[#fbfcf8] text-[#11261f] font-bold focus:bg-white focus:outline-none focus:border-emerald-600"
+                  />
+                  <Search className="h-3.5 w-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+                  {isSearching && (
+                    <RefreshCw className="h-3.5 w-3.5 text-slate-400 absolute right-2.5 top-2.5 animate-spin" />
+                  )}
+
+                  {/* Dropdown Results */}
+                  {showDropdown && searchResults.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-[#e8ede4] rounded-2xl shadow-xl max-h-48 overflow-y-auto divide-y divide-slate-100">
+                      {searchResults.map((res) => (
+                        <button
+                          key={res.id}
+                          type="button"
+                          onClick={() => handleSelectLocation(res)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-[#e8f5e9] text-[#11261f] font-medium flex items-center justify-between cursor-pointer"
+                        >
+                          <span className="truncate font-bold">{res.name}</span>
+                          <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">
+                            {Number(res.lat).toFixed(2)}°N, {Number(res.lon).toFixed(2)}°E
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-auto-detect-gps-main"
+                  onClick={handleAutoDetectGPS}
+                  aria-label="Detect GPS coordinates"
+                  className="px-3 py-2 rounded-xl bg-white hover:bg-[#f2f5f0] text-slate-700 border border-[#e8ede4] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs"
+                  title="Detect GPS"
+                >
+                  <Navigation className="h-3.5 w-3.5 text-emerald-700" />
+                  <span className="hidden sm:inline">GPS</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Leaflet Boundary Map */}
+            <div className="relative rounded-3xl overflow-hidden border border-[#e8ede4] shadow-sm">
+              <RealBoundaryMap
+                center={mapCenter}
+                zoom={16}
+                initialPoints={currentPolygon.length >= 3 ? currentPolygon : profile?.polygon && profile.polygon.length >= 3 ? profile.polygon : undefined}
+                onBoundaryChange={handleBoundaryChange}
+                onCenterChange={(newC) => {
+                  setMapCenter((prev) => {
+                    if (Math.abs(prev[0] - newC[0]) < 0.0003 && Math.abs(prev[1] - newC[1]) < 0.0003) return prev;
+                    return newC;
+                  });
+                }}
+              />
+            </div>
+
+            {/* Calculated Area Bar & Save Boundary Action */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4]">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
+                  {isHindi ? "नक्शे से मापा गया कुल क्षेत्रफल" : "Calculated Acreage for Active Plot"}
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-black text-[#11261f] font-mono">
+                    {calculatedAcres} <span className="text-sm font-semibold text-slate-500">Acres</span>
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-900 bg-[#e8f5e9] border border-[#c8e6c9] px-2.5 py-0.5 rounded-md">
+                    {(calculatedAcres * 0.404686).toFixed(2)} Hectares ({(calculatedAcres * 4046.86).toLocaleString("en-IN", { maximumFractionDigits: 0 })} m²)
+                  </span>
+                </div>
               </div>
 
               <button
                 type="button"
-                id="btn-auto-detect-gps-main"
-                onClick={handleAutoDetectGPS}
-                aria-label="Detect GPS coordinates"
-                className="px-3 py-2 rounded-xl bg-[#f6f9fc] hover:bg-slate-100 text-slate-700 border border-[#e3e8ee] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0"
-                title="Detect GPS"
+                id="btn-save-boundary-main"
+                onClick={handleSaveBoundaryToField}
+                aria-label="Save Boundary to Field"
+                className={`px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition-all flex items-center gap-2 cursor-pointer ${
+                  isSavedSuccess
+                    ? "bg-[#1b4332] text-white"
+                    : "bg-[#1b4332] hover:bg-[#143326] text-white hover:scale-[1.02] active:scale-[0.98]"
+                }`}
               >
-                <Navigation className="h-3.5 w-3.5 text-emerald-600" />
-                <span className="hidden sm:inline">GPS</span>
+                {isSavedSuccess ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span>{isHindi ? "सीमा सुरक्षित हो गई!" : "Boundary Saved to Field!"}</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>{isHindi ? "खेत की सीमा सुरक्षित करें" : "Save Boundary to Field"}</span>
+                  </>
+                )}
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* Leaflet Boundary Map */}
-          <div className="relative rounded-3xl overflow-hidden border border-[#e3e8ee] shadow-sm">
-            <RealBoundaryMap
-              center={mapCenter}
-              zoom={16}
-              initialPoints={currentPolygon.length >= 3 ? currentPolygon : profile?.polygon && profile.polygon.length >= 3 ? profile.polygon : undefined}
-              onBoundaryChange={handleBoundaryChange}
-              onCenterChange={(newC) => setMapCenter(newC)}
-            />
-          </div>
-
-          {/* Calculated Area Bar & Save Boundary Action */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee]">
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase block">
-                {isHindi ? "नक्शे से मापा गया कुल क्षेत्रफल" : "Calculated Acreage for Active Plot"}
-              </span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-black text-[#0d253d] font-mono">
-                  {calculatedAcres} <span className="text-sm font-semibold text-slate-500">Acres</span>
-                </span>
-                <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
-                  {(calculatedAcres * 0.404686).toFixed(2)} Hectares ({(calculatedAcres * 4046.86).toLocaleString("en-IN", { maximumFractionDigits: 0 })} m²)
-                </span>
+          {/* ── 2. Registered Farm Plots Portfolio & Details ───────────────── */}
+          <section aria-labelledby="heading-plots-portfolio" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 id="heading-plots-portfolio" className="text-xl font-bold text-[#11261f] font-display flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-emerald-700" />
+                  <span>{isHindi ? "पंजीकृत खेतों की सूची (My Fields Portfolio)" : "Your Registered Farm Plots"}</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {isHindi
+                    ? "किसी भी खेत को सक्रिय बनाने के लिए उस पर क्लिक करें। पूरी वेबसाइट उसी खेत के आधार पर काम करेगी।"
+                    : "Click any field to make it active. The entire website recalculates predictions based on the active plot."}
+                </p>
               </div>
+
+              <button
+                type="button"
+                id="btn-add-plot-portfolio"
+                onClick={openCreateFieldWizard}
+                aria-label="Add Another Field"
+                className="px-4 py-2 rounded-xl bg-white hover:bg-[#f2f5f0] text-[#1b4332] border border-[#e8ede4] font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+              >
+                <Plus className="h-4 w-4 text-emerald-700" />
+                <span>{isHindi ? "नया खेत जोड़ें" : "Add Another Field"}</span>
+              </button>
             </div>
 
-            <button
-              type="button"
-              id="btn-save-boundary-main"
-              onClick={handleSaveBoundaryToField}
-              aria-label="Save Boundary to Field"
-              className={`px-5 py-2.5 rounded-xl font-bold text-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer ${
-                isSavedSuccess
-                  ? "bg-emerald-600 text-white"
-                  : "bg-emerald-600 hover:bg-emerald-500 text-white hover:scale-[1.02] active:scale-[0.98]"
-              }`}
-            >
-              {isSavedSuccess ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  <span>✓ {isHindi ? "सीमा सुरक्षित हो गई!" : "Boundary Saved to Field!"}</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>{isHindi ? "खेत की सीमा सुरक्षित करें" : "Save Boundary to Field"}</span>
-                </>
-              )}
-            </button>
-          </div>
-        </section>
-
-        {/* ── 2. Registered Farm Plots Portfolio & Details ───────────────── */}
-        <section aria-labelledby="heading-plots-portfolio" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 id="heading-plots-portfolio" className="text-xl font-bold text-[#0d253d] font-display flex items-center gap-2">
-                <Layers className="h-5 w-5 text-emerald-600" />
-                <span>{isHindi ? "पंजीकृत खेतों की सूची (My Fields Portfolio)" : "Your Registered Farm Plots"}</span>
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {isHindi
-                  ? "किसी भी खेत को सक्रिय बनाने के लिए उस पर क्लिक करें। पूरी वेबसाइट उसी खेत के आधार पर काम करेगी।"
-                  : "Click any field to make it active. The entire website recalculates predictions based on the active plot."}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              id="btn-add-plot-portfolio"
-              onClick={openCreateFieldWizard}
-              aria-label="Add Another Field"
-              className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-            >
-              <Plus className="h-4 w-4 text-emerald-600" />
-              <span>{isHindi ? "नया खेत जोड़ें" : "Add Another Field"}</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {savedFields.map((f) => {
-              const isSelected = currentField.id === f.id;
-              return (
-                <article
-                  key={f.id}
-                  onClick={() => handleSelectField(f)}
-                  className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between gap-4 relative ${
-                    isSelected
-                      ? "bg-white border-emerald-500 ring-2 ring-emerald-500/20 shadow-md"
-                      : "bg-white hover:bg-slate-50/80 border-[#e3e8ee] shadow-2xs"
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          {isSelected && (
-                            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shrink-0" />
-                          )}
-                          <h3 className="font-extrabold text-base text-[#0d253d] font-display">
-                            {f.name}
-                          </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {savedFields.map((f) => {
+                const isSelected = currentField.id === f.id;
+                return (
+                  <article
+                    key={f.id}
+                    onClick={() => handleSelectField(f)}
+                    className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between gap-4 relative ${
+                      isSelected
+                        ? "bg-white border-2 border-emerald-600 ring-4 ring-emerald-500/10 shadow-md"
+                        : "bg-white hover:border-emerald-400 hover:shadow-md border-[#e8ede4] shadow-2xs"
+                    }`}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            {isSelected && (
+                              <span className="h-2.5 w-2.5 rounded-full bg-emerald-600 shrink-0" />
+                            )}
+                            <h3 className="font-extrabold text-base text-[#11261f] font-display">
+                              {f.name}
+                            </h3>
+                          </div>
+                          <span className="text-xs text-emerald-800 font-bold block mt-0.5">
+                            🌱 {f.crop} <span className="text-slate-400 font-normal">({f.cropVariety || "Standard"})</span>
+                          </span>
                         </div>
-                        <span className="text-xs text-emerald-700 font-bold block mt-0.5">
-                          🌱 {f.crop} <span className="text-slate-400 font-normal">({f.cropVariety || "Standard"})</span>
+
+                        <span className="text-xs font-mono font-black text-emerald-900 bg-[#e8f5e9] border border-[#c8e6c9] px-2.5 py-1 rounded-full">
+                          {f.areaAcres} Acres
                         </span>
                       </div>
 
-                      <span className="text-xs font-mono font-black text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                        {f.areaAcres} Acres
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-600 pt-2 border-t border-slate-100">
-                      <div>
-                        <span className="text-slate-400 text-[10px] block font-sans uppercase">GROWTH STAGE</span>
-                        <span className="font-bold truncate block">{f.growthStage || "Flowering"}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] block font-sans uppercase">LOCATION</span>
-                        <span className="font-bold truncate block">{f.district || profile.district || "Bhopal"}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] block font-sans uppercase">SOIL TYPE</span>
-                        <span className="font-bold truncate block">{f.soilType?.split(" ")[0] || "Black Clay"}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] block font-sans uppercase">IRRIGATION</span>
-                        <span className="font-bold truncate block">{f.irrigationType?.split("+")[0] || "Drip"}</span>
+                      <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-600 pt-2 border-t border-[#e8ede4]">
+                        <div>
+                          <span className="text-slate-400 text-[10px] block font-sans uppercase">GROWTH STAGE</span>
+                          <span className="font-bold truncate block text-[#11261f]">{f.growthStage || "Flowering"}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 text-[10px] block font-sans uppercase">LOCATION</span>
+                          <span className="font-bold truncate block text-[#11261f]">{f.district || profile.district || "Bhopal"}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 text-[10px] block font-sans uppercase">SOIL TYPE</span>
+                          <span className="font-bold truncate block text-[#11261f]">{f.soilType?.split(" ")[0] || "Black Clay"}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 text-[10px] block font-sans uppercase">IRRIGATION</span>
+                          <span className="font-bold truncate block text-[#11261f]">{f.irrigationType?.split("+")[0] || "Drip"}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Actions Bar */}
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEditFieldWizard(f);
-                      }}
-                      className="text-[#533afd] hover:text-[#432ec7] font-bold flex items-center gap-1 cursor-pointer py-1 px-2 rounded-lg hover:bg-indigo-50 transition-colors"
-                    >
-                      <Edit3 className="h-3.5 w-3.5" />
-                      <span>{isHindi ? "विवरण बदलें" : "Edit Plot Details"}</span>
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                      {isSelected ? (
-                        <span className="text-emerald-700 font-bold flex items-center gap-1 text-[11px] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                          <Check className="h-3 w-3" />
-                          <span>{isHindi ? "सक्रिय खेत" : "Active Plot"}</span>
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectField(f);
-                          }}
-                          className="text-slate-500 hover:text-emerald-700 font-bold text-[11px] underline cursor-pointer"
-                        >
-                          {isHindi ? "सक्रिय करें" : "Set Active"}
-                        </button>
-                      )}
-
+                    {/* Actions Bar */}
+                    <div className="flex items-center justify-between pt-3 border-t border-[#e8ede4] text-xs">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDeleteConfirmId(f.id);
+                          openEditFieldWizard(f);
                         }}
-                        aria-label={`Delete ${f.name}`}
-                        className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer ml-1"
-                        title="Delete Plot"
+                        className="text-[#1b4332] hover:text-[#143326] font-bold flex items-center gap-1 cursor-pointer py-1 px-2 rounded-lg hover:bg-[#e8f5e9] transition-colors"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Edit3 className="h-3.5 w-3.5 text-emerald-700" />
+                        <span>{isHindi ? "विवरण बदलें" : "Edit Plot Details"}</span>
                       </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
 
-      </main>
+                      <div className="flex items-center gap-2">
+                        {isSelected ? (
+                          <span className="text-emerald-900 font-bold flex items-center gap-1 text-[11px] bg-[#e8f5e9] px-2.5 py-0.5 rounded-full border border-[#c8e6c9]">
+                            <Check className="h-3 w-3 text-emerald-700" />
+                            <span>{isHindi ? "सक्रिय खेत" : "Active Plot"}</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectField(f);
+                            }}
+                            className="text-emerald-700 hover:text-emerald-900 font-bold text-[11px] underline cursor-pointer"
+                          >
+                            {isHindi ? "सक्रिय करें" : "Set Active"}
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirmId(f.id);
+                          }}
+                          aria-label={`Delete ${f.name}`}
+                          className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer ml-1"
+                          title="Delete Plot"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
+        </main>
+      </div>
 
       {/* ── 3. SIGNUP-GRADE MULTI-STEP FIELD REGISTRATION WIZARD ──────────── */}
       {showRegisterWizard && (
@@ -1101,13 +1124,13 @@ export default function MyFieldsPage() {
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full border border-slate-200 shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto font-sans">
             
             {/* Modal Header & Progress Indicator */}
-            <div className="flex justify-between items-start border-b border-slate-100 pb-4">
+            <div className="flex justify-between items-start border-b border-[#e8ede4] pb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-2xl bg-indigo-50 text-[#533afd]">
+                <div className="p-2.5 rounded-2xl bg-[#e8f5e9] text-[#1b4332]">
                   <Sprout className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-xl text-[#0d253d] font-display tracking-tight">
+                  <h3 className="font-extrabold text-xl text-[#1b4332] font-display tracking-tight">
                     {editingFieldId
                       ? (isHindi ? "खेत विवरण संपादित करें" : "Edit Field Plot Details")
                       : (isHindi ? "नया खेत पंजीकृत करें (Signup-Grade)" : "Register New Field Plot")}
@@ -1124,7 +1147,7 @@ export default function MyFieldsPage() {
                 type="button"
                 onClick={() => setShowRegisterWizard(false)}
                 aria-label="Close modal"
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-[#e8f5e9]/50 transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1133,7 +1156,7 @@ export default function MyFieldsPage() {
             {/* Step Progress Bar */}
             <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#533afd] to-emerald-500 transition-all duration-300 rounded-full"
+                className="h-full bg-gradient-to-r from-[#1b4332] to-emerald-500 transition-all duration-300 rounded-full"
                 style={{ width: `${(wizardStep / 2) * 100}%` }}
               />
             </div>
@@ -1170,7 +1193,7 @@ export default function MyFieldsPage() {
                     value={wizFieldName}
                     onChange={(e) => setWizFieldName(e.target.value)}
                     placeholder="e.g. North Canal Farm Plot"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d] focus:bg-white focus:outline-none focus:border-[#533afd]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-bold text-[#0d253d] focus:bg-white focus:outline-none focus:border-[#1b4332] focus:ring-1 focus:ring-[#1b4332]/20"
                   />
                 </div>
 
@@ -1227,12 +1250,12 @@ export default function MyFieldsPage() {
                         value={wizVillageSearch}
                         onChange={(e) => setWizVillageSearch(e.target.value)}
                         placeholder="Search Village, Town or Tehsil..."
-                        className="w-full pl-10 pr-24 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:bg-white focus:outline-none focus:border-[#533afd]"
+                        className="w-full pl-10 pr-24 py-2.5 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:bg-white focus:outline-none focus:border-[#1b4332] focus:ring-1 focus:ring-[#1b4332]/20"
                       />
                       <button
                         type="submit"
                         disabled={wizIsSearchingLoc}
-                        className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-[#0d253d] text-white text-[11px] font-bold cursor-pointer hover:bg-slate-800 transition-colors"
+                        className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-[#1b4332] text-white text-[11px] font-bold cursor-pointer hover:bg-[#2d6a4f] transition-colors"
                       >
                         {wizIsSearchingLoc ? "Searching..." : "Search"}
                       </button>
@@ -1243,15 +1266,15 @@ export default function MyFieldsPage() {
                       id="btn-wiz-gps"
                       onClick={handleWizLocateOnMap}
                       disabled={wizLocatingUser}
-                      className="px-3.5 py-2.5 rounded-xl bg-white border border-[#e3e8ee] hover:border-[#533afd] text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0 transition-all hover:bg-indigo-50/50"
+                      className="px-3.5 py-2.5 rounded-xl bg-white border border-[#e8ede4] hover:border-[#1b4332] text-[#1b4332] text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer shrink-0 transition-all hover:bg-[#e8f5e9]/60"
                     >
-                      <Crosshair className={`h-4 w-4 text-[#533afd] ${wizLocatingUser ? "animate-spin" : ""}`} />
+                      <Crosshair className={`h-4 w-4 text-[#1b4332] ${wizLocatingUser ? "animate-spin" : ""}`} />
                       <span>{isHindi ? "GPS खेत खोजें" : "Device GPS"}</span>
                     </button>
                   </div>
 
                   {wizLocationStatus && (
-                    <p className="text-[11px] font-mono text-[#533afd] bg-indigo-50/60 p-2 rounded-lg border border-indigo-100">
+                    <p className="text-[11px] font-mono text-[#1b4332] bg-[#e8f5e9]/70 p-2 rounded-lg border border-[#c8e6c9]">
                       ℹ️ {wizLocationStatus}
                     </p>
                   )}
@@ -1263,7 +1286,7 @@ export default function MyFieldsPage() {
                     <span className="font-bold text-slate-700">
                       {isHindi ? "नक्शे पर खेत की मेढ़ (Satellite Boundary Polygon)" : "Interactive Satellite Boundary Polygon"}
                     </span>
-                    <span className="text-[10px] font-mono text-indigo-600 font-bold">
+                    <span className="text-[10px] font-mono text-[#1b4332] font-bold">
                       Center: {wizMapCenter.lat.toFixed(4)}°N, {wizMapCenter.lon.toFixed(4)}°E
                     </span>
                   </div>
@@ -1273,7 +1296,12 @@ export default function MyFieldsPage() {
                       center={[wizMapCenter.lat, wizMapCenter.lon]}
                       zoom={16}
                       initialPoints={wizPolygon.length >= 3 ? wizPolygon : undefined}
-                      onCenterChange={(newC) => setWizMapCenter({ lat: newC[0], lon: newC[1] })}
+                      onCenterChange={(newC) => {
+                        setWizMapCenter((prev) => {
+                          if (Math.abs(prev.lat - newC[0]) < 0.0003 && Math.abs(prev.lon - newC[1]) < 0.0003) return prev;
+                          return { lat: newC[0], lon: newC[1] };
+                        });
+                      }}
                       onBoundaryChange={(pts, acres) => {
                         setWizPolygon(pts);
                         setWizAcres(acres);
@@ -1294,7 +1322,7 @@ export default function MyFieldsPage() {
                       <span className="font-mono text-xs text-slate-500">
                         ({(wizAcres * 0.4047).toFixed(2)} Ha)
                       </span>
-                      <div className="flex items-center bg-white border border-[#533afd] rounded-xl px-2.5 py-1 shadow-2xs">
+                      <div className="flex items-center bg-white border border-[#1b4332] rounded-xl px-2.5 py-1 shadow-2xs">
                         <input
                           type="number"
                           id="input-wiz-acres"
@@ -1304,7 +1332,7 @@ export default function MyFieldsPage() {
                           step="0.1"
                           value={wizAcres}
                           onChange={(e) => setWizAcres(Number(e.target.value))}
-                          className="w-16 font-mono text-xs font-black text-[#533afd] focus:outline-none text-right mr-1"
+                          className="w-16 font-mono text-xs font-black text-[#1b4332] focus:outline-none text-right mr-1"
                         />
                         <span className="font-mono text-xs font-bold text-slate-700">Acres</span>
                       </div>
@@ -1319,7 +1347,7 @@ export default function MyFieldsPage() {
                     value={wizAcres}
                     onChange={(e) => setWizAcres(Number(e.target.value))}
                     aria-label="Acreage slider"
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#533afd]"
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1b4332]"
                   />
                 </div>
 
@@ -1405,7 +1433,7 @@ export default function MyFieldsPage() {
                       setWizErrorMessage(null);
                       setWizardStep(2);
                     }}
-                    className="px-6 py-2.5 rounded-xl bg-[#533afd] hover:bg-[#4434d4] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>{isHindi ? "अगला: फसल व कृषि इतिहास" : "Next: Crop & Agronomics"}</span>
                     <ArrowRight className="h-4 w-4" />
@@ -1418,11 +1446,11 @@ export default function MyFieldsPage() {
             {wizardStep === 2 && (
               <div className="space-y-5">
                 {/* Regional Banner */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-indigo-50/70 p-3 rounded-2xl border border-indigo-100">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-[#e8f5e9]/70 p-3 rounded-2xl border border-[#c8e6c9]">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-[#533afd] shrink-0" />
+                    <Sparkles className="h-4 w-4 text-[#1b4332] shrink-0" />
                     <div>
-                      <span className="text-xs font-bold text-[#0d253d]">
+                      <span className="text-xs font-bold text-[#1b4332]">
                         {isHindi
                           ? `${wizDistrict}, ${wizState} के लिए अनुशंसित क्षेत्रीय फसलें`
                           : `Regional Crops for ${wizDistrict}, ${wizState}`}
@@ -1435,7 +1463,7 @@ export default function MyFieldsPage() {
                     </div>
                   </div>
                   {wizIsLoadingIntel && (
-                    <span className="text-[10px] font-mono text-[#533afd] animate-pulse bg-white px-2 py-0.5 rounded-full border border-indigo-200">
+                    <span className="text-[10px] font-mono text-[#1b4332] animate-pulse bg-white px-2 py-0.5 rounded-full border border-[#c8e6c9]">
                       Analyzing ICAR...
                     </span>
                   )}
@@ -1452,7 +1480,7 @@ export default function MyFieldsPage() {
                       placeholder={isHindi ? `${wizDistrict} में उगाई जाने वाली फसल खोजें...` : `Filter crops in ${wizDistrict}...`}
                       value={wizCropFilterQuery}
                       onChange={(e) => setWizCropFilterQuery(e.target.value)}
-                      className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:bg-white focus:outline-none focus:border-[#533afd]"
+                      className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#f6f9fc] border border-[#e3e8ee] text-xs font-medium text-[#0d253d] focus:bg-white focus:outline-none focus:border-[#1b4332] focus:ring-1 focus:ring-[#1b4332]/20"
                     />
                     {wizCropFilterQuery && (
                       <button
@@ -1481,7 +1509,7 @@ export default function MyFieldsPage() {
                         onClick={() => setWizCropCategoryFilter(cat.id)}
                         className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
                           wizCropCategoryFilter === cat.id
-                            ? "bg-[#533afd] text-white shadow-2xs"
+                            ? "bg-[#1b4332] text-white shadow-2xs"
                             : "bg-[#f6f9fc] text-slate-600 hover:bg-slate-200/60 border border-[#e3e8ee]"
                         }`}
                       >
@@ -1509,7 +1537,7 @@ export default function MyFieldsPage() {
                         }}
                         className={`rounded-2xl border text-left overflow-hidden transition-all duration-200 cursor-pointer flex flex-col justify-between group ${
                           isSelected
-                            ? "bg-white border-[#533afd] shadow-md ring-2 ring-[#533afd]/20 scale-[1.02]"
+                            ? "bg-white border-[#1b4332] shadow-md ring-2 ring-[#1b4332]/20 scale-[1.02]"
                             : "bg-white hover:border-slate-300 border-[#e3e8ee] text-slate-700"
                         }`}
                       >
@@ -1536,7 +1564,7 @@ export default function MyFieldsPage() {
                             </span>
                           </div>
                           {isSelected && (
-                            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-[#533afd]">
+                            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-[#1b4332]">
                               <CheckCircle2 className="h-3 w-3" />
                               <span>Selected</span>
                             </div>
@@ -1555,7 +1583,7 @@ export default function MyFieldsPage() {
                         Crop Variety (फसल की किस्म)
                       </label>
                       {currentWizCropObj?.varieties && currentWizCropObj.varieties.length > 0 && (
-                        <span className="text-[10px] text-[#533afd] font-bold">
+                        <span className="text-[10px] text-[#1b4332] font-bold">
                           {currentWizCropObj.varieties.length} Local Cultivars
                         </span>
                       )}
@@ -1578,7 +1606,7 @@ export default function MyFieldsPage() {
                             onClick={() => setWizCropVariety(v)}
                             className={`text-[10px] px-2 py-0.5 rounded-md border font-mono transition-colors cursor-pointer ${
                               wizCropVariety === v
-                                ? "bg-[#533afd] text-white border-[#533afd]"
+                                ? "bg-[#1b4332] text-white border-[#1b4332]"
                                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
                             }`}
                           >
@@ -1715,7 +1743,7 @@ export default function MyFieldsPage() {
                     id="btn-submit-field-registration"
                     onClick={handleCompleteFieldRegistration}
                     disabled={wizSaving}
-                    className="px-6 py-2.5 rounded-xl bg-[#533afd] hover:bg-[#4434d4] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
                     {wizSaving ? (
                       <span className="animate-pulse">{isHindi ? "सुरक्षित हो रहा है..." : "Saving Field..."}</span>
@@ -1742,13 +1770,13 @@ export default function MyFieldsPage() {
       {showProfileModal && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
           <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-lg w-full border border-slate-200 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto font-sans">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="flex justify-between items-center border-b border-[#e8ede4] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-indigo-50 text-[#533afd]">
+                <div className="p-2 rounded-xl bg-[#e8f5e9] text-[#1b4332]">
                   <User className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-[#0d253d] font-display">
+                  <h3 className="font-black text-lg text-[#1b4332] font-display">
                     {isHindi ? "किसान प्रोफ़ाइल विवरण संपादित करें" : "Edit Farmer Profile & Information"}
                   </h3>
                   <span className="text-xs text-slate-500">
@@ -1899,14 +1927,14 @@ export default function MyFieldsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-[#f6f9fc] rounded-xl border border-[#e3e8ee]">
+              <div className="flex items-center gap-3 p-3 bg-[#f6f9fc] rounded-xl border border-[#e8ede4]">
                 <input
                   type="checkbox"
                   id="profSoilHealthCard"
                   name="soilHealthCard"
                   checked={profSoilCard}
                   onChange={(e) => setProfSoilCard(e.target.checked)}
-                  className="h-4 w-4 text-[#533afd] rounded cursor-pointer"
+                  className="h-4 w-4 text-[#1b4332] accent-[#1b4332] rounded cursor-pointer"
                 />
                 <label htmlFor="profSoilHealthCard" className="text-xs text-slate-700 font-bold cursor-pointer">
                   {isHindi ? "मृदा स्वास्थ्य कार्ड (Soil Health Card) उपलब्ध है" : "Soil Health Card is Available"}
@@ -1923,7 +1951,7 @@ export default function MyFieldsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-[#533afd] hover:bg-[#4434d4] text-white font-bold shadow transition-all cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold shadow transition-all cursor-pointer"
                 >
                   {profileSavedSuccess
                     ? (isHindi ? "✓ सुरक्षित हो गया!" : "✓ Saved Successfully!")

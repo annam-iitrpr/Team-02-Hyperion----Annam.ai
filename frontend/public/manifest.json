@@ -1,12 +1,13 @@
 {
-  "name": "AASRA — Precision Agriculture Web App",
+  "name": "AASRA Krishyantra — Precision Agriculture Intelligence",
   "short_name": "AASRA",
-  "description": "Evidence-Based Agronomic Intelligence & Multilingual Kisan Voice Assistant",
-  "start_url": "/",
+  "description": "Evidence-Based Agronomic Intelligence & Multilingual Kisan Voice Assistant for Indian Farmers",
+  "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#533afd",
   "orientation": "portrait-primary",
+  "background_color": "#fbfcf8",
+  "theme_color": "#1b4332",
   "categories": ["agriculture", "productivity", "utilities"],
   "icons": [
     {
@@ -20,6 +21,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kisan Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open live crop health, telemetry, and advisory",
+      "url": "/dashboard",
+      "icons": [{ "src": "/images/aasra_logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Season Journal",
+      "short_name": "Journal",
+      "description": "View verified field sprays, weather events, and ledger",
+      "url": "/journal",
+      "icons": [{ "src": "/images/aasra_logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "System Architecture",
+      "short_name": "Architecture",
+      "description": "Inspect real-time telemetry and data pipelines",
+      "url": "/architecture",
+      "icons": [{ "src": "/images/aasra_logo.png", "sizes": "192x192" }]
     }
   ]
 }

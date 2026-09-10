@@ -1,6 +1,6 @@
 {
   "version": "2.0.0-firebase",
-  "lastUpdated": "2026-09-10T02:22:22.055Z",
+  "lastUpdated": "2026-09-10T09:39:55.888Z",
   "settings": {
     "featureFlags": {
       "fieldMapping": true,
@@ -16,29 +16,52 @@
   },
   "farmers": [
     {
-      "id": "kisan-501234-1788782691665",
-      "fullName": "Rajesh Kumar",
-      "mobileNumber": "9876501234",
-      "email": "",
+      "cropVariety": "Kufri Jyoti",
+      "district": "Kasganj",
+      "email": "sameer@syngenta-aasra.in",
+      "fieldAreaAcres": 3.5,
+      "fullName": "Sameer Mishra",
+      "hasKisanCreditCard": true,
+      "id": "farmer-002",
+      "irrigationType": "Tube Well Sprinkler",
       "language": "hi",
-      "state": "Maharashtra",
+      "mobileNumber": "9720413710",
+      "pmKisanBeneficiary": true,
+      "primaryCrop": "Potato",
+      "soilType": "Alluvial Sandy Loam",
+      "sowingDate": "2026-07-15",
+      "state": "Uttar Pradesh",
+      "updatedAt": "2026-09-03T17:45:00.000Z",
+      "village": "Bilram"
+    },
+    {
+      "cropVariety": "JS-335",
       "district": "Nashik",
-      "village": "Village Area",
-      "fieldName": "Soybean Main Field",
+      "email": "",
+      "farmingExperience": "5-10 Years",
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
       "fieldAreaAcres": 6.5,
       "fieldAreaHa": 2.63,
-      "landOwnership": "Owner",
-      "farmingExperience": "5-10 Years",
-      "primaryCrop": "Soybean",
-      "cropVariety": "JS-335",
-      "sowingDate": "2026-06-15",
-      "growthStage": "Flowering & Pod Formation",
-      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "irrigationType": "Drip Irrigation",
+      "fieldName": "Soybean Main Field",
+      "fullName": "Rajesh Kumar",
       "gpsLocation": {
         "lat": 19.997507033345652,
         "lon": 73.78984451293947
       },
+      "growthStage": "Flowering & Pod Formation",
+      "hasKisanCreditCard": true,
+      "id": "kisan-501234-1788782691665",
+      "irrigationType": "Drip Irrigation",
+      "landOwnership": "Owner",
+      "language": "hi",
+      "mobileNumber": "9876501234",
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "pmKisanBeneficiary": true,
       "polygon": [
         [
           23.276278986261158,
@@ -57,75 +80,16 @@
           77.51090455873914
         ]
       ],
-      "pestHistory": [
-        "Heat Stress Flower Drop"
-      ],
-      "fertilizersUsed": [
-        "DAP",
-        "Urea"
-      ],
-      "hasKisanCreditCard": true,
-      "pmKisanBeneficiary": true,
       "preferredCommunication": "Voice + WhatsApp",
-      "updatedAt": "2026-09-07T12:04:57.623Z"
-    },
-    {
-      "id": "kisan-949347-1789006942011",
-      "fullName": "ishaan sen",
-      "mobileNumber": "7222949347",
-      "email": "",
-      "language": "en",
-      "state": "Punjab",
-      "district": "Rupnagar",
-      "tehsil": "Sehore",
-      "village": "Village Area",
-      "fieldName": "Soybean Main Field",
-      "fieldAreaAcres": 21.29,
-      "fieldAreaHa": 8.62,
-      "landOwnership": "Owner",
-      "farmingExperience": "1-3 Yrs",
       "primaryCrop": "Soybean",
-      "cropVariety": "JS-335",
-      "sowingDate": "2026-06-15",
-      "growthStage": "Flowering & Pod Formation",
       "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
-      "irrigationType": "Borewell + Rainfed",
-      "gpsLocation": {
-        "lat": 24.71648612684654,
-        "lon": 76.968412399292
-      },
-      "polygon": [
-        [
-          24.71768612684654,
-          76.96690167045595
-        ],
-        [
-          24.71798612684654,
-          76.97020167045595
-        ],
-        [
-          24.71538612684654,
-          76.96980167045595
-        ],
-        [
-          24.71508612684654,
-          76.96720167045595
-        ]
-      ],
-      "pestHistory": [
-        "Heat Stress Flower Drop"
-      ],
-      "fertilizersUsed": [
-        "DAP",
-        "Urea"
-      ],
-      "hasKisanCreditCard": true,
-      "pmKisanBeneficiary": true,
-      "preferredCommunication": "Voice + WhatsApp",
-      "updatedAt": "2026-09-10T02:22:22.046Z"
+      "sowingDate": "2026-06-15",
+      "state": "Maharashtra",
+      "updatedAt": "2026-09-07T12:04:57.623Z",
+      "village": "Village Area"
     },
     {
-      "id": "kisan-543210-1789006263325",
+      "id": "kisan-543210-1789033187853",
       "fullName": "Ramesh Patel",
       "mobileNumber": "9876543210",
       "email": "ishaan@syngenta-aasra.in",
@@ -133,20 +97,20 @@
       "state": "Madhya Pradesh",
       "district": "Sehore",
       "village": "Village Area",
-      "fieldName": "Soybean Main Field",
+      "fieldName": "Bt Cotton Main Field",
       "fieldAreaAcres": 21.54,
       "fieldAreaHa": 8.72,
       "landOwnership": "Owner",
       "farmingExperience": "5-10 Years",
-      "primaryCrop": "Soybean",
-      "cropVariety": "JS-335",
+      "primaryCrop": "Bt Cotton",
+      "cropVariety": "Bollgard II",
       "sowingDate": "2026-06-15",
       "growthStage": "Flowering & Pod Formation",
       "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
       "irrigationType": "Borewell + Rainfed",
       "gpsLocation": {
-        "lat": 23.203209138550648,
-        "lon": 77.08439111709596
+        "lat": 23.15172473085266,
+        "lon": 77.08436965942384
       },
       "polygon": [
         [
@@ -176,29 +140,177 @@
       "hasKisanCreditCard": true,
       "pmKisanBeneficiary": true,
       "preferredCommunication": "Voice + WhatsApp",
-      "updatedAt": "2026-09-10T02:11:03.379Z"
+      "updatedAt": "2026-09-10T09:39:55.888Z"
     },
     {
-      "id": "farmer-002",
-      "fullName": "Sameer Mishra",
-      "mobileNumber": "9720413710",
-      "email": "sameer@syngenta-aasra.in",
-      "language": "hi",
-      "state": "Uttar Pradesh",
-      "district": "Kasganj",
-      "village": "Bilram",
-      "fieldAreaAcres": 3.5,
-      "primaryCrop": "Potato",
-      "cropVariety": "Kufri Jyoti",
-      "sowingDate": "2026-07-15",
-      "soilType": "Alluvial Sandy Loam",
-      "irrigationType": "Tube Well Sprinkler",
+      "id": "kisan-787878-1789030845685",
+      "fullName": "ritvik",
+      "mobileNumber": "7878787878",
+      "email": "",
+      "language": "en",
+      "state": "Punjab",
+      "district": "Rupnagar",
+      "village": "Village Area",
+      "fieldName": "Bt Cotton Main Field",
+      "fieldAreaAcres": 1.22,
+      "fieldAreaHa": 0.49,
+      "landOwnership": "Owner",
+      "farmingExperience": "1-3 Yrs",
+      "primaryCrop": "Bt Cotton",
+      "cropVariety": "Bollgard II",
+      "sowingDate": "2026-06-15",
+      "growthStage": "Germination & Seedling",
+      "soilType": "Medium Black Clay Loam (मध्यम काली दोमट)",
+      "irrigationType": "Purely Rainfed",
+      "gpsLocation": {
+        "lat": 30.3136166899307,
+        "lon": 76.51016235351564
+      },
+      "polygon": [
+        [
+          30.319265797099945,
+          76.5251102789169
+        ],
+        [
+          30.319182959349302,
+          76.52588052004826
+        ],
+        [
+          30.318613380579176,
+          76.52579799621046
+        ],
+        [
+          30.31864785388661,
+          76.52502475593052
+        ]
+      ],
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
       "hasKisanCreditCard": true,
       "pmKisanBeneficiary": true,
-      "updatedAt": "2026-09-03T17:45:00.000Z"
+      "preferredCommunication": "Voice + WhatsApp",
+      "updatedAt": "2026-09-10T09:04:10.870Z"
+    },
+    {
+      "cropVariety": "JS-335",
+      "district": "Rupnagar",
+      "email": "",
+      "farmingExperience": "1-3 Yrs",
+      "fertilizersUsed": [
+        "DAP",
+        "Urea"
+      ],
+      "fieldAreaAcres": 21.29,
+      "fieldAreaHa": 8.62,
+      "fieldName": "Soybean Main Field",
+      "fullName": "ishaan sen",
+      "gpsLocation": {
+        "lat": 24.71648612684654,
+        "lon": 76.968412399292
+      },
+      "growthStage": "Flowering & Pod Formation",
+      "hasKisanCreditCard": true,
+      "id": "kisan-949347-1789006942011",
+      "irrigationType": "Borewell + Rainfed",
+      "landOwnership": "Owner",
+      "language": "en",
+      "mobileNumber": "7222949347",
+      "pestHistory": [
+        "Heat Stress Flower Drop"
+      ],
+      "pmKisanBeneficiary": true,
+      "polygon": [
+        [
+          24.71768612684654,
+          76.96690167045595
+        ],
+        [
+          24.71798612684654,
+          76.97020167045595
+        ],
+        [
+          24.71538612684654,
+          76.96980167045595
+        ],
+        [
+          24.71508612684654,
+          76.96720167045595
+        ]
+      ],
+      "preferredCommunication": "Voice + WhatsApp",
+      "primaryCrop": "Soybean",
+      "soilType": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "sowingDate": "2026-06-15",
+      "state": "Punjab",
+      "tehsil": "Sehore",
+      "updatedAt": "2026-09-10T08:56:30.817Z",
+      "village": "Village Area"
     }
   ],
   "fields": [
+    {
+      "area_acres": 21.54,
+      "created_at": "2026-09-10T09:00:47.431Z",
+      "crop": "Bt Cotton",
+      "id": "f-847431",
+      "lat": 23.203,
+      "lon": 77.084,
+      "name": "Bt Cotton Main Field",
+      "polygon": [
+        [
+          30.319265797099945,
+          76.5251102789169
+        ],
+        [
+          30.319182959349302,
+          76.52588052004826
+        ],
+        [
+          30.318613380579176,
+          76.52579799621046
+        ],
+        [
+          30.31864785388661,
+          76.52502475593052
+        ]
+      ],
+      "soil_type": "Medium Black Clay Loam (मध्यम काली दोमट)",
+      "variety": "Bollgard II"
+    },
+    {
+      "area_acres": 21.29,
+      "created_at": "2026-09-10T02:22:22.055Z",
+      "crop": "Soybean",
+      "id": "f-942055",
+      "lat": 24.71648612684654,
+      "lon": 76.968412399292,
+      "name": "Soybean Main Field",
+      "polygon": [
+        [
+          24.71768612684654,
+          76.96690167045595
+        ],
+        [
+          24.71798612684654,
+          76.97020167045595
+        ],
+        [
+          24.71538612684654,
+          76.96980167045595
+        ],
+        [
+          24.71508612684654,
+          76.96720167045595
+        ]
+      ],
+      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "variety": "JS-335"
+    },
     {
       "area_acres": 5,
       "created_at": "2026-06-20T10:00:00Z",
@@ -287,33 +399,62 @@
       "variety": "JG-11 Desi"
     },
     {
-      "id": "f-942055",
-      "name": "Soybean Main Field",
-      "lat": 24.71648612684654,
-      "lon": 76.968412399292,
-      "area_acres": 21.29,
-      "crop": "Soybean",
-      "variety": "JS-335",
+      "id": "f-508057",
+      "name": "Bt Cotton Main Field",
+      "lat": 30.31654342009353,
+      "lon": 76.52361631393434,
+      "area_acres": 21.54,
+      "crop": "Bt Cotton",
+      "variety": "Bollgard II",
       "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
       "polygon": [
         [
-          24.71768612684654,
-          76.96690167045595
+          23.2044,
+          77.08290000000001
         ],
         [
-          24.71798612684654,
-          76.97020167045595
+          23.2047,
+          77.0862
         ],
         [
-          24.71538612684654,
-          76.96980167045595
+          23.202099999999998,
+          77.0858
         ],
         [
-          24.71508612684654,
-          76.96720167045595
+          23.2018,
+          77.0832
         ]
       ],
-      "created_at": "2026-09-10T02:22:22.055Z"
+      "created_at": "2026-09-10T09:11:48.057Z"
+    },
+    {
+      "id": "f-195883",
+      "name": "Bt Cotton Main Field",
+      "lat": 23.15172473085266,
+      "lon": 77.08436965942384,
+      "area_acres": 21.54,
+      "crop": "Bt Cotton",
+      "variety": "Bollgard II",
+      "soil_type": "Medium to Deep Black Clay Soil (काली मिट्टी - Vertisol)",
+      "polygon": [
+        [
+          23.2044,
+          77.08290000000001
+        ],
+        [
+          23.2047,
+          77.0862
+        ],
+        [
+          23.202099999999998,
+          77.0858
+        ],
+        [
+          23.2018,
+          77.0832
+        ]
+      ],
+      "created_at": "2026-09-10T09:39:55.883Z"
     }
   ],
   "journal": [

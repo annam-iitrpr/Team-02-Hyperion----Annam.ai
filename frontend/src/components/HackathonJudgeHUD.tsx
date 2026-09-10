@@ -37,7 +37,7 @@ export const HackathonJudgeHUD: React.FC = () => {
       title: "Syngenta CropFit Biological Product Matcher",
       status: "100% Implemented",
       tech: "Agronomic Decision Matrix (Quantis @ 250ml/ac, Isabion)",
-      link: "/product",
+      link: "/plant-intelligence",
       metric: "Phase & Stage Calibrated",
     },
     {
@@ -144,7 +144,7 @@ export const HackathonJudgeHUD: React.FC = () => {
                 <Cpu className="h-3 w-3 text-sky-400" /> PS-02 Stress
               </Link>
               <Link
-                href="/product"
+                href="/plant-intelligence"
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-center flex items-center justify-center gap-1 font-bold"
               >

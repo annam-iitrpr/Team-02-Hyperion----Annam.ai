@@ -12,7 +12,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
-  themeColor: "#533afd",
+  themeColor: "#1b4332",
 };
 
 export const metadata: Metadata = {
@@ -29,6 +29,24 @@ export const metadata: Metadata = {
     icon: "/images/aasra_logo.png",
     apple: "/images/aasra_logo.png",
   },
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/?lang=en",
+      hi: "/?lang=hi",
+      mr: "/?lang=mr",
+      pa: "/?lang=pa",
+      gu: "/?lang=gu",
+      te: "/?lang=te",
+      ta: "/?lang=ta",
+      kn: "/?lang=kn",
+      ml: "/?lang=ml",
+      bn: "/?lang=bn",
+      or: "/?lang=or",
+      as: "/?lang=as",
+      "x-default": "/",
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -37,6 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="apple-touch-icon" href="/images/aasra_logo.png" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="preconnect" href="https://translate.google.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://translate.googleapis.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col bg-[#f8faf6]">
         <LanguageProvider>

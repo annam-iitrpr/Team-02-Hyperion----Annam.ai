@@ -37,6 +37,8 @@ import {
   Zap,
   Tag,
   Info,
+  Sprout,
+  Cloud,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1880,92 +1882,110 @@ export default function PrescriptionCategoryPage() {
 
   return (
     <AppShell>
-      {/* 
-        Linear-Design inspired canvas container:
-        Dark navy headers (#0d253d), subtle hairline borders (#e3e8ee),
-        technical precision, crisp typography, and grounded data badges.
-      */}
-      <div className="max-w-[1140px] mx-auto px-4 sm:px-6 py-8 space-y-8 font-sans">
-        {/* Navigation Breadcrumbs & Field Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium flex-wrap">
-              <Link
-                href="/plant-intelligence"
-                className="hover:text-indigo-600 flex items-center gap-1 transition-colors"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                <span>{isHindi ? "कृषि बुद्धिमत्ता हब" : "Plant Intelligence"}</span>
-              </Link>
-              <span>/</span>
-              <span className="text-slate-900 font-bold">
-                {isHindi ? "2 & 3. उत्पाद सिफारिश, टैंक-मिक्स व छिड़काव समय सारणी" : "2 & 3. Product, Tank-Mix & Timeline"}
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-[#0d253d] tracking-tight flex items-center gap-2.5">
-              <FlaskConical className="h-7 w-7 text-indigo-600 shrink-0" />
-              <span>
-                {isHindi
-                  ? `उत्पाद सिफारिश व छिड़काव सारणी — ${normalizedCrop.nameHi.toUpperCase()}`
-                  : `Crop Solutions & Application Timeline — ${normalizedCrop.nameEn.toUpperCase()}`}
-              </span>
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500">
-              {isHindi
-                ? `${farmName} (${acres} एकड़ · ${cropVariety} · ${district}) हेतु सिंजेंटा क्रॉपफिट व मॉडल 3 पोर्टफोलियो समाधान`
-                : `Customized for ${farmName} (${acres} Acres · ${cropVariety} · ${district}) — Verified by Model 3 & Model 6`}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <FarmCropSwitcher allowRegister={false} />
-
-            <button
-              onClick={handleListenPrescription}
-              className="px-3.5 py-2 text-xs font-bold rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-            >
-              {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              <span>{isSpeaking ? (isHindi ? "रोकें" : "Stop") : (isHindi ? "बोलकर सुनें" : "Listen")}</span>
-            </button>
-            <button
-              onClick={() => refetchPipeline()}
-              disabled={pipelineLoading}
-              className="px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${pipelineLoading ? "animate-spin" : ""}`} />
-              <span>{isHindi ? "ताज़ा करें" : "Refresh"}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ── 1. PRIMARY & ALTERNATIVE PRODUCTS SELECTOR ──────── */}
-        <div className="bg-white border border-[#e3e8ee] rounded-3xl p-6 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-indigo-600" />
-                <h2 className="text-lg sm:text-xl font-black text-[#0d253d] font-display">
-                  {isHindi
-                    ? `${normalizedCrop.nameHi} हेतु अनुशंसित सिंजेंटा क्रॉपफिट उत्पाद`
-                    : `Syngenta CropFit Solution Selection for ${normalizedCrop.nameEn}`}
-                </h2>
+      {/* ── Outer Canvas with Exact Dashboard Dot Matrix Theme ────── */}
+      <div className="relative min-h-screen bg-[#fbfcf8] bg-[radial-gradient(#1b4332_0.75px,transparent_0.75px)] [background-size:24px_24px] [background-position:0_0] text-slate-800 pb-24 md:pb-12">
+        <div className="max-w-[1240px] w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-10 space-y-5 sm:space-y-8 font-sans">
+          
+          {/* Navigation Breadcrumbs & Field Switcher */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 border-b border-[#e8ede4] pb-5 sm:pb-6">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-medium flex-wrap">
+                <Link
+                  href="/plant-intelligence"
+                  className="hover:text-[#1b4332] flex items-center gap-1 transition-colors text-slate-600 font-semibold"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <span>{isHindi ? "पादप स्वास्थ्य हब" : "Plant Intelligence"}</span>
+                </Link>
+                <span>/</span>
+                <span className="text-[#11261f] font-bold">
+                  {isHindi ? "2 & 3. उत्पाद सिफारिश, टैंक-मिक्स व छिड़काव समय सारणी" : "2 & 3. Product, Tank-Mix & Timeline"}
+                </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {isHindi
-                  ? "मॉडल 3 द्वारा रैंक किया गया। यदि प्राथमिक उत्पाद डीलर के पास न मिले, तो नीचे दिए गए 2-3 वैकल्पिक उत्पाद चुनें।"
-                  : "Ranked by Model 3. If primary product is unavailable locally, select verified alternatives below."}
-              </p>
+              <h1 className="text-2xl sm:text-4xl font-black font-display text-[#11261f] tracking-tight flex items-center gap-2.5">
+                <FlaskConical className="h-7 w-7 text-[#2d6a4f] shrink-0" />
+                <span>
+                  {isHindi
+                    ? `उत्पाद सिफारिश व छिड़काव सारणी — ${normalizedCrop.nameHi}`
+                    : `Crop Solutions & Application Timeline — ${normalizedCrop.nameEn}`}
+                </span>
+              </h1>
+              
+              {/* Grounding Chips Strip */}
+              <div className="text-xs sm:text-sm text-slate-600 font-medium flex items-center gap-2 flex-wrap pt-1">
+                <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-[#e8ede4] text-slate-700">
+                  <MapPin className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0" />
+                  <span>{district}{state ? `, ${state}` : ""}, India</span>
+                </span>
+                <span className="bg-white px-2.5 py-1 rounded-lg border border-[#e8ede4] text-slate-700 font-semibold">
+                  {acres} Acres
+                </span>
+                <span className="bg-[#e8f5e9] px-2.5 py-1 rounded-lg border border-[#cbe5cb] text-[#1b4332] font-bold flex items-center gap-1">
+                  <Sprout className="h-3 w-3 text-[#2d6a4f]" />
+                  <span>{normalizedCrop.nameEn}</span>
+                </span>
+                <span className="bg-[#f0f5ee] px-2.5 py-1 rounded-lg border border-[#d9e6d4] text-slate-700 font-semibold">
+                  {growthStage}
+                </span>
+                <span className="text-[10px] font-mono font-bold text-emerald-800 bg-[#e8f5e9] px-2.5 py-1 rounded-full border border-[#cbe5cb] flex items-center gap-1">
+                  <Cloud className="h-3 w-3 text-emerald-700 shrink-0" />
+                  <span>{pipelineData?.execution_source || "Vertex AI Cloud (asia-south1, iitm01)"}</span>
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-mono font-bold text-indigo-900 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-200">
-                {acres} Acres Grounded · {district}
-              </span>
-              <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200">
-                ₹{mandiPrice}/qtl ({liveMandi.commodity})
-              </span>
+            <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+              <FarmCropSwitcher allowRegister={false} />
+
+              <button
+                type="button"
+                onClick={handleListenPrescription}
+                className="px-3.5 py-2.5 text-xs font-bold rounded-2xl border border-[#cbe5cb] bg-[#e8f5e9] hover:bg-[#d8edd9] text-[#1b4332] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs min-h-[40px]"
+              >
+                {isSpeaking ? <VolumeX className="h-4 w-4 text-rose-600" /> : <Volume2 className="h-4 w-4 text-[#2d6a4f]" />}
+                <span>{isSpeaking ? (isHindi ? "रोकें" : "Stop") : (isHindi ? "बोलकर सुनें" : "Listen")}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => refetchPipeline()}
+                disabled={pipelineLoading}
+                className="p-2.5 text-xs font-bold rounded-2xl border border-[#e8ede4] bg-white hover:bg-[#f0f5ee] text-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-2xs disabled:opacity-50 min-h-[40px] min-w-[40px]"
+                title="Refresh Pipeline Inference"
+                aria-label="Refresh Pipeline Inference"
+              >
+                <RefreshCw className={`h-4 w-4 ${pipelineLoading ? "animate-spin text-[#2d6a4f]" : "text-[#2d6a4f]"}`} />
+              </button>
             </div>
           </div>
+
+          {/* ── 1. PRIMARY & ALTERNATIVE PRODUCTS SELECTOR ──────── */}
+          <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-[#2d6a4f]" />
+                  <h2 className="text-lg sm:text-xl font-black text-[#11261f] font-display">
+                    {isHindi
+                      ? `${normalizedCrop.nameHi} हेतु अनुशंसित सिंजेंटा क्रॉपफिट उत्पाद`
+                      : `Syngenta CropFit Solution Selection for ${normalizedCrop.nameEn}`}
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {isHindi
+                    ? "मॉडल 3 द्वारा रैंक किया गया। यदि प्राथमिक उत्पाद डीलर के पास न मिले, तो नीचे दिए गए 2-3 वैकल्पिक उत्पाद चुनें।"
+                    : "Ranked by Model 3. If primary product is unavailable locally, select verified alternatives below."}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-mono font-bold text-[#1b4332] bg-[#e8f5e9] px-3 py-1 rounded-xl border border-[#cbe5cb]">
+                  {acres} Acres Grounded · {district}
+                </span>
+                <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200">
+                  ₹{mandiPrice}/qtl ({liveMandi.commodity})
+                </span>
+              </div>
+            </div>
 
           {/* Product Toggle Tabs (Primary + Alternatives) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -2542,8 +2562,8 @@ export default function PrescriptionCategoryPage() {
               <span>
                 {sprayConfirmed
                   ? isHindi
-                    ? "✓ स्प्रे दर्ज हो गया (Logged)"
-                    : "✓ Spray Confirmed & Logged"
+                    ? "स्प्रे दर्ज हो गया (Logged)"
+                    : "Spray Confirmed & Logged"
                   : isHindi
                   ? "स्प्रे की पुष्टि करें (Confirm Spray)"
                   : "Confirm Spray Done"}
@@ -2553,28 +2573,29 @@ export default function PrescriptionCategoryPage() {
         </div>
 
         {/* ── Navigation Ribbon: To Economic Impact (/impact) ──── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-3xl bg-[#f6f9fc] border border-[#e3e8ee]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-3xl bg-white/95 backdrop-blur-md border border-[#e8ede4] shadow-xs">
           <Link
             href="/plant-intelligence/diagnostics"
-            className="text-xs font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1.5 transition-colors"
+            className="text-xs font-bold text-slate-700 hover:text-[#1b4332] flex items-center gap-1.5 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{isHindi ? "पिछला: 1. समस्या पहचान (14-दिवसीय रडार)" : "Previous: 1. Problem Diagnostics"}</span>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <Link
               href="/impact"
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[44px]"
             >
               <span>
                 {isHindi
-                  ? "अगला: आर्थिक प्रभाव व 5 मंडी तुलना (/impact) ➔"
-                  : "Next: Economic Impact & 5 Mandis Table (/impact) ➔"}
+                  ? "अगला: आर्थिक प्रभाव व 5 मंडी तुलना (/impact)"
+                  : "Next: Economic Impact & 5 Mandis Table (/impact)"}
               </span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
+        </div>
         </div>
       </div>
     </AppShell>

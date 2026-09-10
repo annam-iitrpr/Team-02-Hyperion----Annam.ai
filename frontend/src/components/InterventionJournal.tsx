@@ -256,13 +256,13 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
     <div className="space-y-6">
       
       {/* Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3e8ee] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e8ede4] pb-4">
         <div>
-          <h3 className="text-base sm:text-lg font-black font-display text-[#0d253d] flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-[#533afd]" />
+          <h3 className="text-base sm:text-lg font-black font-display text-[#11261f] flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-[#2d6a4f]" />
             <span>Chronological Agronomic Timeline</span>
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-600 mt-0.5">
             Showing <strong>{filteredEntries.length}</strong> verified events for <strong>{profile.fullName || "Ishaan Sen"}</strong> ({activeFarm.areaAcres || profile.fieldAreaAcres || 5.0} Acres {activeFarm.primaryCrop || profile.primaryCrop || "Soybean"}).
           </p>
         </div>
@@ -270,7 +270,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
         <button
           type="button"
           onClick={() => setShowLogModal(true)}
-          className="px-4 py-2.5 rounded-2xl bg-[#533afd] hover:bg-[#4434d4] text-white font-mono font-bold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          className="px-4 py-2.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-mono font-bold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] shrink-0"
         >
           <Plus className="h-4 w-4" />
           <span>Log New Activity</span>
@@ -278,7 +278,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
       </div>
 
       {/* Vertical Timeline */}
-      <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2.5 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#e3e8ee]">
+      <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2.5 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#e8ede4]">
         {filteredEntries.map((entry) => {
           const isExpanded = expandedEntryId === entry.id;
           return (
@@ -288,12 +288,12 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
               <div
                 className={`absolute -left-6 sm:-left-8 top-5 -translate-x-1/2 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center shadow-sm transition-transform group-hover:scale-110 ${
                   entry.badgeColor === "emerald"
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-[#2d6a4f] text-white"
                     : entry.badgeColor === "rose"
                     ? "bg-rose-600 text-white"
                     : entry.badgeColor === "indigo"
-                    ? "bg-[#533afd] text-white"
-                    : "bg-amber-500 text-white"
+                    ? "bg-[#1b4332] text-white"
+                    : "bg-amber-600 text-white"
                 }`}
               >
                 {entry.category === "spray" ? (
@@ -307,35 +307,35 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                 )}
               </div>
 
-              {/* Timeline Card (Stripe Standard) */}
-              <div className="bg-[#ffffff] border border-[#e3e8ee] hover:border-slate-300 rounded-2xl p-5 sm:p-6 shadow-2xs hover:shadow-sm transition-all space-y-3">
+              {/* Timeline Card */}
+              <div className="bg-[#ffffff] border border-[#e8ede4] hover:border-[#cbe5cb] rounded-2xl p-5 sm:p-6 shadow-[0_4px_24px_rgba(27,67,50,0.04)] hover:shadow-md transition-all space-y-3">
                 
                 {/* Header Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#f1f4f8] pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#f1f5f0] pb-3">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span
                         className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
                           entry.badgeColor === "emerald"
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                            ? "bg-[#e8f5e9] text-[#1b4332] border-[#cbe5cb]"
                             : entry.badgeColor === "rose"
                             ? "bg-rose-50 text-rose-800 border-rose-200"
                             : entry.badgeColor === "indigo"
-                            ? "bg-indigo-50 text-[#533afd] border-indigo-200"
+                            ? "bg-[#e8f5e9] text-[#1b4332] border-[#cbe5cb]"
                             : "bg-amber-50 text-amber-800 border-amber-200"
                         }`}
                       >
                         {entry.badge}
                       </span>
-                      <span className="text-xs font-mono font-semibold text-slate-400">
+                      <span className="text-xs font-mono font-semibold text-slate-500">
                         {entry.date}
                       </span>
                     </div>
 
-                    <h4 className="font-extrabold text-base text-[#0d253d] font-display mt-1">
+                    <h4 className="font-extrabold text-base text-[#11261f] font-display mt-1">
                       {entry.title}
                     </h4>
-                    <p className="text-xs text-slate-500 font-sans">
+                    <p className="text-xs text-slate-600 font-sans">
                       {entry.subtitle}
                     </p>
                   </div>
@@ -343,7 +343,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                   <button
                     type="button"
                     onClick={() => setExpandedEntryId(isExpanded ? null : entry.id)}
-                    className="self-start sm:self-center px-3 py-1.5 rounded-xl bg-[#f6f9fc] hover:bg-[#eef2f6] text-slate-700 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer border border-[#e3e8ee]"
+                    className="self-start sm:self-center px-3 py-1.5 rounded-xl bg-[#f8faf7] hover:bg-[#e8f5e9] text-slate-700 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer border border-[#e8ede4]"
                   >
                     <span>{isExpanded ? "Collapse" : "View Details"}</span>
                     {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -357,14 +357,14 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                       key={idx}
                       className={`p-2.5 rounded-xl border ${
                         m.highlight
-                          ? "bg-emerald-50/70 border-emerald-200 text-emerald-950 font-bold"
-                          : "bg-[#f6f9fc] border-[#e3e8ee] text-slate-700"
+                          ? "bg-[#e8f5e9] border-[#cbe5cb] text-[#1b4332] font-bold"
+                          : "bg-[#f8faf7] border-[#e8ede4] text-slate-700"
                       }`}
                     >
-                      <span className="text-[10px] text-slate-400 block font-normal uppercase">
+                      <span className="text-[10px] text-slate-500 block font-normal uppercase">
                         {m.label}
                       </span>
-                      <span className={`text-xs font-bold ${m.highlight ? "text-emerald-700 text-sm" : "text-[#0d253d]"}`}>
+                      <span className={`text-xs font-bold ${m.highlight ? "text-[#1b4332] text-sm" : "text-[#11261f]"}`}>
                         {m.value}
                       </span>
                     </div>
@@ -373,16 +373,16 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
 
                 {/* Expanded Details / Field Notes */}
                 {isExpanded && (
-                  <div className="pt-2 border-t border-[#f1f4f8] space-y-2 text-xs animate-fade-in">
-                    <p className="text-slate-600 leading-relaxed bg-[#fbfcfd] p-3.5 rounded-xl border border-[#e3e8ee]">
-                      <span className="font-bold text-[#0d253d] block mb-1">Agronomic Observation & Verification:</span>
+                  <div className="pt-2 border-t border-[#f1f5f0] space-y-2 text-xs animate-fade-in">
+                    <p className="text-slate-700 leading-relaxed bg-[#f8faf7] p-3.5 rounded-xl border border-[#e8ede4]">
+                      <span className="font-bold text-[#11261f] block mb-1">Agronomic Observation & Verification:</span>
                       {entry.notes}
                     </p>
 
                     {entry.costINR && entry.returnINR && (
-                      <div className="flex justify-between items-center text-xs font-mono font-bold bg-emerald-50/80 text-emerald-950 p-3 rounded-xl border border-emerald-200">
+                      <div className="flex justify-between items-center text-xs font-mono font-bold bg-[#e8f5e9] text-[#1b4332] p-3 rounded-xl border border-[#cbe5cb]">
                         <span>Input Cost: ₹{entry.costINR.toLocaleString("en-IN")}</span>
-                        <span className="text-emerald-900">
+                        <span className="text-[#1b4332]">
                           Net Verified Return: +₹{(entry.returnINR - entry.costINR).toLocaleString("en-IN")} (4.46x ROBI)
                         </span>
                       </div>
@@ -397,11 +397,11 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────
-          STRIPE-STYLE "LOG NEW ACTIVITY" MODAL
+          UNIFIED "LOG NEW ACTIVITY" MODAL
          ───────────────────────────────────────────────────────────────── */}
       {showLogModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in">
-          <div className="relative w-full max-w-lg bg-white rounded-3xl border border-[#e3e8ee] shadow-2xl p-6 sm:p-8 space-y-5">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl border border-[#e8ede4] shadow-2xl p-6 sm:p-8 space-y-5">
             
             <button
               type="button"
@@ -412,13 +412,13 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
             </button>
 
             <div className="space-y-1">
-              <span className="text-xs font-mono font-bold text-[#533afd] uppercase tracking-wider">
+              <span className="text-xs font-mono font-bold text-[#2d6a4f] uppercase tracking-wider">
                 FIELD CHRONICLE
               </span>
-              <h3 className="text-xl font-black font-display text-[#0d253d]">
+              <h3 className="text-xl font-black font-display text-[#11261f]">
                 Log New Agronomic Activity
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 Record a biological spray, weather event, or crop scouting observation.
               </p>
             </div>
@@ -441,8 +441,8 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                       onClick={() => setNewCategory(cat.id as any)}
                       className={`p-2.5 rounded-xl border text-center font-bold font-mono transition-all cursor-pointer ${
                         newCategory === cat.id
-                          ? "bg-[#533afd] text-white border-[#533afd] shadow-xs"
-                          : "bg-white text-slate-700 border-[#e3e8ee] hover:bg-slate-50"
+                          ? "bg-[#1b4332] text-white border-[#1b4332] shadow-xs"
+                          : "bg-white text-slate-700 border-[#e8ede4] hover:bg-[#e8f5e9]/50"
                       }`}
                     >
                       {cat.label}
@@ -460,7 +460,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Syngenta Quantis / Stress Buster"
                   required
-                  className="w-full bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                  className="w-full bg-[#f8faf7] border border-[#e8ede4] rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#11261f] focus:outline-none focus:border-[#1b4332]"
                 />
               </div>
 
@@ -473,7 +473,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                     value={newDate}
                     onChange={(e) => setNewDate(e.target.value)}
                     required
-                    className="w-full bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                    className="w-full bg-[#f8faf7] border border-[#e8ede4] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#11261f] focus:outline-none focus:border-[#1b4332]"
                   />
                 </div>
 
@@ -484,7 +484,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                     value={newDose}
                     onChange={(e) => setNewDose(e.target.value)}
                     placeholder="e.g. 250 ml / acre"
-                    className="w-full bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl px-3 py-2 text-xs font-bold text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                    className="w-full bg-[#f8faf7] border border-[#e8ede4] rounded-xl px-3 py-2 text-xs font-bold text-[#11261f] focus:outline-none focus:border-[#1b4332]"
                   />
                 </div>
               </div>
@@ -497,7 +497,7 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                   value={newCost}
                   onChange={(e) => setNewCost(Number(e.target.value))}
                   placeholder="1280"
-                  className="w-full bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                  className="w-full bg-[#f8faf7] border border-[#e8ede4] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#11261f] focus:outline-none focus:border-[#1b4332]"
                 />
               </div>
 
@@ -509,14 +509,14 @@ export const InterventionJournal: React.FC<InterventionJournalProps> = ({ filter
                   onChange={(e) => setNewNotes(e.target.value)}
                   rows={2}
                   placeholder="e.g. Applied before night heatwave. No flower drop observed."
-                  className="w-full bg-[#f6f9fc] border border-[#e3e8ee] rounded-xl px-3.5 py-2 text-xs font-medium text-[#0d253d] focus:outline-none focus:border-[#533afd]"
+                  className="w-full bg-[#f8faf7] border border-[#e8ede4] rounded-xl px-3.5 py-2 text-xs font-medium text-[#11261f] focus:outline-none focus:border-[#1b4332]"
                 />
               </div>
 
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full py-3 rounded-2xl bg-[#533afd] hover:bg-[#4434d4] text-white font-mono font-bold text-xs transition-all shadow-sm cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                className="w-full py-3 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-mono font-bold text-xs transition-all shadow-sm cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
               >
                 Save Entry to Farm Timeline
               </button>

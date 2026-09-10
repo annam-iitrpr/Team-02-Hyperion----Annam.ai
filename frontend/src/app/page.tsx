@@ -44,9 +44,85 @@ import { PhoneMockup } from "@/components/PhoneMockup";
 import { useLanguage } from "@/context/LanguageContext";
 import { isUserLoggedIn } from "@/lib/userStore";
 
+const KRISHYANTRA_SLOGANS: Record<string, { line1: string; line2: string; line3: string; desc: string }> = {
+  en: {
+    line1: "Right Information.",
+    line2: "Right Decisions.",
+    line3: "Better Harvest.",
+    desc: "Your AI-powered farming companion that understands your field, weather and crop — and gives simple, actionable advice."
+  },
+  hi: {
+    line1: "सही जानकारी.",
+    line2: "सही फ़ैसला.",
+    line3: "बेहतर फसल.",
+    desc: "आपका AI-संचालित कृषि साथी जो आपके खेत, मौसम और फसल को समझता है — और आपको समय पर सही खेती के फैसले लेने में मदद करता है।"
+  },
+  mr: {
+    line1: "योग्य माहिती.",
+    line2: "योग्य निर्णय.",
+    line3: "उत्तम पीक.",
+    desc: "तुमचा AI-चालित शेती मित्र जो तुमचे शेत, हवामान आणि पीक समजून घेतो — आणि योग्य वेळी अचूक निर्णय घेण्यास मदत करतो."
+  },
+  pa: {
+    line1: "ਸਹੀ ਜਾਣਕਾਰੀ।",
+    line2: "ਸਹੀ ਫੈਸਲਾ।",
+    line3: "ਬਿਹਤਰ ਫਸਲ।",
+    desc: "ਤੁਹਾਡਾ AI-ਸੰਚਾਲਿਤ ਖੇਤੀ ਸਾਥੀ ਜੋ ਤੁਹਾਡੇ ਖੇਤ, ਮੌਸਮ ਅਤੇ ਫਸਲ ਨੂੰ ਸਮਝਦਾ ਹੈ — ਅਤੇ ਸਮੇਂ ਸਿਰ ਸਹੀ ਫੈਸਲੇ ਲੈਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।"
+  },
+  gu: {
+    line1: "સાચી માહિતી.",
+    line2: "સાચો નિર્ણય.",
+    line3: "બહેતર પાક.",
+    desc: "તમારો AI-આધારિત ખેતી સાથી જે તમારા ખેતર, હવામાન અને પાકને સમજે છે — અને સમયસર યોગ્ય નિર્ણય લેવામાં મદદ કરે છે."
+  },
+  te: {
+    line1: "సరైన సమాచారం.",
+    line2: "సరైన నిర్ణయం.",
+    line3: "మెరుగైన పంట.",
+    desc: "మీ పొలం, వాతావరణం మరియు పంటను అర్థం చేసుకునే మీ AI వ్యవసాయ మిత్రుడు — సకాలంలో సరైన నిర్ణయాలు తీసుకోవడంలో సహాయపడుతుంది."
+  },
+  ta: {
+    line1: "சரியான தகவல்.",
+    line2: "சரியான முடிவு.",
+    line3: "சிறந்த விளைச்சல்.",
+    desc: "உங்கள் பண்ணை, வானிலை மற்றும் பயிரைப் புரிந்துகொள்ளும் உங்கள் AI விவசாயத் தோழன் — சரியான நேரத்தில் சரியான முடிவுகளை எடுக்க உதவுகிறது."
+  },
+  kn: {
+    line1: "ಸರಿಯಾದ ಮಾಹಿತಿ.",
+    line2: "ಸರಿಯಾದ ನಿರ್ಧಾರ.",
+    line3: "ಉತ್ತಮ ಬೆಳೆ.",
+    desc: "ನಿಮ್ಮ ಜಮೀನು, ಹವಾಮಾನ ಮತ್ತು ಬೆಳೆಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವ ನಿಮ್ಮ AI ಕೃಷಿ ಸಂಗಾತಿ — ಸಕಾಲದಲ್ಲಿ ಸರಿಯಾದ ನಿರ್ಧಾರಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ."
+  },
+  ml: {
+    line1: "ശരിയായ വിവരം.",
+    line2: "ശരിയായ തീരുമാനം.",
+    line3: "മികച്ച വിളവ്.",
+    desc: "നിങ്ങളുടെ കൃഷിയിടവും കാലാവസ്ഥയും വിളയും മനസ്സിലാക്കുന്ന നിങ്ങളുടെ AI കാർഷിക സഹായി — കൃത്യസമയത്ത് ശരിയായ തീരുമാനങ്ങളെടുക്കാൻ സഹായിക്കുന്നു."
+  },
+  bn: {
+    line1: "সঠিক তথ্য.",
+    line2: "সঠিক সিদ্ধান্ত.",
+    line3: "উন্নত ফসল.",
+    desc: "আপনার এআই-চালিত কৃষি সঙ্গী যা আপনার জমি, আবহাওয়া ও ফসল বোঝে — এবং সময়মতো সঠিক সিদ্ধান্ত নিতে সহায়তা করে।"
+  },
+  or: {
+    line1: "ସଠିକ୍ ତଥ୍ୟ.",
+    line2: "ସଠିକ୍ ନିଷ୍ପତ୍ତି.",
+    line3: "ଉନ୍ନତ ଫସଲ.",
+    desc: "ଆପଣଙ୍କ AI-ଚାଳିତ କୃଷି ସାଥୀ ଯାହା ଆପଣଙ୍କ ଜମି, ପାଣିପାଗ ଏବଂ ଫସଲକୁ ବୁଝିଥାଏ — ଏବଂ ସମୟରେ ସଠିକ୍ ନିଷ୍ପତ୍ତି ନେବାରେ ସାହାଯ୍ୟ କରେ।"
+  },
+  as: {
+    line1: "সঠিক তথ্য.",
+    line2: "সঠিক সিদ্ধান্ত.",
+    line3: "উন্নত শস্য.",
+    desc: "আপোনাৰ AI-চালিত কৃষি সংগী যিয়ে আপোনাৰ পथाৰ, বতৰ আৰু শস্য বুজি পায় — আৰু সময়মতে সঠিক সিদ্ধান্ত লোৱাত সহায় কৰে।"
+  }
+};
+
 export default function LandingPage() {
   const router = useRouter();
-  const { language } = useLanguage();
+  const { language, isChangingLanguage } = useLanguage();
+  const slogan = KRISHYANTRA_SLOGANS[language] || (language === "en" ? KRISHYANTRA_SLOGANS.en : KRISHYANTRA_SLOGANS.hi);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [installModalOpen, setInstallModalOpen] = useState<boolean>(false);
@@ -93,7 +169,7 @@ export default function LandingPage() {
     }
   };
 
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   // 6 Core Agricultural Features (Target Reference Faithful)
   const features = [
@@ -274,21 +350,19 @@ export default function LandingPage() {
               {/* Large Bold Headline (Target Exact Hierarchy) */}
               <div className="space-y-1">
                 <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black tracking-[-0.03em] leading-[1.08] text-[#111827]">
-                  <span>Sahi Jaankari.</span>
+                  <span>{slogan.line1}</span>
                   <br />
-                  <span>Sahi Faisla.</span>
+                  <span>{slogan.line2}</span>
                   <br />
                   <span className="text-[#1b4332] underline decoration-[#52b788]/60 decoration-wavy decoration-2">
-                    Behtar Fasal.
+                    {slogan.line3}
                   </span>
                 </h1>
               </div>
 
               {/* Approachable, Honest Description */}
               <p className="text-base sm:text-lg text-[#374151] leading-relaxed max-w-xl">
-                {isHindi
-                  ? "आपका AI-संचालित कृषि साथी जो आपके खेत, मौसम और फसल को समझता है — और आपको समय पर सही खेती के फैसले लेने में मदद करता है।"
-                  : "Your AI-powered farming companion that understands your field, weather and crop — and gives simple, actionable advice."}
+                {slogan.desc}
               </p>
 
               {/* 5 Lightweight Trust & Capability Badges (Target Exact) */}
@@ -519,25 +593,37 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="relative rounded-3xl overflow-hidden bg-black shadow-[0_25px_60px_-15px_rgba(27,67,50,0.25)] border-4 border-white aspect-video">
+          <div className="relative max-w-[340px] sm:max-w-[380px] mx-auto">
+            {/* Ambient Back Glow */}
+            <div 
+              className="absolute -inset-4 sm:-inset-6 rounded-[50px] bg-gradient-to-tr from-[#2d6a4f]/25 via-[#52b788]/20 to-[#e8f5e9]/40 blur-2xl -z-10 pointer-events-none" 
+            />
+
+            {/* Portrait Smartphone / Reel Container (Native 9:16) */}
+            <div className="relative rounded-[36px] sm:rounded-[44px] overflow-hidden bg-black shadow-[0_30px_70px_-15px_rgba(27,67,50,0.4)] border-[6px] sm:border-[8px] border-slate-900 aspect-[9/16] ring-1 ring-black/10">
+              {/* Subtle Camera Dynamic Island Notch */}
+              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-4 bg-slate-900 rounded-full z-20 pointer-events-none flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-black/80 ring-1 ring-slate-800 mr-2" />
+                <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
+              </div>
+
               <video
                 controls
                 playsInline
                 preload="metadata"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-[28px] sm:rounded-[34px]"
               >
                 <source src="/videos/farmer_problem_solution.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 px-2">
+            <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-slate-600 px-2 text-center sm:text-left">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#2d6a4f]" />
-                <span className="font-semibold text-slate-700">{isHindi ? "वास्तविक कृषि वीडियो" : "Practical Field Demonstration"}</span>
+                <span className="w-2 h-2 rounded-full bg-[#2d6a4f] shrink-0" />
+                <span className="font-semibold text-slate-800">{isHindi ? "वास्तविक कृषि वीडियो" : "Practical Field Demonstration"}</span>
                 <span>·</span>
-                <span>{isHindi ? "सरल ऑडियो-विजुअल मार्गदर्शन" : "Audio & Visual Field Guide"}</span>
+                <span>{isHindi ? "ऑडियो व विजुअल मार्गदर्शन" : "Audio & Visual Field Guide"}</span>
               </div>
               <div className="font-serif italic text-xs font-bold text-[#2d6a4f]">
                 Saath Har Kisan Ke Liye

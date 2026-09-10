@@ -32,11 +32,11 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
     {
       id: "flowering-boost",
       badge: isHindi ? "🌿 फूल और फल वृद्धि" : "🌿 MORE FLOWERS & PODS",
-      badgeClass: "text-indigo-900 bg-indigo-50 border-indigo-200/80",
+      badgeClass: "text-[#1b4332] bg-[#e8f5e9] border-[#cbe5cb]",
       subBadge: isHindi ? "फसल की वर्तमान अवस्था हेतु" : "Recommended for Current Stage",
       title: isHindi ? "पौधा वृद्धि व अधिक फूल पैक (इसाबियन®)" : "Growth & Flowering Booster (Isabion®)",
       discount: isHindi ? "10% तत्काल बचत + मुफ्त माप कप" : "10% Off + Free Measuring Cup",
-      discountClass: "text-[#533afd]",
+      discountClass: "text-[#2d6a4f]",
       desc: isHindi
         ? "फूलों की संख्या बढ़ाता है, शाखाओं को मजबूत करता है और दानों का वजन बढ़ाता है।"
         : "Naturally stimulates plant energy, increases flower setting, and improves pod weight.",
@@ -49,7 +49,7 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
       subBadge: isHindi ? "कम पानी में भी मददगार" : "Dry Spell Protection",
       title: isHindi ? "गहरी जड़ व मिट्टी नमी सुरक्षा पैक" : "Deep Root & Soil Moisture Kit",
       discount: isHindi ? "2 कैन पैक के साथ मुफ्त मिट्टी जांच सलाह" : "Free Soil Guidance with 2-Can Pack",
-      discountClass: "text-sky-600",
+      discountClass: "text-sky-700",
       desc: isHindi
         ? "फसल की जड़ों को गहराई तक फैलाकर सूखे दिनों में भी नमी सोखने में मदद करता है।"
         : "Encourages deeper root penetration to draw moisture from deeper soil during dry spells.",
@@ -58,11 +58,11 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
     {
       id: "spray-kit",
       badge: isHindi ? "🛡️ स्प्रे सुरक्षा व उपकरण" : "🛡️ SPRAY SAFETY",
-      badgeClass: "text-purple-900 bg-purple-50 border-purple-200/80",
+      badgeClass: "text-[#1b4332] bg-[#e8f5e9] border-[#cbe5cb]",
       subBadge: isHindi ? "सुरक्षित छिड़काव किट" : "Farmer Safety Special",
       title: isHindi ? "स्प्रे नोजल व अंशांकन केयर किट" : "Spray Nozzle & Calibration Care Kit",
       discount: isHindi ? "जैविक दवा खरीद पर मुफ्त स्प्रे कैलिब्रेशन किट" : "Free Calibration Kit with Any Biological Purchase",
-      discountClass: "text-purple-600",
+      discountClass: "text-[#1b4332]",
       desc: isHindi
         ? "दवा को बर्बाद होने से बचाता है और पत्तियों पर एक समान सही छिड़काव सुनिश्चित करता है।"
         : "Ensures uniform spray droplets across foliage without wasting medicine or spray drift.",
@@ -71,15 +71,15 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
   ];
 
   return (
-    <div className="bg-white rounded-3xl border border-[#e3e8ee] p-5 sm:p-6 shadow-xs space-y-4">
+    <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-[#e8ede4] p-5 sm:p-6 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-indigo-50 border border-indigo-100/80 text-[#533afd] flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="h-10 w-10 rounded-2xl bg-[#e8f5e9] border border-[#cbe5cb] text-[#2d6a4f] flex items-center justify-center shrink-0 shadow-2xs">
             <Tag className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-extrabold text-[#0d253d] font-display">
+            <h3 className="text-base sm:text-lg font-extrabold text-[#11261f] font-display">
               {isHindi
                 ? `सक्रिय सिंजेंटा मंडी ऑफर (${activeDistrict})`
                 : `Active Syngenta Mandi Offers (${activeDistrict})`}
@@ -92,7 +92,7 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
           </div>
         </div>
 
-        <span className="self-start sm:self-auto px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#533afd] bg-indigo-50/80 border border-indigo-200/60 uppercase tracking-wider">
+        <span className="self-start sm:self-auto px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#1b4332] bg-[#e8f5e9] border border-[#cbe5cb] uppercase tracking-wider">
           {isHindi ? "सत्यापित स्थानीय ऑफर" : "VERIFIED LOCAL OFFERS"}
         </span>
       </div>
@@ -102,7 +102,7 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
         {offers.map((offer) => (
           <div
             key={offer.id}
-            className="p-4 sm:p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-indigo-300 hover:shadow-xs transition-all space-y-3.5 flex flex-col justify-between"
+            className="p-4 sm:p-5 rounded-2xl border border-[#e8ede4] bg-white hover:border-[#2d6a4f]/50 hover:shadow-md transition-all space-y-3.5 flex flex-col justify-between"
           >
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -115,7 +115,7 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
               </div>
 
               <div>
-                <h4 className="font-bold text-sm sm:text-base text-slate-900 font-display">
+                <h4 className="font-bold text-sm sm:text-base text-[#11261f] font-display">
                   {offer.title}
                 </h4>
                 <p className={`text-sm font-extrabold ${offer.discountClass} mt-0.5`}>
@@ -127,10 +127,10 @@ export function SyngentaMandiOffers({ district, crop = "Soybean", acres = 5 }: S
               </div>
             </div>
 
-            {/* Bottom Bar without fake/undefined codes */}
+            {/* Bottom Bar */}
             <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100 text-xs">
               <div className="flex items-center gap-1.5 text-slate-600 font-medium">
-                <MapPin className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                <MapPin className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0" />
                 <span className="text-[11px]">{offer.storeLocation}</span>
               </div>
 

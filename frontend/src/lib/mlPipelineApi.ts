@@ -96,6 +96,8 @@ export interface UnifiedPipelineResponse {
     latency_ms: number;
     timestamp: string;
   };
+  execution_source?: string;
+  weather_live?: boolean;
 }
 
 export async function fetchPipelineModels() {

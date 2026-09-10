@@ -793,11 +793,11 @@ export default function HowItWorksPage() {
 
             <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
               <Link
-                href="/product"
+                href="/plant-intelligence"
                 className="px-5 py-3 rounded-xl bg-white border border-[#e3e8ee] hover:border-[#533afd] text-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
               >
                 <Layers className="h-4 w-4 text-[#533afd]" />
-                <span>{isHindi ? "उत्पाद कैटलॉग" : "Product Catalog"}</span>
+                <span>{isHindi ? "प्लांट इंटेलिजेंस" : "Plant Intelligence"}</span>
               </Link>
               
               <Link

@@ -214,7 +214,7 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
   }, [chatStep]);
 
   return (
-    <div className="bg-white rounded-3xl border border-[#e3e8ee] p-6 sm:p-8 space-y-8 shadow-xl font-sans relative overflow-hidden select-none">
+    <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-[#e8ede4] p-6 sm:p-8 space-y-8 shadow-[0_4px_24px_rgba(27,67,50,0.04)] font-sans relative overflow-hidden select-none">
       
       {/* ── Enterprise Header: Professional Distributor Directory ─ */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
@@ -222,16 +222,16 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono font-bold text-[#533afd] uppercase tracking-wider">
+            <span className="text-xs font-mono font-bold text-[#1b4332] uppercase tracking-wider">
               Syngenta Crop Protection • Certified Retail Network
             </span>
           </div>
 
-          <h3 className="text-xl sm:text-2xl font-black text-[#0d253d] font-display tracking-tight">
+          <h3 className="text-xl sm:text-2xl font-black text-[#11261f] font-display tracking-tight">
             {isHindi ? `सिंजेंटा अधिकृत कृषि सेवा केंद्र व विक्रेता (${effectiveDistrict})` : `Syngenta Authorized Retail & Distribution Network (${effectiveDistrict})`}
           </h3>
 
-          <p className="text-xs text-[#64748d]">
+          <p className="text-xs text-slate-500 font-medium">
             {isHindi
               ? `प्रमाणित बैच ट्रैसबिलिटी, जीएसटी पक्का बिल व तकनीकी सहायता के साथ नजदीकी वितरक केंद्र।`
               : `Direct procurement from certified agricultural input distributors with verified batch traceability and GST invoices.`}
@@ -243,7 +243,7 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
           <select
             value={effectiveDistrict}
             onChange={(e) => setCurrentDistrict(e.target.value)}
-            className="pl-3.5 pr-8 py-2 rounded-xl bg-[#f6f9fc] hover:bg-slate-100 border border-[#e3e8ee] text-xs font-bold text-[#0d253d] focus:outline-none focus:border-[#533afd] cursor-pointer appearance-none shadow-2xs transition-colors"
+            className="pl-3.5 pr-8 py-2.5 rounded-xl bg-[#f8faf6] hover:bg-[#edf2ea] border border-[#e8ede4] text-xs font-bold text-[#11261f] focus:outline-none focus:border-[#2d6a4f] cursor-pointer appearance-none shadow-2xs transition-colors"
           >
             {POPULAR_AGRI_DISTRICTS.map((d) => (
               <option key={d} value={d}>
@@ -251,7 +251,7 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
               </option>
             ))}
           </select>
-          <MapPin className="h-3.5 w-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <MapPin className="h-3.5 w-3.5 text-[#2d6a4f] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
       </div>
@@ -280,11 +280,11 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
               return (
                 <div
                   key={dealer.id}
-                  className="p-5 rounded-2xl bg-[#f6f9fc] border border-[#e3e8ee] hover:border-emerald-400/80 transition-all duration-200 shadow-2xs hover:shadow-md space-y-3 group"
+                  className="p-5 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] hover:border-[#2d6a4f]/50 transition-all duration-200 shadow-2xs hover:shadow-md space-y-3 group"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h4 className="font-bold text-sm text-[#0d253d] group-hover:text-emerald-700 transition-colors flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm text-[#11261f] group-hover:text-[#2d6a4f] transition-colors flex items-center gap-1.5">
                         <span>{dealer.name}</span>
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                       </h4>
@@ -488,7 +488,7 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
       </div>
 
       {/* ── Official Toll-Free Helpline Strip ──────────────────────── */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#0d253d] to-emerald-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-[#0d2319] via-[#1b4332] to-[#0d2319] text-white flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono shadow-md">
         <div className="flex items-center gap-3 text-center sm:text-left">
           <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
             <Phone className="h-4 w-4" />

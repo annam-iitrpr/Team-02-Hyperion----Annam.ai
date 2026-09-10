@@ -183,7 +183,7 @@ const featureChips: FeatureDetailData[] = [
     ],
     actionLabel: "Launch 6-Model Pipeline",
     actionLabelHi: "6-मॉडल पाइपलाइन चलाएं",
-    actionHref: "/pipeline",
+    actionHref: "/dashboard",
   },
   {
     id: "vision",

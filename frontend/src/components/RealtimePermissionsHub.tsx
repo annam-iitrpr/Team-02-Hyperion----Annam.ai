@@ -133,13 +133,13 @@ export function RealtimePermissionsHub({ onLocationUpdated }: RealtimePermission
   }
 
   return (
-    <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-[#e3e8ee] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-700 animate-in fade-in duration-200">
-      <div className="flex items-center gap-2.5">
-        <div className="p-2 rounded-xl bg-indigo-50 text-[#533afd] shrink-0 border border-indigo-100">
+    <div className="p-3 sm:p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-[#e8ede4] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-700 animate-in fade-in duration-200">
+      <div className="flex items-center gap-3">
+        <div className="p-2.5 rounded-xl bg-emerald-50 text-[#2d6a4f] shrink-0 border border-emerald-100">
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
-          <span className="font-bold text-[#0d253d] block text-xs">
+          <span className="font-bold text-[#11261f] block text-xs">
             {isHindi ? "सटीक खेत मौसम व सेंसर सक्रिय करें" : "Enable Real-Time Farm Sensors & Micro-Weather"}
           </span>
           <span className="text-[11px] text-slate-500">
@@ -155,12 +155,12 @@ export function RealtimePermissionsHub({ onLocationUpdated }: RealtimePermission
           type="button"
           onClick={handleRequestAllPermissions}
           disabled={isRequesting}
-          className="px-3.5 py-1.5 rounded-xl bg-[#533afd] hover:bg-[#4434d4] text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-75"
+          className="px-4 py-2 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-75"
         >
           {isRequesting ? (
             <RefreshCw className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <ShieldCheck className="h-3.5 w-3.5" />
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" />
           )}
           <span>{isHindi ? "सेंसर चालू करें" : "Authorize GPS"}</span>
         </button>

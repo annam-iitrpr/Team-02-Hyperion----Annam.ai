@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useFarm } from "@/context/FarmContext";
 import { isUserLoggedIn, getStoredProfile, saveProfile, logoutUser, INDIAN_LANGUAGES } from "@/lib/userStore";
 import { Footer } from "@/components/Footer";
+import { KrishyantraFooter } from "@/components/KrishyantraFooter";
 import { ModelServerStatusPill } from "@/components/ModelServerStatusPill";
 import {
   Globe,
@@ -42,7 +43,7 @@ import {
   Cpu,
 } from "lucide-react";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/how-it-works", "/product", "/impact-story", "/architecture", "/pipeline"];
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/how-it-works", "/impact-story", "/architecture"];
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
@@ -171,18 +172,20 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       )}
 
       {/* ── Precision Glassmorphic Top Navbar ────────────────── */}
-      <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-slate-200/60 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e8ede4] shadow-[0_2px_12px_rgba(27,67,50,0.04)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Global Farm Selector */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
-              <div className="relative h-9 w-9 rounded-xl overflow-hidden border border-purple-200/60 shadow-sm">
-                <Image src="/images/aasra_logo.png" alt="AASRA Logo" fill sizes="36px" className="object-contain" priority />
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-sm font-black text-slate-900 leading-tight">AASRA</p>
-                <p className="text-[9px] text-slate-500 font-medium leading-tight">{language === "hi" ? "आपकी खेती का सच्चा साथी" : "Your Field\'s Intelligent Companion"}</p>
+            <Link href="/" className="flex items-center gap-2 group cursor-pointer shrink-0" title="Krishyantra Home">
+              <div className="relative h-7.5 sm:h-9 w-28 sm:w-44">
+                <Image
+                  src="/images/krishyantra_logo.svg"
+                  alt="Krishyantra"
+                  fill
+                  className="object-contain object-left"
+                  priority
+                />
               </div>
             </Link>
 
@@ -192,22 +195,22 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <button
                   type="button"
                   onClick={() => setFarmDropdownOpen((v) => !v)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#f6f9fc] hover:bg-slate-100 text-[#0d253d] transition-all text-xs font-bold shadow-2xs cursor-pointer border border-[#e3e8ee]"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl bg-[#f8faf6] hover:bg-[#edf2ea] text-[#11261f] transition-all text-xs font-bold shadow-2xs cursor-pointer border border-[#e8ede4]"
                   title="Switch Active Farm or Field"
                 >
-                  <MapPin className="h-3.5 w-3.5 text-[#533afd] shrink-0" />
-                  <div className="text-left leading-tight max-w-[130px] sm:max-w-[170px] truncate">
-                    <span className="block text-[11px] font-extrabold text-[#0d253d] truncate">{activeFarm.name}</span>
-                    <span className="block text-[9px] text-slate-500 font-mono truncate">{activeFarm.primaryCrop} · {activeFarm.areaAcres} ac</span>
+                  <MapPin className="h-3.5 w-3.5 text-[#2d6a4f] shrink-0" />
+                  <div className="text-left leading-tight max-w-[86px] sm:max-w-[170px] truncate">
+                    <span className="block text-[10.5px] sm:text-[11px] font-extrabold text-[#11261f] truncate">{activeFarm.name}</span>
+                    <span className="block text-[8.5px] sm:text-[9px] text-slate-500 font-mono truncate">{activeFarm.primaryCrop} · {activeFarm.areaAcres} ac</span>
                   </div>
-                  <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform ${farmDropdownOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform shrink-0 ${farmDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
 
                 {farmDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-white border border-slate-200 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 text-xs text-slate-800">
+                  <div className="absolute left-0 mt-2 w-80 rounded-2xl bg-white border border-[#e8ede4] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 text-xs text-slate-800">
                     <div className="px-3.5 py-2 border-b border-slate-100 flex items-center justify-between">
                       <span className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active Farm / Portfolio</span>
-                      <span className="text-[10px] text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">{farms.length} Farm(s)</span>
+                      <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">{farms.length} Farm(s)</span>
                     </div>
                     <div className="max-h-64 overflow-y-auto py-1 space-y-1">
                       {farms.map((f) => (
@@ -219,7 +222,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                           }}
                           className={`w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center justify-between transition-colors ${
                             f.id === activeFarm.id
-                              ? "bg-indigo-50 text-indigo-950 font-extrabold border-l-4 border-[#533afd]"
+                              ? "bg-emerald-50/80 text-[#1b4332] font-extrabold border-l-4 border-[#2d6a4f]"
                               : "text-slate-700 font-medium"
                           }`}
                         >
@@ -241,7 +244,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                         <Link
                           href="/fields?action=register"
                           onClick={() => setFarmDropdownOpen(false)}
-                          className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#533afd] to-[#4434d4] hover:opacity-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all"
+                          className="w-full py-2.5 px-3 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all"
                         >
                           <Plus className="h-4 w-4" />
                           <span>Add Another Farm / Field</span>
@@ -262,11 +265,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   href="/dashboard"
                   className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/dashboard"
-                      ? "bg-indigo-50 text-[#533afd] border border-indigo-200 shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-slate-100"
+                      ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
                   }`}
                 >
-                  <LayoutDashboard className="h-4 w-4 text-[#533afd]" />
+                  <LayoutDashboard className="h-4 w-4 text-[#2d6a4f]" />
                   <span>{t.navDashboard || "Dashboard"}</span>
                 </Link>
 
@@ -274,8 +277,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   href="/plant-intelligence"
                   className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/plant-intelligence"
-                      ? "bg-indigo-50 text-[#533afd] border border-indigo-200 shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-slate-100"
+                      ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
                   }`}
                 >
                   <Sprout className="h-4 w-4 text-emerald-600" />
@@ -286,11 +289,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   href="/fields"
                   className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/fields"
-                      ? "bg-indigo-50 text-[#533afd] border border-indigo-200 shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-slate-100"
+                      ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
                   }`}
                 >
-                  <Layers className="h-4 w-4 text-indigo-600" />
+                  <Layers className="h-4 w-4 text-[#2d6a4f]" />
                   <span>{t.navFields || "My Fields"}</span>
                 </Link>
 
@@ -298,8 +301,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   href="/assistant"
                   className={`flex items-center gap-2 py-2 px-3.5 rounded-xl whitespace-nowrap shrink-0 transition-all text-xs font-bold ${
                     pathname === "/assistant"
-                      ? "bg-indigo-50 text-[#533afd] border border-indigo-200 shadow-2xs font-extrabold"
-                      : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-slate-100"
+                      ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] shadow-2xs font-extrabold"
+                      : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
                   }`}
                 >
                   <Mic className="h-4 w-4 text-amber-500" />
@@ -313,8 +316,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                     onClick={() => setMoreDropdownOpen((v) => !v)}
                     className={`flex items-center gap-1.5 py-2 px-3.5 rounded-xl whitespace-nowrap transition-all cursor-pointer text-xs font-bold ${
                       isSecondaryActive
-                        ? "bg-indigo-50 text-[#533afd] border border-indigo-200 font-extrabold"
-                        : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-slate-100"
+                        ? "bg-[#e8f5e9] text-[#1b4332] border border-[#cbe5cb] font-extrabold"
+                        : "text-slate-600 font-semibold hover:text-[#1b4332] hover:bg-[#e8f5e9]/50"
                     }`}
                   >
                     <span>{language === "hi" ? "अधिक उपकरण" : "More Tools"}</span>
@@ -351,21 +354,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                       <div className="border-t border-slate-100 my-1" />
 
                       <Link
-                        href="/pipeline"
-                        onClick={() => setMoreDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
-                      >
-                        <Cpu className="h-4 w-4 text-[#533afd]" />
-                        <div>
-                          <span className="font-bold block flex items-center gap-1.5">
-                            Vertex AI ML Pipeline
-                            <span className="text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.2 rounded font-mono font-bold">M1,2,3,5</span>
-                          </span>
-                          <span className="text-[10px] text-slate-500">Live 4-Model System</span>
-                        </div>
-                      </Link>
-
-                      <Link
                         href="/architecture"
                         onClick={() => setMoreDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-purple-50 hover:text-purple-700 transition-colors"
@@ -383,18 +371,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             ) : (
               <>
                 <Link
-                  href="/pipeline"
-                  className={`py-2 px-3 rounded-xl transition-all text-sm flex items-center gap-1.5 ${
-                    pathname === "/pipeline"
-                      ? "bg-indigo-50 text-[#533afd] font-extrabold border border-indigo-200"
-                      : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-indigo-50/50"
-                  }`}
-                >
-                  <Cpu className="h-4 w-4 text-[#533afd]" />
-                  <span>{language === "hi" ? "ML पाइपलाइन" : "ML Pipeline"}</span>
-                </Link>
-
-                <Link
                   href="/how-it-works"
                   className={`py-2 px-3 rounded-xl transition-all text-sm ${
                     pathname === "/how-it-works"
@@ -403,17 +379,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   }`}
                 >
                   <span>{language === "hi" ? "हाउ इट वर्क्स" : "How It Works"}</span>
-                </Link>
-
-                <Link
-                  href="/product"
-                  className={`py-2 px-3 rounded-xl transition-all text-sm ${
-                    pathname === "/product"
-                      ? "bg-indigo-50 text-[#533afd] font-extrabold border border-indigo-200"
-                      : "text-slate-600 font-semibold hover:text-[#533afd] hover:bg-indigo-50/50"
-                  }`}
-                >
-                  <span>{language === "hi" ? "उत्पाद विशेषताएँ" : "Product"}</span>
                 </Link>
 
                 <Link
@@ -442,25 +407,25 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </nav>
 
           {/* Right Action Tools: Model Status Pill + Language Selector + User Profile + Mobile Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
-            {/* Live Model Server Status Indicator */}
-            <ModelServerStatusPill />
+            {/* Live Model Server Status Indicator removed per user request */}
 
-            {/* Language Switcher Dropdown */}
-            <div className="relative" ref={langDropdownRef}>
+            {/* Language Switcher Dropdown (Desktop/Tablet) */}
+            <div className="relative shrink-0 hidden sm:block notranslate" translate="no" ref={langDropdownRef}>
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen((v) => !v)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 cursor-pointer shrink-0"
+                translate="no"
               >
-                <Globe className="h-3.5 w-3.5 text-blue-600" />
-                <span className="font-bold notranslate" translate="no">{currentLangObj.native}</span>
-                <ChevronDown className="h-3 w-3 text-slate-500" />
+                <Globe className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                <span className="font-bold notranslate" translate="no" lang={currentLangObj.code}>{currentLangObj.native}</span>
+                <ChevronDown className="h-3 w-3 text-slate-500 shrink-0" />
               </button>
 
               {langDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 font-sans">
+                <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50 max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 font-sans notranslate" translate="no">
                   {INDIAN_LANGUAGES.map((l) => (
                     <button
                       key={l.code}
@@ -473,8 +438,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                       }`}
                       translate="no"
                     >
-                      <span>{l.native}</span>
-                      <span className="text-[10px] text-slate-400 font-mono font-normal">({l.name})</span>
+                      <span className="notranslate" translate="no" lang={l.code}>{l.native}</span>
+                      <span className="text-[10px] text-slate-400 font-mono font-normal notranslate" translate="no" lang="en">({l.name})</span>
                     </button>
                   ))}
                 </div>
@@ -487,13 +452,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen((v) => !v)}
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 transition-all cursor-pointer"
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#e8f5e9] hover:bg-[#d8edd9] border border-[#cbe5cb] text-[#1b4332] transition-all cursor-pointer shadow-2xs"
                 >
-                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white flex items-center justify-center text-xs font-bold">
+                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[#1b4332] to-[#2d6a4f] text-white flex items-center justify-center text-xs font-bold">
                     {displayName[0] || "K"}
                   </div>
                   <div className="hidden sm:block text-left">
-                    <span className="text-xs font-bold text-slate-900 block truncate max-w-[120px]">{displayName}</span>
+                    <span className="text-xs font-bold text-[#11261f] block truncate max-w-[120px]">{displayName}</span>
                     <span className="text-[10px] text-slate-500 block truncate max-w-[120px]">{displayLocation}</span>
                   </div>
                   <ChevronDown className="h-3 w-3 text-slate-500 hidden sm:block" />
@@ -579,7 +544,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             ) : (
               [
                 { href: "/how-it-works", icon: <Sparkles className="h-4 w-4 text-[#533afd]" />, label: language === "hi" ? "हाउ इट वर्क्स" : "How It Works" },
-                { href: "/product", icon: <Layers className="h-4 w-4 text-blue-600" />, label: language === "hi" ? "उत्पाद विशेषताएँ" : "Product & Features" },
                 { href: "/impact-story", icon: <TrendingUp className="h-4 w-4 text-emerald-600" />, label: language === "hi" ? "सफलता की कहानियाँ" : "Impact Stories" },
                 { href: "/architecture", icon: <FileText className="h-4 w-4 text-indigo-600" />, label: language === "hi" ? "आर्किटेक्चर" : "Architecture" },
               ].map((item) => (
@@ -594,6 +558,29 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 </Link>
               ))
             )}
+            {/* Language Selector (Mobile Drawer) */}
+            <div className="pt-2.5 mt-2 border-t border-slate-100 flex items-center justify-between px-2" translate="no">
+              <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+                <Globe className="h-3.5 w-3.5 text-[#2d6a4f]" /> Language
+              </span>
+              <select
+                value={language}
+                onChange={(e) => {
+                  setLanguage(e.target.value);
+                  setMobileMenuOpen(false);
+                }}
+                aria-label="Select Language"
+                className="text-xs font-bold text-[#1b4332] bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 focus:outline-hidden notranslate"
+                translate="no"
+              >
+                {INDIAN_LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code} className="notranslate" translate="no" lang={l.code}>
+                    {l.native} ({l.name})
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="pt-2 border-t border-slate-100 flex gap-2">
               {!loggedIn && (
                 <>
@@ -672,61 +659,61 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       )}
 
       {/* ── Mobile Fixed Bottom Nav Bar (1-Tap Fast Web App Switcher) ─────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/98 backdrop-blur-md border-t border-slate-200/80 px-2 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/98 backdrop-blur-md border-t border-[#e8ede4] px-2 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-4px_16px_rgba(27,67,50,0.08)]">
         {loggedIn ? (
           <>
             <Link
               href="/dashboard"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/dashboard" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/dashboard" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <LayoutDashboard className="h-4 w-4" />
-              <span>{language === "hi" ? "होम" : "Home"}</span>
-              {pathname === "/dashboard" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              <span>{language === "hi" ? "डैशबोर्ड" : "Dashboard"}</span>
+              {pathname === "/dashboard" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
               href="/plant-intelligence"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/plant-intelligence" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/plant-intelligence" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <Sprout className="h-4 w-4" />
               <span>{language === "hi" ? "पौधा" : "Plant AI"}</span>
-              {pathname === "/plant-intelligence" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              {pathname === "/plant-intelligence" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
               href="/assistant"
               className="flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative"
             >
-              <div className="h-10 w-10 -mt-5 rounded-full text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95 animate-pulse-ring" style={{ background: "linear-gradient(135deg, #533afd, #4434d4)" }}>
+              <div className="h-10 w-10 -mt-5 rounded-full text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95 animate-pulse-ring" style={{ background: "linear-gradient(135deg, #1b4332, #2d6a4f)" }}>
                 <Mic className="h-4 w-4" />
               </div>
-              <span className="text-[#533afd] font-black">{language === "hi" ? "AI साथी" : "Ask AI"}</span>
+              <span className="text-[#1b4332] font-black">{language === "hi" ? "AI साथी" : "Ask AI"}</span>
             </Link>
 
             <Link
               href="/fields"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/fields" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/fields" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <Layers className="h-4 w-4" />
               <span>{language === "hi" ? "खेत" : "Fields"}</span>
-              {pathname === "/fields" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              {pathname === "/fields" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
               href="/impact"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/impact" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/impact" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <TrendingUp className="h-4 w-4" />
               <span>{language === "hi" ? "प्रभाव" : "Impact"}</span>
-              {pathname === "/impact" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              {pathname === "/impact" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
           </>
         ) : (
@@ -734,50 +721,39 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             <Link
               href="/"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <Home className="h-4 w-4" />
               <span>{language === "hi" ? "होम" : "Home"}</span>
-              {pathname === "/" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              {pathname === "/" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
               href="/how-it-works"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/how-it-works" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/how-it-works" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <Sparkles className="h-4 w-4" />
               <span>{language === "hi" ? "प्रणाली" : "How it Works"}</span>
-              {pathname === "/how-it-works" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
-            </Link>
-
-            <Link
-              href="/product"
-              className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/product" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <Layers className="h-4 w-4" />
-              <span>{language === "hi" ? "विशेषताएं" : "Product"}</span>
-              {pathname === "/product" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              {pathname === "/how-it-works" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
               href="/impact"
               className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold active-press relative transition-all ${
-                pathname === "/impact" ? "text-[#533afd]" : "text-slate-500 hover:text-slate-800"
+                pathname === "/impact" ? "text-[#1b4332]" : "text-slate-500 hover:text-slate-800"
               }`}
             >
               <TrendingUp className="h-4 w-4" />
               <span>{language === "hi" ? "ROBI लाभ" : "ROBI Impact"}</span>
-              {pathname === "/impact" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#533afd]" />}
+              {pathname === "/impact" && <span className="absolute -bottom-1 h-1 w-4 rounded-full bg-[#1b4332]" />}
             </Link>
 
             <Link
               href="/login"
-              className="flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold text-[#533afd] active-press"
+              className="flex flex-col items-center justify-center min-w-[54px] min-h-[44px] gap-0.5 text-[10px] font-bold text-[#1b4332] active-press"
             >
               <User className="h-4 w-4" />
               <span>{language === "hi" ? "लॉगिन" : "Login"}</span>
@@ -786,18 +762,16 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         )}
       </nav>
 
-
-
       {/* Floating WhatsApp Quick Action Widget */}
       <a
         href="https://wa.me/15556694548?text=Namaste"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-2xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all font-extrabold text-sm group"
+        className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-2xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all font-extrabold text-xs sm:text-sm group"
         title="Chat with AASRA AI on WhatsApp (+1 555-669-4548)"
       >
         <div className="relative">
-          <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
           </svg>
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -808,7 +782,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         <span className="hidden sm:inline font-bold tracking-wide">WhatsApp Bot</span>
       </a>
 
-      <Footer />
+      <KrishyantraFooter />
     </div>
   );
 };

@@ -81,6 +81,12 @@ export function RealBoundaryMap({
     ];
   });
 
+  const isProgrammaticMoveRef = useRef(false);
+  const lastReportedCenterRef = useRef<[number, number]>(center);
+
+  const centerLat = center?.[0] ?? 23.2032;
+  const centerLng = center?.[1] ?? 77.0844;
+
   const onBoundaryChangeRef = useRef(onBoundaryChange);
   onBoundaryChangeRef.current = onBoundaryChange;
 
@@ -113,6 +119,7 @@ export function RealBoundaryMap({
         const map = mapInstanceRef.current;
         if (map) {
           try {
+            isProgrammaticMoveRef.current = true;
             const bounds = L.latLngBounds(initialPoints);
             map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 });
           } catch (e) {
@@ -137,8 +144,8 @@ export function RealBoundaryMap({
       delete (containerRef.current as any)._leaflet_id;
     }
 
-    const safeLat = center[0] || 23.2032;
-    const safeLon = center[1] || 77.0844;
+    const safeLat = centerLat;
+    const safeLon = centerLng;
 
     const map = L.map(containerRef.current, {
       center: [safeLat, safeLon],
@@ -157,10 +164,29 @@ export function RealBoundaryMap({
     map.on("moveend", () => {
       const c = map.getCenter();
       const z = map.getZoom();
-      setCurrentCenter([c.lat, c.lng]);
-      setCurrentZoom(z);
-      if (onCenterChangeRef.current) {
-        onCenterChangeRef.current([c.lat, c.lng]);
+
+      // Deduplicate local HUD state updates
+      setCurrentCenter((prev) => {
+        if (Math.abs(prev[0] - c.lat) < 0.00005 && Math.abs(prev[1] - c.lng) < 0.00005) return prev;
+        return [c.lat, c.lng];
+      });
+      setCurrentZoom((prev) => (prev === z ? prev : z));
+
+      // If move was programmatic (e.g. external prop change, fitBounds), do not echo back to parent
+      if (isProgrammaticMoveRef.current) {
+        isProgrammaticMoveRef.current = false;
+        return;
+      }
+
+      // Only notify parent if user drag shifted the center significantly (> 0.0002 deg)
+      if (
+        Math.abs(lastReportedCenterRef.current[0] - c.lat) > 0.0002 ||
+        Math.abs(lastReportedCenterRef.current[1] - c.lng) > 0.0002
+      ) {
+        lastReportedCenterRef.current = [c.lat, c.lng];
+        if (onCenterChangeRef.current) {
+          onCenterChangeRef.current([c.lat, c.lng]);
+        }
       }
     });
 
@@ -220,17 +246,22 @@ export function RealBoundaryMap({
     }
   }, [mapType]);
 
-  // 4. Center update from outside
+  // 4. Center update from outside (scalar primitive dependency)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
-    const [cLat, cLng] = center;
     const cur = map.getCenter();
-    if (Math.abs(cur.lat - cLat) > 0.0001 || Math.abs(cur.lng - cLng) > 0.0001) {
-      map.setView([cLat, cLng], map.getZoom(), { animate: true });
+    if (Math.abs(cur.lat - centerLat) > 0.0003 || Math.abs(cur.lng - centerLng) > 0.0003) {
+      isProgrammaticMoveRef.current = true;
+      map.setView([centerLat, centerLng], map.getZoom(), { animate: false });
       map.invalidateSize({ animate: false });
+      setCurrentCenter((prev) => {
+        if (Math.abs(prev[0] - centerLat) < 0.00005 && Math.abs(prev[1] - centerLng) < 0.00005) return prev;
+        return [centerLat, centerLng];
+      });
+      lastReportedCenterRef.current = [centerLat, centerLng];
     }
-  }, [center]);
+  }, [centerLat, centerLng]);
 
   // Navigation helpers for farmers sitting at home
   const panMapByOffset = (dLat: number, dLon: number) => {
@@ -493,7 +524,7 @@ export function RealBoundaryMap({
       </div>
 
       {/* Map Header Controls */}
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-bold text-[#0d253d]">
@@ -501,7 +532,7 @@ export function RealBoundaryMap({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {/* Map Layer Switcher */}
           <div className="flex bg-[#f6f9fc] p-0.5 rounded-xl border border-[#e3e8ee] text-xs">
             <button
@@ -552,11 +583,11 @@ export function RealBoundaryMap({
       </div>
 
       {/* Real Map Container */}
-      <div className="relative w-full h-[400px] rounded-3xl overflow-hidden border border-[#e3e8ee] shadow-sm bg-slate-900">
+      <div className="relative w-full h-[320px] sm:h-[400px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#e3e8ee] shadow-sm bg-slate-900">
         <div ref={containerRef} className="w-full h-full z-0 cursor-crosshair" />
 
         {/* HUD Overlay Bar (Clean White Stripe Aesthetic) */}
-        <div className="absolute bottom-3.5 left-3.5 right-3.5 z-[500] flex items-center justify-between bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-[#e3e8ee] text-[#0d253d] text-xs font-mono shadow-xl pointer-events-none">
+        <div className="absolute bottom-2.5 sm:bottom-3.5 left-2.5 sm:left-3.5 right-2.5 sm:right-3.5 z-[500] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-[#e3e8ee] text-[#0d253d] text-xs font-mono shadow-xl pointer-events-none">
           <div className="flex items-center gap-2">
             <span className="text-[#2d6a4f] font-extrabold flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#2d6a4f]" />
@@ -567,13 +598,13 @@ export function RealBoundaryMap({
             </span>
           </div>
 
-          <div className="font-black text-emerald-800 bg-emerald-50 px-3.5 py-1 rounded-xl border border-emerald-300 text-xs">
+          <div className="font-black text-emerald-800 bg-emerald-50 px-3.5 py-1 rounded-xl border border-emerald-300 text-xs text-center sm:text-right">
             Calculated: {calculatedAcres} Acres ({(calculatedAcres * 0.4047).toFixed(2)} Ha)
           </div>
         </div>
 
         {/* GPS Coordinates Top Right */}
-        <div className="absolute top-3.5 right-3.5 z-[500] bg-white/95 backdrop-blur-md text-[#0d253d] text-[11px] font-mono font-bold px-3 py-1.5 rounded-xl border border-[#e3e8ee] shadow-sm pointer-events-none">
+        <div className="absolute top-2.5 sm:top-3.5 right-2.5 sm:right-3.5 z-[500] bg-white/95 backdrop-blur-md text-[#0d253d] text-[10px] sm:text-[11px] font-mono font-bold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-[#e3e8ee] shadow-sm pointer-events-none">
           📍 {currentCenter[0].toFixed(4)}°N, {currentCenter[1].toFixed(4)}°E
         </div>
       </div>
