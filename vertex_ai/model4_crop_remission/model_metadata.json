@@ -1,0 +1,14 @@
+{
+  "model_name": "aasra_model4_crop_remission",
+  "version": "1.0.0",
+  "framework": "scikit-learn",
+  "estimator": "GradientBoostingRegressor",
+  "track": "PS-02/PS-03 (Recovery Trajectory)",
+  "description": "Predicts crop remission probability and yield salvage after biostimulant intervention on stressed fields. When a farmer reports that a recommended product is not showing results, Model 4 evaluates recovery trajectory and recommends rotational rescue actions.",
+  "artifacts": {
+    "model4_crop_remission_predictor.joblib": "GradientBoostingRegressor — predicts remission probability (0.0-1.0)",
+    "model4_yield_salvage_predictor.joblib": "GradientBoostingRegressor — predicts salvageable yield fraction"
+  },
+  "n_features": 49,
+  "serving_container_image_uri": "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-0:latest"
+}
