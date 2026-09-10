@@ -354,7 +354,7 @@ export default function LandingPage() {
     {
       num: "01",
       icon: <Phone className="w-5 h-5 text-[#2d6a4f]" />,
-      title: isHindi ? "कृषियंत्र खोलें" : "Open Krishyantra",
+      title: isHindi ? "कृषियंत्र खोलें" : "Open KrishYantra",
       desc: isHindi
         ? "बिना ऐप स्टोर डाउनलोड के सीधे अपने फोन ब्राउज़र में खोलें"
         : "Open on your phone (No app store needed)",
@@ -396,34 +396,34 @@ export default function LandingPage() {
   // FAQs
   const faqs = [
     {
-      q: isHindi ? "कृषियंत्र क्या है?" : "What is Krishyantra?",
+      q: isHindi ? "कृषियंत्र क्या है?" : "What is KrishYantra?",
       a: isHindi
         ? "कृषियंत्र एक भारतीय किसानों के लिए समर्पित AI कृषि साथी है, जो आपके खेत के वास्तविक स्थान, मौसम और फसल की स्थिति को समझकर आपको सही समय पर सटीक और वैज्ञानिक फैसले लेने में मदद करता है।"
-        : "Krishyantra is an AI-powered farming companion tailored for Indian agriculture. It understands your exact field coordinates, crop type, and hyperlocal weather to deliver timely, scientifically-verified guidance.",
+        : "KrishYantra is an AI-powered farming companion tailored for Indian agriculture. It understands your exact field coordinates, crop type, and hyperlocal weather to deliver timely, scientifically-verified guidance.",
     },
     {
-      q: isHindi ? "क्या कृषियंत्र किसी भी सामान्य फोन पर काम करता है?" : "Can I use Krishyantra on any phone?",
+      q: isHindi ? "क्या कृषियंत्र किसी भी सामान्य फोन पर काम करता है?" : "Can I use KrishYantra on any phone?",
       a: isHindi
         ? "हाँ! कृषियंत्र को किसी भारी ऐप डाउनलोड की आवश्यकता नहीं है। यह किसी भी स्मार्टफोन के ब्राउज़र में तुरंत खुलता है और कमजोर 2G/3G नेटवर्क पर भी सुचारू रूप से चलता है।"
-        : "Yes! Krishyantra requires no bulky app store downloads. It opens instantly in any mobile browser, uses minimal data, and is engineered to perform reliably even on 2G and 3G rural network connections.",
+        : "Yes! KrishYantra requires no bulky app store downloads. It opens instantly in any mobile browser, uses minimal data, and is engineered to perform reliably even on 2G and 3G rural network connections.",
     },
     {
-      q: isHindi ? "कृषियंत्र मेरी खेती में कैसे मदद करता है?" : "How does Krishyantra help with my farm?",
+      q: isHindi ? "कृषियंत्र मेरी खेती में कैसे मदद करता है?" : "How does KrishYantra help with my farm?",
       a: isHindi
         ? "यह आपको 14-दिन का सटीक मौसम पूर्वानुमान देता है, कीटनाशक/खाद छिड़कने का सबसे सुरक्षित समय बताता है, पत्ती की फोटो से रोग पहचानता है, और सरकारी APMC मंडियों के ताजा भाव दिखाता है ताकि आपकी लागत घटे और पैदावार सुरक्षित रहे।"
-        : "Krishyantra provides a 14-day agrometeorological forecast, alerts you to safe spray windows to avoid chemical drift, diagnoses leaf diseases from photos, and tracks real APMC mandi prices to protect your crop and profit.",
+        : "KrishYantra provides a 14-day agrometeorological forecast, alerts you to safe spray windows to avoid chemical drift, diagnoses leaf diseases from photos, and tracks real APMC mandi prices to protect your crop and profit.",
     },
     {
-      q: isHindi ? "क्या कृषियंत्र किसानों के लिए पूरी तरह निःशुल्क है?" : "Is Krishyantra free for farmers?",
+      q: isHindi ? "क्या कृषियंत्र किसानों के लिए पूरी तरह निःशुल्क है?" : "Is KrishYantra free for farmers?",
       a: isHindi
         ? "हाँ, कृषियंत्र के मुख्य कृषि उपकरण—जैसे मौसम रडार, रोग पहचान, मंडी भाव और वॉइस सहायक—किसानों के लिए पूर्णतः निःशुल्क हैं।"
-        : "Yes, Krishyantra's foundational agricultural tools—including weather forecasting, spray timing, visual disease detection, APMC mandi prices, and multilingual voice assistance—are completely free for farmers.",
+        : "Yes, KrishYantra's foundational agricultural tools—including weather forecasting, spray timing, visual disease detection, APMC mandi prices, and multilingual voice assistance—are completely free for farmers.",
     },
     {
-      q: isHindi ? "कृषियंत्र कौन सी जानकारी का उपयोग करता है?" : "What information does Krishyantra use?",
+      q: isHindi ? "कृषियंत्र कौन सी जानकारी का उपयोग करता है?" : "What information does KrishYantra use?",
       a: isHindi
         ? "यह आपके द्वारा चुने गए फसल प्रकार, बुआई की तारीख और मौसम उपग्रह डेटा का उपयोग करता है। हम किसी भी निजी जानकारी को सुरक्षित रखते हैं और इसे किसी तीसरे पक्ष को नहीं बेचते।"
-        : "Krishyantra relies on your crop type, sowing timeline, and open agrometeorological satellite telemetry. All farmer data is kept confidential and is never shared or sold to third parties.",
+        : "KrishYantra relies on your crop type, sowing timeline, and open agrometeorological satellite telemetry. All farmer data is kept confidential and is never shared or sold to third parties.",
     },
   ];
 
@@ -448,7 +448,7 @@ export default function LandingPage() {
               {/* Handwritten Brand Annotation (Faithful to Target) */}
               <div className="inline-block">
                 <div className="relative font-serif italic text-sm sm:text-base font-semibold text-[#1b4332] tracking-wide rotate-[-2deg]">
-                  <span>Meri Fasal · Mera Saathi · Krishyantra</span>
+                  <span>Meri Fasal · Mera Saathi · KrishYantra</span>
                   <svg className="absolute -bottom-2 left-0 w-full h-2 text-[#40916c]" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <path d="M0 5 Q 25 0, 50 6 T 100 4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
@@ -625,7 +625,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#111827]">
-                How Krishyantra Works
+                How KrishYantra Works
               </h2>
               <p className="text-base text-slate-600">
                 Get started in just a few simple steps.
@@ -692,12 +692,12 @@ export default function LandingPage() {
               <span>{isHindi ? "खेत की असली समस्या और समाधान" : "Real Ground Realities & Solutions"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#111827]">
-              {isHindi ? "किसान की हर समस्या — कृषियंत्र का समाधान" : "Every Farmer Has a Problem — Krishyantra Has the Solution"}
+              {isHindi ? "किसान की हर समस्या — कृषियंत्र का समाधान" : "Every Farmer Has a Problem — KrishYantra Has the Solution"}
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               {isHindi
                 ? "देखें कैसे कृषियंत्र भारतीय किसानों को वैज्ञानिक सलाह, सुरक्षित स्प्रे समय और सही फैसले लेने में मदद करता है।"
-                : "Watch how Krishyantra solves daily field challenges with precision timing, weather radar, and crop intelligence."}
+                : "Watch how KrishYantra solves daily field challenges with precision timing, weather radar, and crop intelligence."}
             </p>
           </div>
 
@@ -755,7 +755,7 @@ export default function LandingPage() {
               <span>{isHindi ? "5-चरणीय स्वायत्त निर्णय चक्र" : "5-Stage Autonomous Decision Cycle"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#0d253d] font-display">
-              {isHindi ? "देखें कृषियंत्र कैसे काम करता है" : "See Krishyantra in Action"}
+              {isHindi ? "देखें कृषियंत्र कैसे काम करता है" : "See KrishYantra in Action"}
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               {isHindi
@@ -1160,7 +1160,7 @@ export default function LandingPage() {
                     Greener Tomorrow.
                   </h3>
                   <p className="text-sm text-emerald-100/90 leading-relaxed">
-                    Krishyantra is built for real fields, real farmers and a more sustainable agricultural future across India.
+                    KrishYantra is built for real fields, real farmers and a more sustainable agricultural future across India.
                   </p>
                 </div>
               </div>
@@ -1184,7 +1184,7 @@ export default function LandingPage() {
               Frequently Asked Questions
             </h2>
             <p className="text-sm text-slate-600">
-              Clear answers to help you get the most out of Krishyantra.
+              Clear answers to help you get the most out of KrishYantra.
             </p>
           </div>
 
@@ -1248,7 +1248,7 @@ export default function LandingPage() {
               Ready to make better farming decisions?
             </h2>
             <p className="text-base sm:text-lg text-emerald-100/90 leading-relaxed">
-              Start exploring Krishyantra for your farm today.
+              Start exploring KrishYantra for your farm today.
             </p>
           </div>
 
@@ -1311,7 +1311,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-[#111827]">
-                    {isHindi ? "कृषियंत्र वेबऐप इंस्टॉल करें" : "Install Krishyantra WebApp"}
+                    {isHindi ? "कृषियंत्र वेबऐप इंस्टॉल करें" : "Install KrishYantra WebApp"}
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isHindi ? "सीधे अपने होमस्क्रीन पर जोड़ें — बिना ऐप स्टोर" : "Fast, lightweight & works on any phone"}

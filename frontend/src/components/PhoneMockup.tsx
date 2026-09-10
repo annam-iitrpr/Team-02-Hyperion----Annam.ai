@@ -185,13 +185,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
           <div className="absolute top-1.5 left-1/2 -translate-x-1/2 z-40 w-12 h-1 bg-slate-800/80 rounded-full" />
 
           {/* Dynamic Island Notch with Camera Lens & Sensor */}
-          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 z-40 bg-black rounded-full px-3.5 py-1.5 flex items-center justify-between gap-3 shadow-md min-w-[112px]">
-            <div className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[7.5px] font-mono text-slate-300 font-semibold tracking-wider">
-                krishyantra
-              </span>
-            </div>
+          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 z-40 bg-black rounded-full px-3 py-1.5 flex items-center justify-center gap-2 shadow-md w-24">
             {/* Camera lens & infrared sensor dots */}
             <div className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#111827] ring-1 ring-white/10 flex items-center justify-center">
@@ -225,7 +219,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
                 </div>
                 <div>
                   <span className="text-[11px] font-black text-[#1b4332] block leading-none tracking-tight">
-                    krishyantra
+                    KrishYantra
                   </span>
                   <span className="text-[7.5px] text-[#40916c] font-medium leading-none">
                     Saath Har Kisan Ke Liye
@@ -343,7 +337,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
                         <Mic className="w-3.5 h-3.5" />
                       </div>
                       <span className="text-[9.5px] font-bold text-slate-800">
-                        {isHindi ? "कृषियंत्र से पूछें" : "Ask Krishyantra"}
+                        {isHindi ? "कृषियंत्र से पूछें" : "Ask KrishYantra"}
                       </span>
                     </button>
 
@@ -427,7 +421,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
                 <div className="space-y-2.5 animate-in fade-in duration-300">
                   <div className="text-center space-y-0.5">
                     <span className="text-xs font-black text-[#1b4332] block">
-                      {isHindi ? "कृषियंत्र वॉइस सहायक" : "Krishyantra Voice Assistant"}
+                      {isHindi ? "कृषियंत्र वॉइस सहायक" : "KrishYantra Voice Assistant"}
                     </span>
                     <span className="text-[8.5px] text-slate-500 font-medium">
                       Speak naturally in your own language
@@ -447,7 +441,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
                   {/* Krishyantra Response */}
                   <div className="bg-white border border-[#e5e7eb] text-[#1b4332] p-2.5 rounded-2xl rounded-tl-none text-[9.5px] space-y-1 mr-3 shadow-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[8px] font-bold text-[#2d6a4f] font-mono">Krishyantra:</span>
+                      <span className="text-[8px] font-bold text-[#2d6a4f] font-mono">KrishYantra:</span>
                       <span className="text-[7.5px] text-[#2d6a4f] bg-[#e8f5e9] px-1.5 rounded-full font-mono">
                         Voice Advisory
                       </span>

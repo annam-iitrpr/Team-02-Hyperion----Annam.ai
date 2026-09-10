@@ -190,11 +190,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           
           {/* Brand Logo & Global Farm Selector */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <Link href="/" className="flex items-center gap-2 group cursor-pointer shrink-0" title="Krishyantra Home">
+            <Link href="/" className="flex items-center gap-2 group cursor-pointer shrink-0" title="KrishYantra Home">
               <div className="relative h-7.5 sm:h-9 w-28 sm:w-44">
                 <Image
                   src="/images/krishyantra_logo.svg"
-                  alt="Krishyantra"
+                  alt="KrishYantra"
                   fill
                   className="object-contain object-left"
                   priority

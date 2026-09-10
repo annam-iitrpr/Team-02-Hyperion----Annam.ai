@@ -26,7 +26,7 @@ export const KrishyantraFooter: React.FC = () => {
             <div className="relative h-10 w-44">
               <Image
                 src="/images/krishyantra_logo.svg"
-                alt="Krishyantra"
+                alt="KrishYantra"
                 fill
                 className="object-contain object-left"
               />
@@ -103,7 +103,7 @@ export const KrishyantraFooter: React.FC = () => {
         {/* Bottom Legal & Ethics Note */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 text-center sm:text-left">
           <p>
-            © {new Date().getFullYear()} Krishyantra. Built for Indian agriculture, empowering farmers with real-time field intelligence.
+            © {new Date().getFullYear()} KrishYantra. Built for Indian agriculture, empowering farmers with real-time field intelligence.
           </p>
           <p className="font-mono text-[11px] text-slate-500">
             100% Farmer-First · ICAR Aligned · Deterministic Agronomics

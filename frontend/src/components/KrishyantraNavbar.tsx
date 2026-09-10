@@ -63,7 +63,7 @@ export const KrishyantraNavbar: React.FC = () => {
           <div className="relative h-8.5 sm:h-11 w-36 sm:w-52">
             <Image
               src="/images/krishyantra_logo.svg"
-              alt="Krishyantra — Saath Har Kisan Ke Liye"
+              alt="KrishYantra — Saath Har Kisan Ke Liye"
               fill
               className="object-contain object-left"
               priority
