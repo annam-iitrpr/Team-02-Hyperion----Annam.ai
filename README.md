@@ -18,12 +18,11 @@
 - **Precision Prescription & Dosage Engine:** [https://krishyantra.vercel.app/plant-intelligence/prescription](https://krishyantra.vercel.app/plant-intelligence/prescription)
 - **Biophysical Weather Gating & Diagnostics:** [https://krishyantra.vercel.app/diagnostics](https://krishyantra.vercel.app/diagnostics)
 - **Farmer Field Intelligence Dashboard:** [https://krishyantra.vercel.app/dashboard](https://krishyantra.vercel.app/dashboard)
-- **Economic ROBI Causal Impact Calculator:** [https://krishyantra.vercel.app/impact](https://krishyantra.vercel.app/impact)
-- **Closed-Loop 48h Remission Audit Engine:** [https://krishyantra.vercel.app/closed-loop](https://krishyantra.vercel.app/closed-loop)
+- **Closed-Loop Crop Remission & Recovery:** [https://krishyantra.vercel.app/plant-intelligence/recovery](https://krishyantra.vercel.app/plant-intelligence/recovery)
 - **APMC Mandi Real-time Price Intelligence:** [https://krishyantra.vercel.app/mandi](https://krishyantra.vercel.app/mandi)
 - **Digital Field Journal & Spray Audit Ledger:** [https://krishyantra.vercel.app/journal](https://krishyantra.vercel.app/journal)
 - **AI Multilingual Voice Agro-Assistant:** [https://krishyantra.vercel.app/assistant](https://krishyantra.vercel.app/assistant)
-- **Interactive Timing What-If Simulator:** [https://krishyantra.vercel.app/what-if](https://krishyantra.vercel.app/what-if)
+- **Dynamic Intervention & Spray Window Simulator:** [https://krishyantra.vercel.app/plant-intelligence/prescription](https://krishyantra.vercel.app/plant-intelligence/prescription)
 
 ---
 
@@ -33,7 +32,7 @@ The repository is cleanly structured into focused subsystems, separating fronten
 
 ```
 KrishYantra/
-├── frontend/                   # Next.js 16 (Turbopack) Farmer PWA & Decision Platform (60 routes)
+├── frontend/                   # Next.js 16 (Turbopack) Farmer PWA & Decision Platform (58 routes)
 ├── backend/                    # Python FastAPI service & Vertex AI Cloud ML bridge
 ├── docs/                       # Centralized Documentation & Research Archive
 │   ├── architecture/           # System specifications, technical blueprints & algorithm papers
@@ -62,7 +61,7 @@ The core farmer-facing web application. Built with Next.js 16 App Router and sty
   - **Personalized Dosage**: Dynamic calculations based on **Field Size (Acres)** and **Soil Type** (Black Vertisol, Alluvial Loam, Sandy Loam, Red Soil).
   - **Zero-Cost Cultural Advisory**: A dedicated square card providing free cultural farming practices (evening furrow cooling irrigation, surface hoeing, organic mulching, W-pattern scouting).
 - [`frontend/src/app/impact/page.tsx`](frontend/src/app/impact/page.tsx): 3-Step Investment Story and Causal ROBI Calculator grounded in actual APMC Mandi benchmark rates (Sugarcane SAP @ ₹385/q, Cotton @ ₹7,450/q).
-- [`frontend/src/app/closed-loop/page.tsx`](frontend/src/app/closed-loop/page.tsx): Closed-loop remission engine with 48h follow-up and rotational rescue chemistry.
+- [`frontend/src/app/plant-intelligence/recovery/page.tsx`](frontend/src/app/plant-intelligence/recovery/page.tsx): Closed-loop remission engine with 48h follow-up and rotational rescue chemistry.
 - [`frontend/src/lib/farmerAdvisoryEngine.ts`](frontend/src/lib/farmerAdvisoryEngine.ts): Humanized advisory engine translating chemical formulations into plain language.
 - [`frontend/src/lib/usePipelinePrediction.ts`](frontend/src/lib/usePipelinePrediction.ts): Unified hook coordinating weather telemetry and ML inference with smart cache invalidation.
 
@@ -196,7 +195,7 @@ npm run dev -- -p 3001
 
 ## 🧪 Production Verification & Build Integrity
 
-To verify that all 60 static and dynamic routes compile without errors:
+To verify that all 58 static and dynamic routes compile without errors:
 
 ```bash
 cd frontend

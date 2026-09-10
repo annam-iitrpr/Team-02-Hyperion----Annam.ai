@@ -27,7 +27,7 @@ frontend/
 ├── public/                         # Static assets, SVG icons, logos, and PWA manifest
 ├── scripts/                        # Automated testing & scenario validation scripts
 └── src/
-    ├── app/                        # Next.js App Router (60 routes: pages & API handlers)
+    ├── app/                        # Next.js App Router (58 routes: pages & API handlers)
     │   ├── api/                    # Serverless API endpoints
     │   │   ├── chat/               # Voice & multimodal Gemini chat handlers
     │   │   ├── crops/              # Crop detection & regional databases
@@ -39,7 +39,6 @@ frontend/
     │   │   ├── pipeline/           # Vertex AI ML pipeline coordination endpoints
     │   │   └── plant-intelligence/ # Diagnostics & prescription inference APIs
     │   ├── assistant/              # Multilingual Voice & Chat Agronomist Assistant
-    │   ├── closed-loop/            # Closed-Loop Crop Remission & Recovery Engine
     │   ├── dashboard/              # Primary Farmer Telemetry & Farm Health Dashboard
     │   ├── diagnostics/            # 14-Day Multi-Stress Biophysical Risk Matrix
     │   ├── fields/                 # Interactive Satellite Geofencing & Polygon Mapping
@@ -60,7 +59,6 @@ frontend/
     │   ├── robi/                   # Direct Return on Biological Investment Deep Dive
     │   ├── settings/               # Feature flags, notification channels & language preferences
     │   ├── weather/                # 14-day agricultural weather forecast with Delta-T alerts
-    │   ├── what-if/                # Interactive Spray Timing Scenario Simulator
     │   └── yield/                  # Yield regression & harvest forecast engine
     ├── components/                 # Reusable UI primitives & feature modules
     │   ├── AppShell.tsx            # Main responsive layout shell with navigation
