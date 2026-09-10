@@ -19,6 +19,47 @@ import {
   Sparkles, ArrowRight, Sun, RefreshCw, Edit3, Sprout, CheckCircle2, Mic, TrendingUp, MapPin
 } from "lucide-react";
 
+interface CropEconomicProfile {
+  baseYieldQtlPerAcre: number;
+  preservedYieldQtlPerAcre: number;
+  typicalProductCostPerAcre: number;
+}
+
+function getCropEconomicProfile(cropName: string): CropEconomicProfile {
+  const c = (cropName || "").toLowerCase();
+  if (c.includes("sugarcane") || c.includes("ganna")) {
+    return { baseYieldQtlPerAcre: 350, preservedYieldQtlPerAcre: 12.0, typicalProductCostPerAcre: 480 };
+  }
+  if (c.includes("cotton") || c.includes("kapas")) {
+    return { baseYieldQtlPerAcre: 10, preservedYieldQtlPerAcre: 1.1, typicalProductCostPerAcre: 450 };
+  }
+  if (c.includes("rice") || c.includes("paddy") || c.includes("dhan")) {
+    return { baseYieldQtlPerAcre: 24, preservedYieldQtlPerAcre: 1.6, typicalProductCostPerAcre: 420 };
+  }
+  if (c.includes("wheat") || c.includes("gehu")) {
+    return { baseYieldQtlPerAcre: 20, preservedYieldQtlPerAcre: 1.4, typicalProductCostPerAcre: 390 };
+  }
+  if (c.includes("soybean") || c.includes("soya")) {
+    return { baseYieldQtlPerAcre: 10, preservedYieldQtlPerAcre: 0.95, typicalProductCostPerAcre: 420 };
+  }
+  if (c.includes("maize") || c.includes("makka")) {
+    return { baseYieldQtlPerAcre: 25, preservedYieldQtlPerAcre: 1.8, typicalProductCostPerAcre: 400 };
+  }
+  if (c.includes("mustard") || c.includes("sarson")) {
+    return { baseYieldQtlPerAcre: 8, preservedYieldQtlPerAcre: 0.75, typicalProductCostPerAcre: 380 };
+  }
+  if (c.includes("chana") || c.includes("gram") || c.includes("pulse") || c.includes("arhar") || c.includes("moong")) {
+    return { baseYieldQtlPerAcre: 7.5, preservedYieldQtlPerAcre: 0.7, typicalProductCostPerAcre: 400 };
+  }
+  if (c.includes("potato") || c.includes("aalu")) {
+    return { baseYieldQtlPerAcre: 120, preservedYieldQtlPerAcre: 8.0, typicalProductCostPerAcre: 600 };
+  }
+  if (c.includes("tomato") || c.includes("tamatar") || c.includes("onion") || c.includes("pyaz") || c.includes("vegetable")) {
+    return { baseYieldQtlPerAcre: 130, preservedYieldQtlPerAcre: 9.0, typicalProductCostPerAcre: 650 };
+  }
+  return { baseYieldQtlPerAcre: 16, preservedYieldQtlPerAcre: 1.2, typicalProductCostPerAcre: 420 };
+}
+
 export default function DashboardPage() {
   const { language } = useLanguage();
   const { weather, refetch, setCustomCoordinates } = useWeather();
@@ -121,16 +162,21 @@ export default function DashboardPage() {
   const mandiRateObj = findCropMandiRate(currentCrop, currentDistrict, currentState);
   const currentMandiPrice = mandiRateObj?.modalPrice || 2150;
 
+  const cropProfile = getCropEconomicProfile(currentCrop);
+  const totalEstimatedHarvestQuintals = Math.round(cropProfile.baseYieldQtlPerAcre * currentAcres);
+  const totalEstimatedHarvestValue = Math.round(currentMandiPrice * totalEstimatedHarvestQuintals);
+
   const roi = calculateDeterministicROI({
     acres: currentAcres,
     mandiPricePerQtl: currentMandiPrice,
-    preservedYieldQtlPerAcre: 0.52,
-    productCostPerAcre: 420,
+    preservedYieldQtlPerAcre: cropProfile.preservedYieldQtlPerAcre,
+    productCostPerAcre: cropProfile.typicalProductCostPerAcre,
     labourCostPerAcre: 150,
     cropName: currentCrop,
   });
 
   const netProfitEst = roi.totalFieldNetProfit;
+  const protectedGross = roi.totalFieldProtectedGross;
 
   return (
     <AppShell>
@@ -384,21 +430,31 @@ export default function DashboardPage() {
                 <span className="text-[10px] text-slate-500 font-sans">/quintal</span>
               </div>
               <div className="flex items-center justify-between text-[11px] text-slate-600 font-sans">
-                <span>{currentAcres}-Ac Harvest: ~₹{(currentMandiPrice * currentAcres * 9).toLocaleString("en-IN")}</span>
-                <span className="font-bold text-[#2d6a4f]">+₹{netProfitEst.toLocaleString("en-IN")} Protected Gain</span>
+                <span>{currentAcres}-Ac Harvest: ~₹{totalEstimatedHarvestValue.toLocaleString("en-IN")}</span>
+                <span className={`font-bold ${netProfitEst >= 0 ? "text-[#2d6a4f]" : "text-amber-700"}`}>
+                  {netProfitEst >= 0
+                    ? `+₹${netProfitEst.toLocaleString("en-IN")} Net Gain`
+                    : `₹${protectedGross.toLocaleString("en-IN")} Value Protected`}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         {/* 🌟 2. Detailed 4-Card 2x2 Agro-Science Telemetry Grid (Screenshot 1 bottom) */}
-        <FieldAgroTelemetryGrid weather={weather} district={currentDistrict} />
+        <FieldAgroTelemetryGrid
+          weather={weather}
+          district={currentDistrict}
+          crop={currentCrop}
+          acres={currentAcres}
+        />
 
         {/* 🌟 3. Active Syngenta Mandi Offers (Screenshot 2) */}
         <SyngentaMandiOffers
           district={currentDistrict}
           crop={currentCrop}
           acres={currentAcres}
+          weather={weather}
         />
 
         {/* 🌟 4. Clean Connected Farm Workflows Ribbon (Simple words, Krishyantra Theme) */}

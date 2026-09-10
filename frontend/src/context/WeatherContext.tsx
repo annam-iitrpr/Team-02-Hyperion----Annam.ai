@@ -29,6 +29,12 @@ export interface WeatherData {
   nightStressDegreeHours: number; // Real Degree-Hours > 25°C
   soilMoistureEst: number;      // Real measured soil moisture %
   soilTemperatureReal: number;  // Real measured soil temperature °C
+  dayMaxTemperature?: number;   // Real peak daytime temperature °C
+  dayMinTemperature?: number;   // Real minimum night temperature °C
+  precipitationSum24h?: number; // Real 24h cumulative precipitation mm
+  rootZoneSoilMoisture?: number;// Real measured subsoil moisture (9-27cm) %
+  rootZoneSoilTemp?: number;    // Real measured subsoil temp (6cm) °C
+  vpdKpa?: number;              // Real Vapor Pressure Deficit kPa
   precipitationProbability: number; // % probability
   locationName: string;         // reverse-geocoded city/district
   village?: string;
@@ -93,6 +99,12 @@ const DEFAULT_WEATHER: WeatherData = {
   nightStressDegreeHours: 0,
   soilMoistureEst: 44,
   soilTemperatureReal: 24.2,
+  dayMaxTemperature: 32.5,
+  dayMinTemperature: 22.4,
+  precipitationSum24h: 0,
+  rootZoneSoilMoisture: 38,
+  rootZoneSoilTemp: 25.4,
+  vpdKpa: 1.4,
   precipitationProbability: 10,
   locationName: "Detecting Location...",
   village: "",
@@ -195,7 +207,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const effectiveState = overrideState || geo.state || "India";
 
       // Fetch Real Telemetry from Open-Meteo with live cache-busting
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,soil_temperature_0cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=2`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,soil_temperature_0cm,soil_temperature_6cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm,soil_moisture_9_to_27cm,vapour_pressure_deficit&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=2`;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error("Open-Meteo fetch failed");
       const data = await res.json();
@@ -206,6 +218,9 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const hourlyTemps: number[] = h.temperature_2m || [];
       const hourlySoilM: number[] = h.soil_moisture_0_to_1cm || [];
       const hourlySoilT: number[] = h.soil_temperature_0cm || [];
+      const hourlyDeepSoilM: number[] = h.soil_moisture_9_to_27cm || [];
+      const hourlyDeepSoilT: number[] = h.soil_temperature_6cm || [];
+      const hourlyVpd: number[] = h.vapour_pressure_deficit || [];
       const hourlyPrecipProb: number[] = h.precipitation_probability || [];
 
       // Extract the 8-hour agricultural nocturnal respiration window (22:00 - 06:00)
@@ -258,6 +273,30 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ? Math.round(hourlySoilT[0] * 10) / 10
         : Math.round((c.temperature_2m + 1.2) * 10) / 10;
 
+      const dailyMaxTemp = data.daily?.temperature_2m_max?.[0] != null
+        ? Math.round(data.daily.temperature_2m_max[0] * 10) / 10
+        : Math.round(c.temperature_2m * 10) / 10;
+
+      const dailyMinTemp = data.daily?.temperature_2m_min?.[0] != null
+        ? Math.round(data.daily.temperature_2m_min[0] * 10) / 10
+        : realNightMin;
+
+      const dailyPrecipSum = data.daily?.precipitation_sum?.[0] != null
+        ? Number(data.daily.precipitation_sum[0].toFixed(1))
+        : c.precipitation;
+
+      const rootZoneMoistureVal = hourlyDeepSoilM.length > 0
+        ? Math.round(hourlyDeepSoilM[0] * 100)
+        : Math.min(55, Math.max(18, Math.round(soilMoistureVal * 1.25)));
+
+      const rootZoneSoilTempVal = hourlyDeepSoilT.length > 0
+        ? Math.round(hourlyDeepSoilT[0] * 10) / 10
+        : Math.round((soilTempVal + 1.2) * 10) / 10;
+
+      const vpdVal = hourlyVpd.length > 0
+        ? Math.round(hourlyVpd[0] * 10) / 10
+        : Number((0.61078 * Math.exp((17.27 * c.temperature_2m) / (c.temperature_2m + 237.3)) * (1 - c.relative_humidity_2m / 100)).toFixed(1));
+
       const precipProbVal = hourlyPrecipProb.length > 0 ? hourlyPrecipProb[0] : 10;
       const wmoData = WMO_DESCRIPTIONS[c.weather_code] || { desc: "Clear", emoji: "☀️" };
 
@@ -288,6 +327,12 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         nightStressDegreeHours: Math.round(totalDegreeHours * 10) / 10,
         soilMoistureEst: soilMoistureVal,
         soilTemperatureReal: soilTempVal,
+        dayMaxTemperature: dailyMaxTemp,
+        dayMinTemperature: dailyMinTemp,
+        precipitationSum24h: dailyPrecipSum,
+        rootZoneSoilMoisture: rootZoneMoistureVal,
+        rootZoneSoilTemp: rootZoneSoilTempVal,
+        vpdKpa: vpdVal,
         precipitationProbability: precipProbVal,
         locationName: displayLocationName,
         village: geo.village,

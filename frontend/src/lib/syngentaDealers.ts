@@ -524,6 +524,8 @@ export function getNearbySyngentaDealers(districtName: string = "Bhopal", userLa
   ];
 }
 
+export const getSyngentaDealersForDistrict = getNearbySyngentaDealers;
+
 /**
  * Get active localized Syngenta deals
  */
