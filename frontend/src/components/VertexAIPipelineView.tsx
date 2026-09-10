@@ -109,7 +109,7 @@ export function VertexAIPipelineView() {
   // Educational Preview for non-logged-in visitors (Feature Tour Mode)
   const loadEducationalPreview = (targetLang?: string) => {
     const activeLang = targetLang || language || "en";
-    const isHindi = ["hi", "mr", "gu", "pa"].includes(activeLang);
+    const isHindi = activeLang === "hi";
     setData({
       farmer_name: isHindi ? "किसान प्रोफ़ाइल (फ़ीचर टूर पूर्वावलोकन)" : "Farmer Profile (Feature Tour Mode)",
       farmer_id: "preview-guest-001",

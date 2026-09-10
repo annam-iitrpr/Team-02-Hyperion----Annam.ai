@@ -155,7 +155,7 @@ const PHASES: PlantPhase[] = [
 
 export const LiveFarmSimulator: React.FC = () => {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const [phaseIndex, setPhaseIndex] = useState(0);
 

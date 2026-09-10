@@ -216,17 +216,50 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [language]);
 
   const setLanguage = (lang: string) => {
-    // 1. Instant React state update (0ms latency for all React components)
+    if (typeof window === "undefined") return;
+
+    // 1. Instant React state update
     setLanguageState(lang);
     setIsChangingLanguage(true);
-    setTimeout(() => setIsChangingLanguage(false), 300);
 
-    // 2. Persist in profile
+    // 2. Persist in profile and explicit language storage
     const profile = getStoredProfile();
     saveProfile({ ...profile, language: lang });
+    try {
+      localStorage.setItem("aasra_selected_language", lang);
+    } catch {}
 
-    // 3. Drive Google Translate rapidly
+    // 3. Set googtrans cookie across all domain levels for Google Translate
+    const hostname = window.location.hostname;
+    const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+    const domains = ["", hostname, `.${hostname}`];
+    if (!isLocal) {
+      const parts = hostname.split(".");
+      if (parts.length >= 2) {
+        domains.push(`.${parts.slice(-2).join(".")}`);
+      }
+    }
+
+    if (lang === "en") {
+      domains.forEach((d) => {
+        const dAttr = d ? `; domain=${d}` : "";
+        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${dAttr}`;
+        document.cookie = `googtrans=/auto/en; path=/${dAttr}`;
+      });
+    } else {
+      const cookieValue = `/auto/${lang}`;
+      domains.forEach((d) => {
+        const dAttr = d ? `; domain=${d}` : "";
+        document.cookie = `googtrans=${cookieValue}; path=/;${dAttr}`;
+      });
+    }
+
+    // 4. Drive Google Translate combo and perform a clean, swift reload to guarantee 100% of the entire page changes to that single language
     applyGoogleTranslate(lang);
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 120);
   };
 
   const t = getTranslation(language);

@@ -20,7 +20,7 @@ export function SyngentaMandiOffers({
   weather,
 }: SyngentaMandiOffersProps) {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
   const activeDistrict = district || "Bhopal";
   const numAcres = Math.max(acres || 1, 0.5);
   const currentTemp = weather?.temperature || 31;

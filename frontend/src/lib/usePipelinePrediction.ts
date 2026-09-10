@@ -94,14 +94,14 @@ export function usePipelinePrediction() {
   const growthStage = activeFarm?.growthStage || profile?.growthStage || "Flowering / Bloom";
   const farmerName = profile?.fullName || "Farmer Friend";
 
-  // Stable key representing the current farm+crop combination
-  const farmCropKey = `${farmId}::${crop}::${district}::${acres}`;
+  // Stable key representing the current farm+crop+language combination
+  const farmCropKey = `${farmId}::${crop}::${district}::${acres}::${language}`;
 
   const fetchPrediction = useCallback(async (forceFresh = false) => {
     setLoading(true);
     setError(null);
 
-    const cacheKey = `${CACHE_PREFIX}${farmId}_${crop}_${district}_${acres}`;
+    const cacheKey = `${CACHE_PREFIX}${farmId}_${crop}_${district}_${acres}_${language}`;
 
     // Determine if this is a new farm/crop — if so, always skip cache
     const isNewFarmOrCrop = prevFarmCropKeyRef.current !== "" && prevFarmCropKeyRef.current !== farmCropKey;
@@ -529,10 +529,14 @@ export function usePipelinePrediction() {
       return;
     }
 
-    const isHindi = language === "hi";
+    const langCode = (language || "en").toLowerCase();
     const primaryStress = (data as any)?.primary_stress || data?.model1_risk?.stress_type || "Thermal Heat Stress";
     const isDrought = primaryStress.toLowerCase().includes("drought");
     const isCane = (crop || "").toLowerCase().includes("sugarcane") || (crop || "").toLowerCase().includes("गन्ना");
+
+    // Dynamic localized statement from backend pipeline supporting all 12 Indian languages
+    const stmtKey = `statement_${langCode}`;
+    const dynamicStatement = (data?.gemini_statement as any)?.[stmtKey] || data?.gemini_statement?.statement;
 
     const fallbackHi = isDrought
       ? `आपके ${acres} एकड़ ${crop} के खेत में सूखा तनाव का खतरा है। ${isCane ? "हल्की सिंचाई और सिंजेंटा इसाबियन" : "मृदा नमी संरक्षण और तनाव निवारक"} का प्रयोग करें।`
@@ -546,12 +550,25 @@ export function usePipelinePrediction() {
       ? `Stress detected on your ${acres} acre sugarcane crop. Foliar spray of Syngenta Isabion at 400 ml per acre recommended in late evening.`
       : `${primaryStress} risk detected on your ${acres} acre ${crop} crop. Apply recommended foliar protectant in the late evening.`;
 
-    const textToSpeak = isHindi
-      ? data?.gemini_statement?.statement_hi || fallbackHi
-      : data?.gemini_statement?.statement_en || fallbackEn;
+    const textToSpeak = dynamicStatement || (langCode === "hi" ? fallbackHi : fallbackEn);
+
+    const speechLangMap: Record<string, string> = {
+      hi: "hi-IN",
+      mr: "mr-IN",
+      pa: "pa-IN",
+      gu: "gu-IN",
+      te: "te-IN",
+      ta: "ta-IN",
+      kn: "kn-IN",
+      ml: "ml-IN",
+      bn: "bn-IN",
+      or: "or-IN",
+      as: "as-IN",
+      en: "en-IN",
+    };
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = isHindi ? "hi-IN" : "en-IN";
+    utterance.lang = speechLangMap[langCode] || "en-IN";
     utterance.rate = 0.95;
 
     utterance.onend = () => setIsSpeaking(false);

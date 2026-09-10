@@ -66,7 +66,7 @@ export const SyngentaDealerLocator: React.FC<SyngentaDealerLocatorProps> = ({
   compact = false,
 }) => {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   // Dynamic Location & Farmer State
   const [currentDistrict, setCurrentDistrict] = useState<string>(initialDistrict || "Sehore");

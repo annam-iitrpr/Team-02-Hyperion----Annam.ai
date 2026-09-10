@@ -202,7 +202,7 @@ const DEFAULT_REGIONAL_CROPS: RegionalCropOption[] = [
 export default function SignupPage() {
   const router = useRouter();
   const { language, setLanguage } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);

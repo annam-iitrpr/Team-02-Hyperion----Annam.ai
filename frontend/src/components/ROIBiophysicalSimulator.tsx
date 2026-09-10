@@ -161,7 +161,7 @@ const INDUSTRY_CROP_BENCHMARKS: CropBenchmark[] = [
 
 export function ROIBiophysicalSimulator() {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Auto-play state

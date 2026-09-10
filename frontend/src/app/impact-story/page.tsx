@@ -403,7 +403,7 @@ const INITIAL_FARMER_REVIEWS: FarmerReview[] = [
 
 export default function ImpactStoryPage() {
   const { language } = useLanguage();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
   // Active Story Index & Progression

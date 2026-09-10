@@ -20,7 +20,7 @@ interface RealtimePermissionsHubProps {
 export function RealtimePermissionsHub({ onLocationUpdated }: RealtimePermissionsHubProps) {
   const { language } = useLanguage();
   const { setCustomCoordinates } = useWeather();
-  const isHindi = ["hi", "mr", "gu", "pa"].includes(language);
+  const isHindi = language === "hi";
 
   const [locationStatus, setLocationStatus] = useState<"granted" | "prompt" | "denied">("prompt");
   const [micStatus, setMicStatus] = useState<"granted" | "prompt" | "denied">("prompt");
