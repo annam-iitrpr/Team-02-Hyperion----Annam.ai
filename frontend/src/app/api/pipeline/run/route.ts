@@ -291,12 +291,18 @@ function executeResilientAgronomicPipeline(body: Record<string, any>, weather: R
     ? `Optimal Window for ${topRecommendations[0].name} in ${district}`
     : `Advisory: Hold Spray Window in ${district} (${safetyReasons[0].slice(0, 45)}...)`;
 
+  const isStressActive = m1StressClass > 0 && !/optimal|no severe stress|none|safe/i.test(m1StressType);
+
   const statementEn = isSpraySafe
-    ? `Biophysical models indicate favorable spray conditions (Delta-T: ${deltaT}°C, Wind: ${windSpeed} km/h). Applying ${topRecommendations[0].name} now triggers heat shock protein synthesis to safeguard against ${m1StressType}. Counterfactual causal gain: +${causalGainTau} Q/Acre with projected net return of ₹${netProfit.toLocaleString("en-IN")}.`
+    ? isStressActive
+      ? `Biophysical models indicate favorable spray conditions (Delta-T: ${deltaT}°C, Wind: ${windSpeed} km/h). Applying ${topRecommendations[0].name} now triggers heat shock protein synthesis to safeguard against ${m1StressType}. Counterfactual causal gain: +${causalGainTau} Q/Acre with projected net return of ₹${netProfit.toLocaleString("en-IN")}.`
+      : `Biophysical models indicate favorable spray conditions (Delta-T: ${deltaT}°C, Wind: ${windSpeed} km/h) with optimal crop conditions and no severe stress. Maintenance spray of ${topRecommendations[0].name} sustains photosynthetic vigor and crop resilience. Counterfactual causal gain: +${causalGainTau} Q/Acre with projected net return of ₹${netProfit.toLocaleString("en-IN")}.`
     : `Foliar spray is currently gated due to biophysical stress: ${safetyReasons[0]}. Re-evaluate window during cooler evening or tomorrow dawn. Anticipated causal gain upon proper application: +${causalGainTau} Q/Acre (+₹${revenueSavedPerAcre.toLocaleString("en-IN")}/acre).`;
 
   const statementHi = isSpraySafe
-    ? `बायोफिजिकल मॉडल अनुकूल छिड़काव की पुष्टि करते हैं (डेल्टा-टी: ${deltaT}°C, हवा: ${windSpeed} किमी/घंटा)। ${m1StressType} से बचाव के लिए ${topRecommendations[0].name} का तुरंत छिड़काव करें। अनुमानित अतिरिक्त उपज: +${causalGainTau} क्विंटल/एकड़, शुद्ध लाभ: ₹${netProfit.toLocaleString("en-IN")}।`
+    ? isStressActive
+      ? `बायोफिजिकल मॉडल अनुकूल छिड़काव की पुष्टि करते हैं (डेल्टा-टी: ${deltaT}°C, हवा: ${windSpeed} किमी/घंटा)। ${m1StressType} से बचाव के लिए ${topRecommendations[0].name} का तुरंत छिड़काव करें। अनुमानित अतिरिक्त उपज: +${causalGainTau} क्विंटल/एकड़, शुद्ध लाभ: ₹${netProfit.toLocaleString("en-IN")}।`
+      : `बायोफिजिकल मॉडल अनुकूल छिड़काव की पुष्टि करते हैं (डेल्टा-टी: ${deltaT}°C, हवा: ${windSpeed} किमी/घंटा) एवं फसल सुरक्षित अवस्था में है। ${topRecommendations[0].name} फसल की हरियाली व शक्ति को बनाए रखने में सहायक है। अनुमानित अतिरिक्त उपज: +${causalGainTau} क्विंटल/एकड़, शुद्ध लाभ: ₹${netProfit.toLocaleString("en-IN")}।`
     : `वर्तमान में छिड़काव रोका गया है: ${safetyReasons[0]}। ठंडे समय या कल सुबह दोबारा जांचें। सुरक्षित छिड़काव से अनुमानित बचत: ₹${revenueSavedPerAcre.toLocaleString("en-IN")} प्रति एकड़।`;
 
   // ─────────────────────────────────────────────────────────────

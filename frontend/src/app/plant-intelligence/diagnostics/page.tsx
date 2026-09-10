@@ -63,6 +63,11 @@ export default function DiagnosticsCategoryPage() {
   const stressType = data?.model1_risk?.stress_type || "Optimal / No Severe Stress";
   const tele = data?.telemetry_summary;
 
+  const isOptimalOrNoStress =
+    data?.model1_risk?.stress_class === 0 ||
+    /optimal|no severe stress|no stress|none|safe|healthy/i.test(stressType);
+  const hasActualStress = !isOptimalOrNoStress;
+
   const activeDayData =
     fourteenDayStress.find((d) => d.dayIndex === selectedDayIdx) || fourteenDayStress[0];
 
@@ -128,7 +133,11 @@ export default function DiagnosticsCategoryPage() {
               </div>
               
               <h1 className="text-2xl sm:text-4xl font-black font-display text-[#11261f] tracking-tight flex items-center gap-2.5">
-                <ShieldAlert className="h-7 w-7 text-rose-600 shrink-0" />
+                {hasActualStress ? (
+                  <ShieldAlert className="h-7 w-7 text-rose-600 shrink-0" />
+                ) : (
+                  <CheckCircle2 className="h-7 w-7 text-emerald-600 shrink-0" />
+                )}
                 <span>
                   {isHindi
                     ? `फसल समस्या निदान — ${crop}`
@@ -185,15 +194,25 @@ export default function DiagnosticsCategoryPage() {
           </div>
 
           {/* ── REAL-TIME MODEL 1 RISK BANNER ── */}
-          <div className="bg-gradient-to-r from-rose-50/80 via-white to-amber-50/60 border border-rose-200/80 rounded-3xl p-5 sm:p-7 shadow-xs">
+          <div className={`rounded-3xl p-5 sm:p-7 shadow-xs border transition-all ${
+            hasActualStress
+              ? "bg-gradient-to-r from-rose-50/80 via-white to-amber-50/60 border-rose-200/80"
+              : "bg-gradient-to-r from-emerald-50/80 via-white to-teal-50/60 border-emerald-200/90"
+          }`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3.5">
-                <div className="p-3 rounded-2xl bg-rose-600 text-white shrink-0 shadow-sm mt-0.5">
-                  <Flame className="h-6 w-6" />
+                <div className={`p-3 rounded-2xl text-white shrink-0 shadow-sm mt-0.5 ${
+                  hasActualStress ? "bg-rose-600" : "bg-emerald-600"
+                }`}>
+                  {hasActualStress ? <Flame className="h-6 w-6" /> : <CheckCircle2 className="h-6 w-6" />}
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-mono font-black uppercase tracking-wider bg-rose-100 text-rose-800 px-2.5 py-0.5 rounded-full">
+                    <span className={`text-[10px] font-mono font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                      hasActualStress
+                        ? "bg-rose-100 text-rose-800"
+                        : "bg-emerald-100 text-emerald-800"
+                    }`}>
                       MODEL 1 HORIZON FORECAST (XGBOOST)
                     </span>
                     <span className="text-xs text-slate-500 font-mono font-medium">
@@ -206,19 +225,29 @@ export default function DiagnosticsCategoryPage() {
                   <p className="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
                     {isHindi
                       ? data?.gemini_statement?.statement_hi ||
-                        `आपके ${acres} एकड़ ${crop} के खेत में मॉडल 1 के अनुसार थर्मल तनाव का अनुमान लगाया गया है। रात के तापमान व आर्द्रता के आधार पर फसल की सुरक्षा हेतु समय पर कदम उठाएं।`
+                        (hasActualStress
+                          ? `आपके ${acres} एकड़ ${crop} के खेत में मॉडल 1 के अनुसार ${stressType} का अनुमान लगाया गया है। रात के तापमान व आर्द्रता के आधार पर फसल की सुरक्षा हेतु समय पर कदम उठाएं।`
+                          : `मॉडल 1 के अनुसार ${district} में आपके ${acres} एकड़ ${crop} के खेत में मौसम अनुकूल है और किसी गंभीर तनाव का कोई जोखिम नहीं है।`)
                       : data?.gemini_statement?.statement_en ||
-                        `Model 1 predicts ${stressType} on your ${acres} acre ${crop} field in ${district}. Nocturnal degrees and biophysical gates are being monitored in real time.`}
+                        (hasActualStress
+                          ? `Model 1 predicts ${stressType} on your ${acres} acre ${crop} field in ${district}. Nocturnal degrees and biophysical gates are being monitored in real time.`
+                          : `Model 1 confirms optimal growing conditions with no severe stress on your ${acres} acre ${crop} field in ${district}. Biophysical conditions remain favorable.`)}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white/90 border border-slate-200 rounded-2xl p-4 sm:px-6 sm:py-4 text-center shrink-0 min-w-[150px] shadow-2xs">
-                <div className="text-3xl sm:text-4xl font-mono font-black text-rose-600">
+              <div className={`rounded-2xl p-4 sm:px-6 sm:py-4 text-center shrink-0 min-w-[150px] shadow-2xs bg-white/90 border ${
+                hasActualStress ? "border-rose-200" : "border-emerald-200"
+              }`}>
+                <div className={`text-3xl sm:text-4xl font-mono font-black ${
+                  hasActualStress ? "text-rose-600" : "text-emerald-600"
+                }`}>
                   {riskPct}%
                 </div>
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-0.5">
-                  {isHindi ? "मॉडल 1 जोखिम स्तर" : "Peak Model 1 Probability"}
+                  {hasActualStress
+                    ? (isHindi ? "मॉडल 1 जोखिम स्तर" : "Peak Model 1 Probability")
+                    : (isHindi ? "मॉडल 1 अनुकूलता स्कोर" : "Optimal Condition Score")}
                 </div>
               </div>
             </div>
@@ -468,8 +497,10 @@ export default function DiagnosticsCategoryPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             {/* WHAT */}
             <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-6 shadow-[0_4px_24px_rgba(27,67,50,0.04)] space-y-2.5">
-              <div className="flex items-center gap-2 text-rose-600 font-bold text-xs uppercase tracking-wider">
-                <span className="h-2.5 w-2.5 rounded-full bg-rose-500" />
+              <div className={`flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${
+                hasActualStress ? "text-rose-600" : "text-emerald-700"
+              }`}>
+                <span className={`h-2.5 w-2.5 rounded-full ${hasActualStress ? "bg-rose-500" : "bg-emerald-500"}`} />
                 <span>{isHindi ? "1. क्या हो रहा है? (WHAT IS HAPPENING?)" : "1. What is Happening?"}</span>
               </div>
               <h3 className="text-base sm:text-lg font-black text-[#11261f] font-display">

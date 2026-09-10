@@ -74,6 +74,10 @@ export default function PlantIntelligencePage() {
     : 92;
 
   const stressType = data?.model1_risk?.stress_type || (isHindi ? "थर्मल हीट शॉक" : "Thermal Heat Stress");
+  const isOptimalOrNoStress =
+    data?.model1_risk?.stress_class === 0 ||
+    /optimal|no severe stress|no stress|none|safe|healthy/i.test(stressType);
+  const hasActualStress = !isOptimalOrNoStress;
 
   const topRec = data?.model3_portfolio?.top_recommendations?.[0] || data?.model3_portfolio?.primary_recommendation;
   const primaryProduct = topRec?.name || "Syngenta Quantis®";
@@ -225,15 +229,23 @@ export default function PlantIntelligencePage() {
             {/* 6 Real Telemetry Metric Cells matching dashboard layout */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono text-xs">
               {/* 1. Stress Risk */}
-              <div className="bg-[#fbfcf8] p-4 rounded-2xl border border-[#e8ede4] space-y-1 hover:border-[#2d6a4f]/40 transition-all shadow-2xs">
+              <div className={`p-4 rounded-2xl border space-y-1 transition-all shadow-2xs ${
+                hasActualStress
+                  ? "bg-rose-50/50 border-rose-200"
+                  : "bg-[#fbfcf8] border-[#e8ede4] hover:border-[#2d6a4f]/40"
+              }`}>
                 <span className="text-slate-500 block text-[10px] font-bold tracking-wider uppercase font-sans">
-                  {isHindi ? "तनाव जोखिम" : "Stress Risk"}
+                  {hasActualStress ? (isHindi ? "तनाव जोखिम" : "Stress Risk") : (isHindi ? "फसल स्थिति" : "Crop Condition")}
                 </span>
-                <div className="text-lg sm:text-xl font-extrabold text-rose-600">
+                <div className={`text-lg sm:text-xl font-extrabold ${
+                  hasActualStress ? "text-rose-600" : "text-emerald-700"
+                }`}>
                   {riskPct}%
                 </div>
-                <span className="text-[10px] text-rose-700 font-semibold flex items-center gap-1 font-sans truncate">
-                  <Flame className="h-3 w-3 shrink-0" />
+                <span className={`text-[10px] font-semibold flex items-center gap-1 font-sans truncate ${
+                  hasActualStress ? "text-rose-700" : "text-emerald-700"
+                }`}>
+                  {hasActualStress ? <Flame className="h-3 w-3 shrink-0" /> : <CheckCircle2 className="h-3 w-3 shrink-0" />}
                   <span>{stressType}</span>
                 </span>
               </div>
