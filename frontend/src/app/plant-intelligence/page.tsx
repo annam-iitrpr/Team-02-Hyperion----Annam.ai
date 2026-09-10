@@ -80,8 +80,28 @@ export default function PlantIntelligencePage() {
   const hasActualStress = !isOptimalOrNoStress;
 
   const topRec = data?.model3_portfolio?.top_recommendations?.[0] || data?.model3_portfolio?.primary_recommendation;
-  const primaryProduct = topRec?.name || "Syngenta Quantis®";
-  const recommendedDosage = topRec?.recommended_dosage || "250 ml / Acre";
+  const isCane = (crop || "").toLowerCase().includes("sugarcane") || (crop || "").toLowerCase().includes("cane") || (crop || "").toLowerCase().includes("गन्ना");
+  const isRice = (crop || "").toLowerCase().includes("rice") || (crop || "").toLowerCase().includes("धान") || (crop || "").toLowerCase().includes("chawal");
+  const isCotton = (crop || "").toLowerCase().includes("cotton") || (crop || "").toLowerCase().includes("कपास");
+
+  const defaultCropProduct = isCane
+    ? "Syngenta Isabion®"
+    : isRice
+    ? "Syngenta Virtako®"
+    : isCotton
+    ? "Syngenta Quantis®"
+    : "Syngenta Isabion®";
+
+  const defaultCropDosage = isCane
+    ? "400 ml / Acre"
+    : isRice
+    ? "2.5 kg / Acre (soil) / 100 ml / Acre"
+    : isCotton
+    ? "300 ml / Acre"
+    : "250 ml / Acre";
+
+  const primaryProduct = topRec?.name || defaultCropProduct;
+  const recommendedDosage = topRec?.recommended_dosage || defaultCropDosage;
 
   const causalGainQ = data?.model6_causal_robi?.causal_gain_tau_q_acre || 1.38;
   const baselineYield = data?.model5_baseline?.expected_baseline_yield_q_acre || 7.4;

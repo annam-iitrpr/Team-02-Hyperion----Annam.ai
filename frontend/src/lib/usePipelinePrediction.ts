@@ -166,6 +166,14 @@ export function usePipelinePrediction() {
 
     const today = new Date();
 
+    const primaryStress = data?.model1_risk?.stress_type || "";
+    const primaryConfidence = data?.model1_risk?.confidence || 0.89;
+    const primaryRiskPct = Math.round(primaryConfidence * 100);
+    const primaryLossQ = Number((data?.model6_causal_robi?.causal_gain_tau_q_acre || 0.85).toFixed(2));
+    const soilMoistureVal = data?.telemetry_summary?.soil_moisture_pct ?? weather?.soilMoistureEst ?? 18;
+    const isDroughtScenario = primaryStress.toLowerCase().includes("drought") || soilMoistureVal < 20;
+    const isCane = (crop || "").toLowerCase().includes("sugarcane") || (crop || "").toLowerCase().includes("ganna");
+
     // Generate 14 day rolling horizon using weather telemetry curve
     for (let i = 0; i < 14; i++) {
       const d = new Date(today);
@@ -181,40 +189,65 @@ export function usePipelinePrediction() {
       const vpd = Math.round((0.6108 * Math.exp((17.27 * tMax) / (tMax + 237.3)) * 0.48) * 10) / 10;
       const rainProb = Math.max(5, Math.min(85, Math.round(15 + Math.cos(i) * 20)));
 
-      let stressType = "Optimal Weather Window";
-      let stressTypeHi = "अनुकूल मौसम अवधि (फसल सुरक्षित)";
-      let riskPct = 15;
+      let stressNameEn = "Optimal / Safe Crop";
+      let stressNameHi = "अनुकूल / सुरक्षित फसल";
+      let riskPct = 12;
       let severity: "critical" | "warning" | "moderate" | "safe" = "safe";
       let whatWillBeLostEn = "Weather is within safe biophysical thresholds. Canopy cellular respiration is active with zero yield loss expected.";
       let whatWillBeLostHi = "मौसम पूरी तरह अनुकूल और सुरक्षित सीमाओं में है। फसल की वृद्धि सामान्य रहेगी और शून्य उपज हानि का अनुमान है।";
       let lossQtlAcre = 0.0;
 
-      if (tMin >= 25.0 && tMax >= 34.0) {
-        stressType = "Nocturnal Heat Shock";
-        stressTypeHi = "रात का अत्यधिक तापमान तनाव";
+      // 1. Drought Stress Priority (matches Model 1 detection or severe soil moisture depletion <20%)
+      if (isDroughtScenario) {
+        stressNameEn = "Drought Stress";
+        stressNameHi = "सूखा तनाव";
+        riskPct = Math.max(65, Math.min(95, primaryRiskPct - i * 2));
+        severity = riskPct >= 75 ? "critical" : "warning";
+        lossQtlAcre = Math.max(0.65, Number((primaryLossQ * (riskPct / 100)).toFixed(2)));
+        if (isCane) {
+          whatWillBeLostEn = `Soil moisture is severely depleted (<20%). High root zone water deficit arrests cane internode elongation and stalks dry out (~${lossQtlAcre} Q/acre risk).`;
+          whatWillBeLostHi = `जड़ क्षेत्र में मिट्टी की नमी की भारी कमी है (<20%)। सूखे के कारण गन्ने की पोरियों की वृद्धि रुकने और तना सूखने से लगभग ${lossQtlAcre} क्विंटल/एकड़ के नुकसान की आशंका है।`;
+        } else {
+          whatWillBeLostEn = `Soil moisture is depleted (<20% wilting buffer). Severe transpirational water deficit induces wilting and ~${lossQtlAcre} Q/acre loss if untreated.`;
+          whatWillBeLostHi = `मिट्टी में नमी की अत्यधिक कमी है (<20% सीमा)। पानी के भारी अभाव से पौधे मुरझाने और लगभग ${lossQtlAcre} क्विंटल/एकड़ के नुकसान का जोखिम है।`;
+        }
+      } else if (tMin >= 25.0) {
+        // 2. Nocturnal Heat Shock
+        stressNameEn = "Nocturnal Heat Shock";
+        stressNameHi = "रात का अत्यधिक तापमान तनाव";
         riskPct = Math.min(96, Math.round(84 + (tMin - 25) * 6));
         severity = "critical";
         lossQtlAcre = +(1.2 + (tMin - 24.5) * 0.3).toFixed(2);
-        whatWillBeLostEn = `Night temperatures exceed 25°C during flowering. Pollen sterility and dark respiration burn causes estimated ~${lossQtlAcre} Q/acre loss if untreated.`;
-        whatWillBeLostHi = `फूल आने के समय रात का तापमान 25°C से अधिक होने पर पराग बांझपन व श्वसन जलने से लगभग ${lossQtlAcre} क्विंटल/एकड़ के नुकसान का जोखिम है।`;
+        if (isCane) {
+          whatWillBeLostEn = `Night temperatures exceed 25°C. Excessive dark respiration burns cane sucrose reserves, causing estimated ~${lossQtlAcre} Q/acre loss if untreated.`;
+          whatWillBeLostHi = `रात का तापमान 25°C से अधिक रहने से गन्ने में सुक्रोज की कमी और श्वसन जलने से लगभग ${lossQtlAcre} क्विंटल/एकड़ नुकसान का जोखिम है।`;
+        } else {
+          whatWillBeLostEn = `Night temperatures exceed 25°C during flowering/pod stage. Pollen sterility and dark respiration burn causes estimated ~${lossQtlAcre} Q/acre loss if untreated.`;
+          whatWillBeLostHi = `फूल व दाना बनने के समय रात का तापमान 25°C से अधिक होने पर पराग बांझपन व श्वसन जलने से लगभग ${lossQtlAcre} क्विंटल/एकड़ के नुकसान का जोखिम है।`;
+        }
       } else if (tMax >= 36.0) {
-        stressType = "Peak Day Heat Scorch";
-        stressTypeHi = "दोपहर की भीषण गर्मी व लू";
+        // 3. Peak Day Heat Scorch
+        stressNameEn = "Peak Day Heat Scorch";
+        stressNameHi = "दोपहर की भीषण गर्मी व लू";
         riskPct = Math.min(90, Math.round(78 + (tMax - 35) * 5));
         severity = "warning";
         lossQtlAcre = 0.95;
-        whatWillBeLostEn = `Canopy temperature surpasses 36°C, inducing stomatal closure and membrane leakage (~0.95 Q/acre estimated risk).`;
+        whatWillBeLostEn = `Canopy temperature surpasses 36°C, inducing stomatal closure and leaf scorching (~0.95 Q/acre estimated risk).`;
         whatWillBeLostHi = `दोपहर का तापमान 36°C पार करने से पौधों के रंध्र बंद होने और झुलसने से लगभग 0.95 क्विंटल प्रति एकड़ नुकसान का जोखिम है।`;
       } else if (vpd >= 2.2) {
-        stressType = "Atmospheric Vapor Deficit";
-        stressTypeHi = "हवा में नमी की अत्यधिक कमी (VPD)";
+        // 4. Atmospheric Vapor Deficit
+        stressNameEn = "Atmospheric Vapor Deficit";
+        stressNameHi = "हवा में नमी की कमी (VPD)";
         riskPct = 68;
         severity = "moderate";
         lossQtlAcre = 0.65;
-        whatWillBeLostEn = `High VPD creates extreme transpirational demand, causing flower drop and moisture loss (~0.65 Q/acre estimated risk).`;
-        whatWillBeLostHi = `हवा में अत्यधिक सूखापन फूलों को झुलसाकर गिराने का जोखिम पैदा करता है (~0.65 क्विंटल/एकड़)।`;
+        whatWillBeLostEn = `High VPD creates extreme transpirational demand, causing foliage moisture stress (~0.65 Q/acre estimated risk).`;
+        whatWillBeLostHi = `हवा में अत्यधिक सूखापन पौधों से नमी खींचकर तनाव पैदा करता है (~0.65 क्विंटल/एकड़)।`;
       }
 
+      // Name format: Weather Window (Stress Name) as requested
+      const stressType = `Weather Window (${stressNameEn})`;
+      const stressTypeHi = `मौसम विंडो (${stressNameHi})`;
       const lossInrAcre = Math.round(lossQtlAcre * mandiRate);
 
       dailyList.push({
@@ -237,7 +270,7 @@ export function usePipelinePrediction() {
     }
 
     return dailyList;
-  }, [weather, data]);
+  }, [weather, data, crop]);
 
   // Voice narration helper using browser SpeechSynthesis
   const speakSummary = useCallback(() => {
@@ -250,11 +283,25 @@ export function usePipelinePrediction() {
     }
 
     const isHindi = language === "hi";
+    const primaryStress = (data as any)?.primary_stress || data?.model1_risk?.stress_type || "Thermal Heat Stress";
+    const isDrought = primaryStress.toLowerCase().includes("drought");
+    const isCane = (crop || "").toLowerCase().includes("sugarcane") || (crop || "").toLowerCase().includes("गन्ना");
+
+    const fallbackHi = isDrought
+      ? `आपके ${acres} एकड़ ${crop} के खेत में सूखा तनाव का खतरा है। ${isCane ? "हल्की सिंचाई और सिंजेंटा इसाबियन" : "मृदा नमी संरक्षण और तनाव निवारक"} का प्रयोग करें।`
+      : isCane
+      ? `आपके ${acres} एकड़ गन्ना फसल में तनाव का जोखिम है। सिंजेंटा इसाबियन 400 मिली प्रति एकड़ शाम के समय छिड़काव करें।`
+      : `आपके ${acres} एकड़ ${crop} के खेत में ${primaryStress} का जोखिम है। अनुशंसित बायोस्टिमुलेंट शाम 5 बजे के बाद छिड़काव करें।`;
+
+    const fallbackEn = isDrought
+      ? `Drought stress detected on your ${acres} acre ${crop} crop. ${isCane ? "Apply light irrigation and Syngenta Isabion" : "Conserve soil moisture and apply recommended anti-stress shield"}.`
+      : isCane
+      ? `Stress detected on your ${acres} acre sugarcane crop. Foliar spray of Syngenta Isabion at 400 ml per acre recommended in late evening.`
+      : `${primaryStress} risk detected on your ${acres} acre ${crop} crop. Apply recommended foliar protectant in the late evening.`;
+
     const textToSpeak = isHindi
-      ? data?.gemini_statement?.statement_hi ||
-        `आपके ${acres} एकड़ ${crop} के खेत में 92 प्रतिशत गर्मी तनाव का खतरा है। सिंजेंटा क्वांटिस 250 मिली प्रति एकड़ की दर से शाम 5 बजे के बाद छिड़काव करें।`
-      : data?.gemini_statement?.statement_en ||
-        `Thermal heat stress risk of 92 percent detected on your ${acres} acre ${crop} crop. Spray Syngenta Quantis at 250 ml per acre in the late evening.`;
+      ? data?.gemini_statement?.statement_hi || fallbackHi
+      : data?.gemini_statement?.statement_en || fallbackEn;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = isHindi ? "hi-IN" : "en-IN";
