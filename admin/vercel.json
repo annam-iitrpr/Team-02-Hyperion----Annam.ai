@@ -3,7 +3,7 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_MAIN_API_URL": "https://frontend-phi-flame-21.vercel.app",
+    "NEXT_PUBLIC_MAIN_API_URL": "https://nibooz-whatup.vercel.app",
     "NEXT_PUBLIC_ADMIN_SECRET": "aasra-admin-2026"
   }
 }
