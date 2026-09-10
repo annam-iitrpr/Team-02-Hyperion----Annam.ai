@@ -351,7 +351,13 @@ export async function executeGoogleGeminiPrompt(prompt: string, systemInstructio
   }
 
   // 2. Secondary: Google AI Studio Multi-Key Failover
-  const studioModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-3.5-flash"];
+  const studioModels = [
+    "gemini-3.6-flash",
+    "gemini-2.5-flash",
+    "gemini-flash-latest",
+    "gemini-2.5-flash-lite",
+    "gemini-3.5-flash",
+  ];
   const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
 
   for (const key of uniqueKeys) {
@@ -361,7 +367,7 @@ export async function executeGoogleGeminiPrompt(prompt: string, systemInstructio
         const reqBody: any = {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.15,
+            temperature: 0.1,
             topK: 40,
             topP: 0.95,
             maxOutputTokens: 2048,
@@ -485,7 +491,13 @@ export async function executeGoogleGeminiVisionPrompt(
   }
 
   // 2. Secondary: Google AI Studio Failover
-  const studioModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-3.5-flash"];
+  const studioModels = [
+    "gemini-3.6-flash",
+    "gemini-2.5-flash",
+    "gemini-flash-latest",
+    "gemini-2.5-flash-lite",
+    "gemini-3.5-flash",
+  ];
   const uniqueKeys = Array.from(new Set(GOOGLE_AI_KEYS));
 
   for (const key of uniqueKeys) {
@@ -507,7 +519,7 @@ export async function executeGoogleGeminiVisionPrompt(
             },
           ],
           generationConfig: {
-            temperature: 0.2,
+            temperature: 0.1,
             maxOutputTokens: 2048,
             responseMimeType: "application/json",
           },

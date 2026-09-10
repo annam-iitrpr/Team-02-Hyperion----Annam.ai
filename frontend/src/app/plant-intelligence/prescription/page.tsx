@@ -1072,8 +1072,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "chess_rice",
+        name: "Syngenta Chess® 50 WDG",
+        nameHi: "सिंजेंटा चेस (Chess® — भूरा फुदका व बीपीएच विशेषज्ञ)",
+        category: "Brown Plant Hopper (BPH) Anti-Feeding Systemic",
+        categoryHi: "धान भूरा फुदका (BPH) व रस चूसक कीट रक्षक",
+        activeIngredient: "Pymetrozine 50% WDG (IRAC 9B)",
+        modeOfAction: "Stylet blocker causing immediate irreversible cessation of feeding within 1 hour",
+        doseAmount: 120,
+        doseUnit: "g",
+        doseDisplay: "120 g / acre",
+        formulationType: "powder",
+        waterPerAcre: 200,
+        costPerAcre: 520,
+        rankScore: 91.5,
+        efficacyPct: 91.0,
+        timing: hi ? "कल्ले फूटने के बाद या पौधों के निचले हिस्से में तेला/फुदका दिखने पर" : "At nymph emergence of BPH/GLH at base of rice hills",
+        timingHi: "निचले हिस्से में भूरा फुदका दिखने पर",
+        whyChoose: hi
+          ? "भूरा फुदका (BPH) धान का रस चूसकर हॉपर बर्न कर देता है। चेस कीट का डंक तुरंत जाम कर देता है।"
+          : "Stops BPH feeding in 60 minutes. Prevents Hopper Burn and lodging in heavy canopies.",
+        whyChooseHi: "भूरा फुदका (BPH) का डंक तुरंत जाम कर फसल को गिरने से बचाता है।",
+        targetPests: ["Brown Plant Hopper (BPH)", "White Backed Plant Hopper (WBPH)", "Green Leaf Hopper"],
+        safeTankMix: [
+          {
+            name: "Syngenta Amistar Top®",
+            chemical: "Fungicide",
+            reasonEn: "Simultaneous Hopper and Sheath Blight control.",
+            reasonHi: "शीथ ब्लाइट और भूरा फुदका दोनों का एक साथ नियंत्रण।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "Alkaline spray water",
+            chemical: "Basic pH",
+            reasonEn: "Reduces active longevity.",
+            reasonHi: "क्षारीय पानी के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── 7. MAIZE / CORN / MAKKA ────────────────────────────────────────────────
   if (cropKey === "maize") {
@@ -1158,8 +1199,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "amistar_maize",
+        name: "Syngenta Amistar Top®",
+        nameHi: "सिंजेंटा एमिस्टार टॉप (मक्का टर्सिकम झुलसा रक्षक)",
+        category: "Turcicum & Maydis Leaf Blight Specialist Fungicide",
+        categoryHi: "मक्का टर्सिकम व मेडिस पत्ती झुलसा कवकनाशी",
+        activeIngredient: "Azoxystrobin 18.2% + Difenoconazole 11.4% SC",
+        modeOfAction: "Dual QoI + DMI systemic inhibition protecting photosynthetic canopy",
+        doseAmount: 200,
+        doseUnit: "ml",
+        doseDisplay: "200 ml / acre",
+        formulationType: "liquid",
+        waterPerAcre: 150,
+        costPerAcre: 680,
+        rankScore: 92.5,
+        efficacyPct: 91.0,
+        timing: hi ? "घुटने तक ऊंचाई पर या पत्तियों पर भूरे नाव जैसे धब्बे दिखते ही" : "Knee-high (V6-V8) stage or at first cigar-shaped lesion of Turcicum blight",
+        timingHi: "पत्तियों पर नाव जैसे धब्बे दिखते ही",
+        whyChoose: hi
+          ? "मक्के की पत्तियों पर टर्सिकम झुलसा फैलने से रोकता है। दाना भराव के समय पत्तियों को हरा-भरा रखकर भुट्टे का वजन 12% बढ़ाता है।"
+          : "Arrests Turcicum Leaf Blight (Exserohilum turcicum), extending green leaf duration and boosting cob fill weight.",
+        whyChooseHi: "टर्सिकम झुलसा रोककर भुट्टे में दाने का वजन बढ़ाता है।",
+        targetPests: ["Turcicum Leaf Blight", "Maydis Leaf Blight", "Common Rust"],
+        safeTankMix: [
+          {
+            name: "Syngenta Quantis®",
+            chemical: "Biostimulant",
+            reasonEn: "Combined disease defense and heat shock resilience.",
+            reasonHi: "झुलसा रोग व तेज धूप दोनों से दोहरी सुरक्षा।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "Copper Fungicides",
+            chemical: "Copper Oxychloride",
+            reasonEn: "Foliar burn risk under hot noon temperatures.",
+            reasonHi: "तेज धूप में कॉपर के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── 8. CHILLI / MIRCH ──────────────────────────────────────────────────────
   if (cropKey === "chilli") {
@@ -1244,8 +1326,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "pegasus_chilli",
+        name: "Syngenta Pegasus® 50 WP",
+        nameHi: "सिंजेंटा पेगासस (मिर्च सफेद मक्खी व पीली मकड़ी रक्षक)",
+        category: "Mite & Resistant Whitefly Eradication Specialist",
+        categoryHi: "मिर्च सफेद मक्खी व पीली मकड़ी (Mite) नाशक",
+        activeIngredient: "Diafenthiuron 50% WP (IRAC 12A)",
+        modeOfAction: "ATP synthase inhibitor converted into carbodiimide by sunlight on foliage",
+        doseAmount: 250,
+        doseUnit: "g",
+        doseDisplay: "250 g / acre",
+        formulationType: "powder",
+        waterPerAcre: 200,
+        costPerAcre: 650,
+        rankScore: 91.8,
+        efficacyPct: 91.0,
+        timing: hi ? "पत्तियों के नीचे सफेद मक्खी या पीली मकड़ी का प्रकोप दिखते ही" : "At nymph threshold of whitefly or broad mite underside infestation",
+        timingHi: "पत्तियों के नीचे सफेद मक्खी या मकड़ी दिखते ही",
+        whyChoose: hi
+          ? "सफेद मक्खी और पीली मकड़ी का 3-तरफा सफाया। धूप पड़ते ही दवा सक्रिय होकर कीटों को तुरंत मार गिराती है।"
+          : "Photo-activated translaminar chemistry controlling both adult and nymphal whiteflies and mites on leaf undersides.",
+        whyChooseHi: "सफेद मक्खी और पीली मकड़ी का अंडों सहित संपूर्ण सफाया।",
+        targetPests: ["Whitefly (Bemisia tabaci)", "Broad Mite / Yellow Mite", "Nymph Colonies"],
+        safeTankMix: [
+          {
+            name: "Syngenta Isabion®",
+            chemical: "Biostimulant",
+            reasonEn: "Restores foliar chlorophyll after sucking pest injury.",
+            reasonHi: "कीटों के नुकसान के बाद पत्तियों की हरियाली वापस लाता है।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "Alkaline Water",
+            chemical: "High pH water",
+            reasonEn: "Reduces gas-phase translaminar activity.",
+            reasonHi: "खारे पानी के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── 9. POTATO / ALOO ───────────────────────────────────────────────────────
   if (cropKey === "potato") {
@@ -1330,8 +1453,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "revus_potato",
+        name: "Syngenta Revus® 250 SC",
+        nameHi: "सिंजेंटा रेवुस (Revus® — पछेती झुलसा व बारिश-रोधी कवकनाशी)",
+        category: "CAA Anti-Resistance Specialist Fungicide (FRAC 40)",
+        categoryHi: "आलू पछेती झुलसा (CAA ग्रुप 40) बारिश-रोधी कवकनाशी",
+        activeIngredient: "Mandipropamid 23.4% SC (LOK-FLO Technology)",
+        modeOfAction: "Phospholipid biosynthesis inhibitor binding into cuticular wax within 30 minutes",
+        doseAmount: 200,
+        doseUnit: "ml",
+        doseDisplay: "200 ml / acre",
+        formulationType: "liquid",
+        waterPerAcre: 200,
+        costPerAcre: 780,
+        rankScore: 93.5,
+        efficacyPct: 93.0,
+        timing: hi ? "कोहरे या लगातार बूंदाबांदी के समय (रिडोमिल के बाद रोटेशनल स्प्रे)" : "During intermittent drizzle, high humidity or as rotational partner to phenylamides",
+        timingHi: "कोहरे या लगातार बूंदाबांदी के समय",
+        whyChoose: hi
+          ? "LOK-FLO तकनीक: छिड़काव के 30 मिनट बाद बारिश हो जाए तब भी नहीं धुलता। पछेती झुलसा में दवा के प्रति प्रतिरोध (Resistance) को तोड़ता है।"
+          : "LOK-FLO wax binding provides 100% rainfastness in 30 minutes. Solves phenylamide-resistant Phytophthora.",
+        whyChooseHi: "बारिश में भी 30 मिनट में पक्का चिपकता है और झुलसा को पूरी तरह रोकता है।",
+        targetPests: ["Late Blight (Phytophthora infestans)", "Resistant Phytophthora Strains"],
+        safeTankMix: [
+          {
+            name: "Syngenta Isabion®",
+            chemical: "Biostimulant",
+            reasonEn: "Surges tuber sizing while curing blight.",
+            reasonHi: "कंद बड़ा करने और बीमारी रोकने में सहायक।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "Strong Alkaline Buffers",
+            chemical: "pH > 8",
+            reasonEn: "Reduces wax binding.",
+            reasonHi: "क्षारीय पानी के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── 10. ONION / PYAZ ───────────────────────────────────────────────────────
   if (cropKey === "onion") {
@@ -1416,8 +1580,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "kavach_onion",
+        name: "Syngenta Kavach® 75 WP",
+        nameHi: "सिंजेंटा कवच (Kavach® — प्याज पत्ती झुलसा व डाउनी मिल्ड्यू रक्षक)",
+        category: "Broad-Spectrum Contact Multi-Site Shield (FRAC M5)",
+        categoryHi: "प्याज पत्ती झुलसा व डाउनी मिल्ड्यू संपर्क कवकनाशी",
+        activeIngredient: "Chlorothalonil 75% WP",
+        modeOfAction: "Multi-site cellular enzyme inhibitor with micro-fine particle adhesion to waxy onion foliage",
+        doseAmount: 400,
+        doseUnit: "g",
+        doseDisplay: "400 g / acre",
+        formulationType: "powder",
+        waterPerAcre: 200,
+        costPerAcre: 520,
+        rankScore: 91.0,
+        efficacyPct: 90.5,
+        timing: hi ? "बादल छाने पर या पत्तियों पर सफेद/पीले धब्बे बनते ही (निवारक छिड़काव)" : "Preventative spray during cloudy, humid weather to prevent downy mildew spore germination",
+        timingHi: "बादल छाने पर या पीले धब्बे बनते ही",
+        whyChoose: hi
+          ? "कवच प्याज की चिकनी पत्तियों पर मोम की तरह चिपक जाता है। फफूंद में इसके प्रति कभी भी प्रतिरोध (Resistance) विकसित नहीं होता।"
+          : "Sticks firmly to waxy onion leaves. Multi-site contact action prevents fungal spore penetration.",
+        whyChooseHi: "प्याज की पत्तियों पर चिपक कर फफूंद का संक्रमण रोकता है।",
+        targetPests: ["Downy Mildew (Peronospora destructor)", "Stemphylium Leaf Blight", "Purple Blotch"],
+        safeTankMix: [
+          {
+            name: "Syngenta Isabion®",
+            chemical: "Biostimulant",
+            reasonEn: "Strengthens neck development and bulb vigor.",
+            reasonHi: "प्याज का कंद मजबूत और चमकदार बनाता है।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "EC Formulations",
+            chemical: "Emulsifiable Concentrates",
+            reasonEn: "May increase risk of phytotoxicity.",
+            reasonHi: "तेल आधारित EC दवाओं के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── 11. MUSTARD / SARSON ───────────────────────────────────────────────────
   if (cropKey === "mustard") {
@@ -1502,8 +1707,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "score_mustard",
+        name: "Syngenta Score® 25 EC",
+        nameHi: "सिंजेंटा स्कोर (सरसों अल्टरनेरिया झुलसा रक्षक)",
+        category: "DMI Triazole Curative Specialist for Siliqua Pod Blight",
+        categoryHi: "सरसों फली झुलसा व अल्टरनेरिया कवकनाशी",
+        activeIngredient: "Difenoconazole 25% EC",
+        modeOfAction: "Sterol demethylation inhibitor with translaminar leaf tissue penetration within 2 hours",
+        doseAmount: 150,
+        doseUnit: "ml",
+        doseDisplay: "150 ml / acre",
+        formulationType: "liquid",
+        waterPerAcre: 150,
+        costPerAcre: 460,
+        rankScore: 91.5,
+        efficacyPct: 91.0,
+        timing: hi ? "फलियां बनते समय या फलियों पर काले धब्बे दिखते ही" : "At early siliqua pod formation to stop Alternaria pod spots",
+        timingHi: "फलियों पर काले धब्बे दिखते ही",
+        whyChoose: hi
+          ? "सरसों की फलियों पर अल्टरनेरिया के काले गोल धब्बों को रोकता है। दाने सिकुड़ने नहीं देता और तेल की मात्रा 40%+ बनाए रखता है।"
+          : "Curative action against Alternaria brassicae. Prevents pod shattering and premature seed drying.",
+        whyChooseHi: "फलियों पर काले धब्बे रोककर दाना सिकुड़ने से बचाता है।",
+        targetPests: ["Alternaria Pod Blight", "Black Spot of Mustard", "Powdery Mildew"],
+        safeTankMix: [
+          {
+            name: "Syngenta Quantis®",
+            chemical: "Biostimulant",
+            reasonEn: "Surges seed oil accumulation during winter sun spells.",
+            reasonHi: "दाने में तेल की मात्रा बढ़ाने में मददगार।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "Direct tank mixing with herbicides",
+            chemical: "Herbicides",
+            reasonEn: "Causes leaf scorch.",
+            reasonHi: "खरपतवारनाशी के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── 12. SUGARCANE / GANNA ──────────────────────────────────────────────────
   if (cropKey === "sugarcane") {
@@ -1588,8 +1834,49 @@ function getCropSolutions(cropKey: string, lang: "en" | "hi"): CropProduct[] {
           },
         ],
       },
+      {
+        id: "isabion_cane",
+        name: "Syngenta Isabion®",
+        nameHi: "सिंजेंटा इसाबियन (गन्ना बढ़वार व फुटाव टॉनिक)",
+        category: "Pure Vegetative Biostimulant for Tillering & Sugar Recovery",
+        categoryHi: "गन्ना कल्ले बढ़वार व सुक्रोज निर्माण टॉनिक",
+        activeIngredient: "Natural Free Amino Acids (62.5%) + Short & Long Chain Peptides",
+        modeOfAction: "Direct stimulation of glutamate dehydrogenase and cane stalk internode cell expansion",
+        doseAmount: 500,
+        doseUnit: "ml",
+        doseDisplay: "500 ml / acre",
+        formulationType: "liquid",
+        waterPerAcre: 200,
+        costPerAcre: 520,
+        rankScore: 92.0,
+        efficacyPct: 91.0,
+        timing: hi ? "कल्ले फूटते समय (Formative Stage 45-90 दिन) या तीव्र बढ़वार अवस्था में" : "During tillering (45-90 DAP) and rapid vegetative elongation",
+        timingHi: "कल्ले फूटते समय या तीव्र बढ़वार में",
+        whyChoose: hi
+          ? "गन्ने में कल्ले (Tillers) की संख्या 20-25% बढ़ाता है। पोरियों की लंबाई व मोटाई बढ़ाकर वजन और रस की रिकवरी बढ़ाता है।"
+          : "Increases millable tillers per clump and surges internode length, weight and juice brix recovery.",
+        whyChooseHi: "गन्ने के कल्ले बढ़ाता है और पोरियों की मोटाई व रस में वृद्धि करता है।",
+        targetPests: ["Poor Tillering", "Stunted Cane Growth", "Low Brix Recovery"],
+        safeTankMix: [
+          {
+            name: "Syngenta Amistar Top®",
+            chemical: "Fungicide",
+            reasonEn: "Combined tillering surge and red rot defense.",
+            reasonHi: "बढ़वार और लाल सड़न सुरक्षा दोनों एक साथ।",
+          },
+        ],
+        prohibitedTankMix: [
+          {
+            name: "Copper Fungicides",
+            chemical: "Copper Oxychloride",
+            reasonEn: "Coagulates active amino peptides.",
+            reasonHi: "कॉपर के साथ न मिलाएं।",
+          },
+        ],
+      },
     ];
   }
+
 
   // ── DEFAULT / UNIVERSAL SCIENTIFIC FALLBACK ────────────────────────────────
   return [

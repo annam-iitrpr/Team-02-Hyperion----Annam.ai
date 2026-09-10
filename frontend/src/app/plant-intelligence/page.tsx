@@ -511,21 +511,29 @@ export default function PlantIntelligencePage() {
             {/* 1. WHAT */}
             <div className="bg-white/95 backdrop-blur-md border border-[#e8ede4] rounded-3xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(27,67,50,0.03)] space-y-2.5 hover:border-emerald-300/60 transition-all">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-rose-700 font-bold text-xs uppercase tracking-wider font-mono">
-                  <span className="h-2 w-2 rounded-full bg-rose-500" />
+                <div className={`flex items-center gap-2 ${!hasActualStress ? "text-emerald-700" : "text-rose-700"} font-bold text-xs uppercase tracking-wider font-mono`}>
+                  <span className={`h-2 w-2 rounded-full ${!hasActualStress ? "bg-emerald-500" : "bg-rose-500"}`} />
                   <span>{isHindi ? "1. क्या हो रहा है? (WHAT)" : "1. What is Happening?"}</span>
                 </div>
-                <span className="text-[10px] font-mono font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
-                  {riskPct}% Risk
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
+                  !hasActualStress
+                    ? "text-emerald-800 bg-emerald-50 border-emerald-200"
+                    : "text-rose-700 bg-rose-50 border-rose-200"
+                }`}>
+                  {!hasActualStress ? `${riskPct}% Healthy / Stress Free` : `${riskPct}% Risk`}
                 </span>
               </div>
               <h3 className="text-base sm:text-lg font-black text-[#11261f] font-display">
-                {stressType} in {cropMaster.name}
+                {!hasActualStress ? `Canopy Vigorous & Healthy in ${cropMaster.name}` : `${stressType} in ${cropMaster.name}`}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                {isHindi
-                  ? `मॉडल 1 वर्गीकरण इंजन ने ${cropMaster.nameHi} के "${currentStage.stageNameHi}" चरण में ${stressType} की पुष्टि की है। पत्तियों में वाष्पोत्सर्जन दर सामान्य से अधिक है।`
-                  : `Model 1 Stress Risk Classifier detects ${stressType} (${riskPct}% confidence) for your ${cropMaster.name} during the ${currentStage.stageName} stage.`}
+                {!hasActualStress
+                  ? (isHindi
+                      ? `मॉडल 1 वर्गीकरण इंजन ने ${cropMaster.nameHi} के "${currentStage.stageNameHi}" चरण में फसल को स्वस्थ व तनाव-मुक्त पाया है (${riskPct}% विश्वास)। नियमित पोषक तत्व संधारण बनाए रखें।`
+                      : `Model 1 Stress Risk Classifier verifies Healthy & Vigorous Canopy (${riskPct}% confidence) for your ${cropMaster.name} during the ${currentStage.stageName} stage. Maintain standard preventative nutrition.`)
+                  : (isHindi
+                      ? `मॉडल 1 वर्गीकरण इंजन ने ${cropMaster.nameHi} के "${currentStage.stageNameHi}" चरण में ${stressType} की पुष्टि की है (${riskPct}% जोखिम)।`
+                      : `Model 1 Stress Risk Classifier detects ${stressType} (${riskPct}% confidence) for your ${cropMaster.name} during the ${currentStage.stageName} stage.`)}
               </p>
             </div>
 
@@ -572,22 +580,24 @@ export default function PlantIntelligencePage() {
             </div>
 
             {/* 4. WHAT ACTION TO TAKE */}
-            <div className={`bg-gradient-to-br from-white to-[#f0f6f1] border-2 ${spraySafe ? "border-[#52b788]/60" : "border-rose-300"} rounded-3xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(27,67,50,0.04)] space-y-2.5`}>
+            <div className={`bg-gradient-to-br from-white to-[#f0f6f1] border-2 ${spraySafe ? "border-[#52b788]/60" : "border-amber-300"} rounded-3xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(27,67,50,0.04)] space-y-2.5`}>
               <div className="flex items-center justify-between">
-                <div className={`flex items-center gap-2 ${spraySafe ? "text-[#1b4332]" : "text-rose-700"} font-bold text-xs uppercase tracking-wider font-mono`}>
-                  <span className={`h-2 w-2 rounded-full ${spraySafe ? "bg-[#1b4332]" : "bg-rose-500"}`} />
+                <div className={`flex items-center gap-2 ${spraySafe ? "text-[#1b4332]" : "text-amber-800"} font-bold text-xs uppercase tracking-wider font-mono`}>
+                  <span className={`h-2 w-2 rounded-full ${spraySafe ? "bg-[#1b4332]" : "bg-amber-500"}`} />
                   <span>{isHindi ? "4. आपको क्या करना चाहिए? (ACTION)" : "4. What Action to Take?"}</span>
                 </div>
-                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${spraySafe ? "text-[#1b4332] bg-[#e8f5e9] border-[#cbe5cb]" : "text-rose-700 bg-rose-50 border-rose-200"}`}>
-                  {spraySafe ? "Window Safe" : "Hold Spray"}
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${spraySafe ? "text-[#1b4332] bg-[#e8f5e9] border-[#cbe5cb]" : "text-amber-800 bg-amber-50 border-amber-200"}`}>
+                  {spraySafe ? (isHindi ? "स्प्रे अनुकूल" : "Window Safe") : (isHindi ? "स्प्रे रोकें" : "Hold Spray")}
                 </span>
               </div>
-              <h3 className={`text-base sm:text-lg font-black ${spraySafe ? "text-[#1b4332]" : "text-rose-700"} font-display`}>
-                Apply {cropRx.name} ({cropRx.dosage})
+              <h3 className={`text-base sm:text-lg font-black ${spraySafe ? "text-[#1b4332]" : "text-amber-900"} font-display`}>
+                {!hasActualStress
+                  ? (isHindi ? `फसल संवर्धन पोषण: ${cropRx.name}` : `Protective Canopy Vigor: ${cropRx.name}`)
+                  : (isHindi ? `उपचारात्मक स्प्रे: ${cropRx.name}` : `Targeted Curative Rx: ${cropRx.name}`)}
               </h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                 {isHindi
-                  ? `खुराक: ${cropRx.dosage} (${cropRx.rationale})। मौसम परिस्थितियाँ अनुकूल हैं। 200L पानी/एकड़ के साथ सुबह 06:30 से 09:30 बजे छिड़काव करें।`
+                  ? `अनुशंसित खुराक: ${cropRx.dosage} (${cropRx.rationale})। 200L पानी/एकड़ के साथ सुबह के समय (06:30 से 09:30 बजे) छिड़काव करें।`
                   : `Prescription: ${cropRx.dosage}. ${cropRx.rationale} Apply during early morning window (06:30–09:30 AM) with calibrated 200 L/acre water carrier volume.`}
               </p>
             </div>

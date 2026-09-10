@@ -9,7 +9,6 @@ import {
   formatKnapsackWhatsAppBox,
   getKnapsackProfile,
 } from "@/lib/knapsackPumpMatrix";
-import { resolveCropStageByDas, formatStageLabel, getCropGrowthStages } from "@/lib/cropGrowthStages";
 
 function logWebhookEvent(msg: string) {
   const ts = new Date().toISOString();
@@ -471,68 +470,8 @@ function resolveFarmerProfile(rawPhone: string): FarmerDbRecord {
 }
 
 /**
- * Map stage to one of the 5 standard recommendation engine stage keys:
- * germination | vegetative | flowering | podFormation | maturity
- */
-function mapStageToCategory(
-  stageOrder: number,
-  totalStages: number,
-  stageName: string
-): "germination" | "vegetative" | "flowering" | "podFormation" | "maturity" {
-  const name = stageName.toLowerCase();
-  if (
-    name.includes("germinat") ||
-    name.includes("emerg") ||
-    name.includes("sprout") ||
-    name.includes("nursery") ||
-    name.includes("dormanc") ||
-    stageOrder === 1
-  ) {
-    return "germination";
-  }
-  if (
-    name.includes("flowering") ||
-    name.includes("bloom") ||
-    name.includes("tassel") ||
-    name.includes("silking") ||
-    name.includes("anthesis") ||
-    name.includes("heading") ||
-    name.includes("booting") ||
-    name.includes("squaring")
-  ) {
-    return "flowering";
-  }
-  if (
-    name.includes("pod") ||
-    name.includes("boll") ||
-    name.includes("tuber") ||
-    name.includes("berry") ||
-    name.includes("fruit") ||
-    name.includes("bulb") ||
-    name.includes("siliqua") ||
-    name.includes("grain") ||
-    name.includes("milk") ||
-    name.includes("dough") ||
-    name.includes("pegging")
-  ) {
-    return "podFormation";
-  }
-  if (
-    name.includes("matur") ||
-    name.includes("harvest") ||
-    name.includes("ripen") ||
-    name.includes("curing") ||
-    stageOrder === totalStages
-  ) {
-    return "maturity";
-  }
-  return "vegetative";
-}
-
-/**
  * Calculate accurate crop growth stage from Sowing Date (DAS: Days After Sowing)
- * Across all 20 verified crops from MASTER_CROP_GROWTH_STAGES
- * Provides pure English or pure Hindi labels based on lang
+ * Provides 100% pure English or 100% pure Hindi labels based on lang
  */
 function calculateGrowthStage(
   crop: string,
@@ -542,26 +481,47 @@ function calculateGrowthStage(
   stageKey: "germination" | "vegetative" | "flowering" | "podFormation" | "maturity";
   stageLabel: string;
   das: number;
-  stageName: string;
-  stageNameHi: string;
-  daysAfterSowing: string;
 } {
   const sowing = sowingDateStr ? new Date(sowingDateStr) : new Date(Date.now() - 45 * 86400000);
   const das = Math.max(1, Math.floor((Date.now() - sowing.getTime()) / (1000 * 60 * 60 * 24)));
+  const c = (crop || "").toLowerCase();
+  const isEn = lang === "en";
 
-  const stage = resolveCropStageByDas(crop, das);
-  const stages = getCropGrowthStages(crop);
-  const stageKey = mapStageToCategory(stage.stageOrder, stages.length, stage.stageName);
-  const stageLabel = formatStageLabel(stage, lang);
+  if (c.includes("potato") || c.includes("aloo")) {
+    if (das < 20) return { stageKey: "germination", stageLabel: isEn ? "Sprouting & Emergence (0-20 DAS)" : "अंकुरण एवं फुटाव (0-20 DAS)", das };
+    if (das < 45) return { stageKey: "vegetative", stageLabel: isEn ? "Vegetative Canopy & Stolons (20-45 DAS)" : "वानस्पतिक बढ़वार एवं शाखाएं (20-45 DAS)", das };
+    if (das < 75) return { stageKey: "flowering", stageLabel: isEn ? "Tuber Initiation & Bulking (45-75 DAS)" : "कंद निर्माण एवं फुलाव (45-75 DAS)", das };
+    return { stageKey: "maturity", stageLabel: isEn ? "Tuber Maturity & Harvest (75+ DAS)" : "परिपक्वता एवं खुदाई (75+ DAS)", das };
+  }
 
-  return {
-    stageKey,
-    stageLabel,
-    das,
-    stageName: stage.stageName,
-    stageNameHi: stage.stageNameHi,
-    daysAfterSowing: stage.daysAfterSowing,
-  };
+  if (c.includes("mustard") || c.includes("sarson") || c.includes("raya")) {
+    if (das < 20) return { stageKey: "germination", stageLabel: isEn ? "Seedling & Rosette (0-20 DAS)" : "अंकुरण एवं रोज़ेट (0-20 DAS)", das };
+    if (das < 45) return { stageKey: "vegetative", stageLabel: isEn ? "Vegetative Branching (20-45 DAS)" : "वानस्पतिक शाखाएं (20-45 DAS)", das };
+    if (das < 70) return { stageKey: "flowering", stageLabel: isEn ? "Flowering & Siliqua Formation (45-70 DAS)" : "फूल खिलना एवं फली निर्माण (45-70 DAS)", das };
+    return { stageKey: "maturity", stageLabel: isEn ? "Siliqua Seed Fill & Maturity (70+ DAS)" : "दाना भराव एवं परिपक्वता (70+ DAS)", das };
+  }
+
+  if (c.includes("tomato") || c.includes("tamatar")) {
+    if (das < 25) return { stageKey: "germination", stageLabel: isEn ? "Transplanting & Vegetative (0-25 DAS)" : "रोपाई एवं वानस्पतिक बढ़वार (0-25 DAS)", das };
+    if (das < 50) return { stageKey: "flowering", stageLabel: isEn ? "Flowering & Early Fruit Set (25-50 DAS)" : "फूल खिलना एवं फल बनना (25-50 DAS)", das };
+    if (das < 80) return { stageKey: "podFormation", stageLabel: isEn ? "Fruit Development & Sizing (50-80 DAS)" : "फल विकास एवं आकार वृद्धि (50-80 DAS)", das };
+    return { stageKey: "maturity", stageLabel: isEn ? "Fruit Ripening & Harvest (80+ DAS)" : "फल परिपक्वता एवं तुड़ाई (80+ DAS)", das };
+  }
+
+  if (c.includes("soy") || c.includes("soya")) {
+    if (das < 15) return { stageKey: "germination", stageLabel: isEn ? "Germination & Emergence (0-15 DAS)" : "अंकुरण एवं फुटाव (0-15 DAS)", das };
+    if (das < 40) return { stageKey: "vegetative", stageLabel: isEn ? "Vegetative Growth (15-40 DAS)" : "वानस्पतिक बढ़वार (15-40 DAS)", das };
+    if (das < 65) return { stageKey: "flowering", stageLabel: isEn ? "Flowering R1-R2 (40-65 DAS)" : "फूल खिलना (40-65 DAS)", das };
+    if (das < 90) return { stageKey: "podFormation", stageLabel: isEn ? "Pod Fill R3-R5 (65-90 DAS)" : "फली विकास एवं दाना भराव (65-90 DAS)", das };
+    return { stageKey: "maturity", stageLabel: isEn ? "Maturity R7-R8 (90+ DAS)" : "परिपक्वता एवं कटाई (90+ DAS)", das };
+  }
+
+  // Default Wheat and Cereals
+  if (das < 20) return { stageKey: "germination", stageLabel: isEn ? "Crown Root Initiation CRI (0-20 DAS)" : "अंकुरण एवं सीआरआई अवस्था (0-20 DAS)", das };
+  if (das < 50) return { stageKey: "vegetative", stageLabel: isEn ? "Tillering & Vegetative (20-50 DAS)" : "कल्ले फूटना एवं बढ़वार (20-50 DAS)", das };
+  if (das < 75) return { stageKey: "flowering", stageLabel: isEn ? "Booting & Flowering (50-75 DAS)" : "गाभा एवं फूल अवस्था (50-75 DAS)", das };
+  if (das < 105) return { stageKey: "podFormation", stageLabel: isEn ? "Grain Milking & Fill (75-105 DAS)" : "दूधिया एवं दाना भराव (75-105 DAS)", das };
+  return { stageKey: "maturity", stageLabel: isEn ? "Maturity & Ripening (105+ DAS)" : "परिपक्वता एवं कटाई (105+ DAS)", das };
 }
 
 /**
