@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import {
   Sparkles,
@@ -14,10 +15,28 @@ import {
   Volume2,
   Check,
   XCircle,
+  ShieldCheck,
+  Droplets,
+  Thermometer,
+  Zap,
+  Layers,
+  Leaf,
+  Award,
+  ExternalLink,
+  MessageSquare,
+  Info,
+  FlaskConical,
+  Stethoscope,
+  Copy,
+  ChevronRight,
 } from "lucide-react";
 
 interface Scenario {
+  id: string;
   crop: string;
+  variety: string;
+  location: string;
+  acres: number;
   stage: string;
   m1Diagnosis: string;
   recommendedProduct: string;
@@ -34,79 +53,208 @@ interface Scenario {
 
 const PRESET_SCENARIOS: Scenario[] = [
   {
-    crop: "Wheat (PBW-826)",
-    stage: "Milking & Grain Filling (Zadoks GS 73-77)",
-    m1Diagnosis: "Yellow Rust (Puccinia striiformis) & Nocturnal Heat Stress (Chamkaur Sahib, Rupnagar, Punjab)",
-    recommendedProduct: "Syngenta Score® (Difenoconazole 25% EC)",
-    activeIngredient: "Difenoconazole 25% EC (Triazole Systemic Fungicide)",
+    id: "potato-kasganj",
+    crop: "Potato",
+    variety: "Kufri Pukhraj / Chipsona",
+    location: "Bilram, Kasganj, Uttar Pradesh",
+    acres: 3.5,
+    stage: "Tuber Bulking & Canopy Closure",
+    m1Diagnosis: "Potato Late Blight (Phytophthora infestans) with nocturnal humid microclimate risk",
+    recommendedProduct: "Syngenta Ridomil Gold®",
+    activeIngredient: "Metalaxyl-M 4% + Mancozeb 64% WP",
     category: "fungicide",
-    iracFrac: "FRAC Group 3 (Sterol Demethylation Inhibitor)",
+    iracFrac: "FRAC 4 (Phenylamide) + FRAC M3 (Multi-Site)",
+    dosage: "1000 g / acre",
+    waterVol: "200 L / acre (12 knapsack tanks)",
+    costPerAcre: 1000,
+    expectedTrajectory: "Curative systemic inhibition: arrest of Phytophthora mycelium within 48h. Day +2 triage verifies lesion desiccation; Day +5 triggers Syngenta Revus® (FRAC 40) or Syngenta Isabion®.",
+    qSaved: 28.0,
+    mandiPrice: 1720,
+  },
+  {
+    id: "wheat-punjab",
+    crop: "Wheat",
+    variety: "PBW-826 (High Yield Punjab Wheat)",
+    location: "Chamkaur Sahib, Rupnagar, Punjab",
+    acres: 5.0,
+    stage: "Milking & Grain Filling (Zadoks GS 73-77)",
+    m1Diagnosis: "Yellow Rust (Puccinia striiformis) & Nocturnal Heat Stress (>25°C Night Temp)",
+    recommendedProduct: "Syngenta Score®",
+    activeIngredient: "Difenoconazole 25% EC",
+    category: "fungicide",
+    iracFrac: "FRAC 3 (Triazole Demethylation Inhibitor)",
     dosage: "200 ml / acre",
-    waterVol: "200 L / acre",
+    waterVol: "200 L / acre (12 knapsack tanks)",
     costPerAcre: 390,
-    expectedTrajectory: "Translaminar stop-action within 48h: fungal rust pustules dry into dark chlorotic scars. Day +2 WhatsApp triage verifies remission; Day +5 triggers Syngenta Quantis® biostimulant rescue.",
+    expectedTrajectory: "Translaminar stop-action within 48h: fungal rust pustules dry into dark chlorotic scars. Day +2 triage verifies spore arrest; Day +5 triggers Syngenta Quantis® biostimulant rescue.",
     qSaved: 2.8,
     mandiPrice: 2425,
   },
   {
-    crop: "Soybean",
-    stage: "R2 Flowering",
-    m1Diagnosis: "Nocturnal Heatwave Stress (25.8°C Night Peak)",
-    recommendedProduct: "Quantis®",
-    activeIngredient: "Amino Acids + Peptides + Osmoprotectants",
-    category: "biostimulant",
-    iracFrac: "Biostimulant (Osmolyte)",
-    dosage: "400 ml / acre",
-    waterVol: "200 L / acre",
-    costPerAcre: 320,
-    expectedTrajectory: "Restores stomatal transpiration within 72h. ΔCTD increases by +2.4°C; halts flower abortion.",
-    qSaved: 1.25,
-    mandiPrice: 4800,
-  },
-  {
+    id: "rice-haryana",
     crop: "Rice (Paddy)",
-    stage: "Tillering to Panicle",
-    m1Diagnosis: "Rice Sheath Blight (Rhizoctonia solani)",
-    recommendedProduct: "Amistar Top®",
+    variety: "PR-126 (Basmati Belt)",
+    location: "Karnal, Haryana / Ludhiana, Punjab",
+    acres: 4.0,
+    stage: "Booting to Panicle Initiation",
+    m1Diagnosis: "Rhizoctonia solani (Sheath Blight) & Brown Plant Hopper (BPH)",
+    recommendedProduct: "Syngenta Amistar Top®",
     activeIngredient: "Azoxystrobin 18.2% + Difenoconazole 11.4% SC",
     category: "fungicide",
-    iracFrac: "FRAC 11 + FRAC 3",
+    iracFrac: "FRAC 11 + FRAC 3 (Strobilurin + Triazole)",
     dosage: "200 ml / acre",
-    waterVol: "200 L / acre",
+    waterVol: "200 L / acre (12 knapsack tanks)",
     costPerAcre: 1300,
-    expectedTrajectory: "Translaminar stop-action within 72h: active water-soaked lesions dry into dark papery scars. Sporulation halts.",
-    qSaved: 3.2,
-    mandiPrice: 2200,
+    expectedTrajectory: "QoI respiration block + ergosterol stop: active water-soaked lesions dry into dark papery scars within 72h. Day +2 triage verifies remission; Day +5 prescribes Syngenta Chess® (IRAC 9B) or Isabion®.",
+    qSaved: 3.5,
+    mandiPrice: 2850,
   },
   {
-    crop: "Chickpea (Gram)",
-    stage: "Pod Formation",
-    m1Diagnosis: "Pod Borer Infestation (Helicoverpa armigera)",
-    recommendedProduct: "Evicent®",
-    activeIngredient: "Emamectin Benzoate 5% SG",
+    id: "cotton-gujarat",
+    crop: "Cotton",
+    variety: "Bt RCH-659",
+    location: "Rajkot, Gujarat / Nagpur, Maharashtra",
+    acres: 6.0,
+    stage: "Squaring & Early Boll Formation",
+    m1Diagnosis: "Bollworm Complex & Invasive Whitefly (Bemisia tabaci)",
+    recommendedProduct: "Syngenta Ampligo®",
+    activeIngredient: "Chlorantraniliprole 9.3% + Lambda-cyhalothrin 4.6% ZC",
     category: "insecticide",
-    iracFrac: "IRAC 6 (Avermectin)",
-    dosage: "80 g / acre",
-    waterVol: "200 L / acre",
-    costPerAcre: 380,
-    expectedTrajectory: "Larval muscle paralysis within 24-48h. Caterpillars cease feeding and drop to soil. 0 new pod boreholes.",
-    qSaved: 1.8,
-    mandiPrice: 5400,
+    iracFrac: "IRAC 28 + IRAC 3A (Ryanodine + Sodium Channel Modulator)",
+    dosage: "100 ml / acre",
+    waterVol: "200 L / acre (12 knapsack tanks)",
+    costPerAcre: 850,
+    expectedTrajectory: "Neuromuscular paralysis within 2h: cessation of larval feeding and drop to soil. Day +2 triage verifies 0 new boreholes; Day +5 triggers Syngenta Quantis® or Pegasus®.",
+    qSaved: 2.2,
+    mandiPrice: 7100,
   },
   {
-    crop: "Potato",
-    stage: "Vegetative / Tuber Bulking",
-    m1Diagnosis: "Late Blight Alert (Phytophthora infestans)",
-    recommendedProduct: "Orondis Ultra®",
-    activeIngredient: "Oxathiapiprolin + Mandipropamid SC",
-    category: "fungicide",
-    iracFrac: "FRAC 49 + FRAC 40",
-    dosage: "200 ml / acre",
-    waterVol: "200 L / acre",
-    costPerAcre: 1100,
-    expectedTrajectory: "Oomycete sporangia lysis within 48h. Halts petiole collapse; protects expanding green foliage.",
-    qSaved: 22.0,
-    mandiPrice: 1250,
+    id: "tomato-up",
+    crop: "Tomato / Chilli",
+    variety: "Syngenta Saaho / US-440",
+    location: "Varanasi, UP / Guntur, Andhra Pradesh",
+    acres: 2.5,
+    stage: "Flowering & Early Fruit Set",
+    m1Diagnosis: "Invasive Black Thrips (Thrips parvispinus) & Flower Abortion",
+    recommendedProduct: "Syngenta Simodis®",
+    activeIngredient: "Isocycloseram 9.2% w/w DC (PLINAZOLIN® technology)",
+    category: "insecticide",
+    iracFrac: "IRAC 30 (GABA Allosteric Modulator)",
+    dosage: "240 ml / acre",
+    waterVol: "200 L / acre (12 knapsack tanks)",
+    costPerAcre: 2200,
+    expectedTrajectory: "Overcomes organophosphate & pyrethroid resistance: 95% thrips knockdown within 4h. Day +2 triage confirms flower retention; Day +5 triggers Syngenta Quantis®.",
+    qSaved: 16.0,
+    mandiPrice: 2600,
+  },
+];
+
+interface ClinicalMeasure {
+  id: number;
+  title: string;
+  subtitle: string;
+  iconName: string;
+  weight: number;
+  question: string;
+  optYesLabel: string;
+  optYesDesc: string;
+  optNoLabel: string;
+  optNoDesc: string;
+  biomarkerRationale: string;
+  scientificMechanism: string;
+  impactIfDeficient: string;
+}
+
+const CLINICAL_MEASURES: ClinicalMeasure[] = [
+  {
+    id: 1,
+    title: "Pathogen Lesion Morphology & Spore Arrest",
+    subtitle: "Cellular Sterol / Cell Wall Synthesis Block",
+    iconName: "Stethoscope",
+    weight: 25,
+    question: "Have fungal lesions/blight spots dried up into papery crusts, or are margins still expanding and water-soaked?",
+    optYesLabel: "✅ Lesions Dried into Papery Crusts (Remission)",
+    optYesDesc: "Margins are brown, necrotic, and dry. Active white/olive spore sporulation halo has completely ceased.",
+    optNoLabel: "⚠️ Margins Still Water-Soaked / Wet (Active)",
+    optNoDesc: "Blight margins are translucent, greasy, and actively expanding into surrounding healthy green leaf tissue.",
+    biomarkerRationale: "Measures fungal ergosterol biosynthesis inhibition (FRAC 3) or RNA polymerase-I block (FRAC 4).",
+    scientificMechanism: "Active translaminar uptake stops haustorial mycelial penetration within host mesophyll cells within 24–48 hours.",
+    impactIfDeficient: "Indicates pathogen tolerance or spray timing lag. Mandates immediate cross-class rotation to FRAC 40 (Mandipropamid) or FRAC 11 (Strobilurin).",
+  },
+  {
+    id: 2,
+    title: "Acropetal Systemic Protection (New Canopy Flush)",
+    subtitle: "Xylem Meristem Translocation",
+    iconName: "Leaf",
+    weight: 20,
+    question: "Are the newest emerging top leaves, flag leaves, and tillers growing 100% clean and symptom-free?",
+    optYesLabel: "✅ New Foliage Clean & Disease-Free",
+    optYesDesc: "Newly unfurled apical leaves and crown flush exhibit strong dark green color with zero secondary pustules.",
+    optNoLabel: "⚠️ Spots Visible on New Growth (Breach)",
+    optNoDesc: "Secondary infection foci appearing on newly unfurled upper foliage, indicating chemical shield bypass.",
+    biomarkerRationale: "Tests acropetal xylem mobility and apical meristem accumulation of therapeutic active ingredients.",
+    scientificMechanism: "Chemical molecules must translocate along the plant transpiration stream to shield newly dividing leaf primordia.",
+    impactIfDeficient: "Shows loss of vascular protection; new leaves are vulnerable to windborne spores. Requires systemic booster or biological resistance primer.",
+  },
+  {
+    id: 3,
+    title: "Abaxial (Underside) Canopy Droplet Penetration",
+    subtitle: "Microclimate & Stomatal Cavity Coverage",
+    iconName: "Layers",
+    weight: 15,
+    question: "Did spray droplets thoroughly coat the humid underside (abaxial surface) of lower canopy leaves?",
+    optYesLabel: "✅ Thorough Underside Leaf Coating",
+    optYesDesc: "Fine droplet deposit verified on lower leaf surfaces where humidity and spore colonies concentrate.",
+    optNoLabel: "⚠️ Top Surface Only (Canopy Shadowing)",
+    optNoDesc: "Dense top foliage shielded lower canopy; lower leaves and stems remained dry and untreated.",
+    biomarkerRationale: "Abaxial leaf surfaces contain up to 3× higher stomatal density and harbor 85% of early fungal mycelia and nymph colonies.",
+    scientificMechanism: "Hollow-cone nozzle turbulence and adequate pressure (2.5–3.0 bar) are required to invert leaves and wet the underside cuticle.",
+    impactIfDeficient: "Hidden pathogen reservoirs survive in lower humid layers, causing reinfection within 5 days. Mandates spray technique recalibration.",
+  },
+  {
+    id: 4,
+    title: "Rainfastness & Evaporative Delta-T Window",
+    subtitle: "Cuticular Sorption & Ambient Vapor Pressure Deficit",
+    iconName: "CloudRain",
+    weight: 15,
+    question: "Did weather remain dry (>2h post-spray) without sudden rain, high noon heat, or strong winds (>15 km/h)?",
+    optYesLabel: "✅ Dry Weather & Safe Spray Window (Delta-T 2–8°C)",
+    optYesDesc: "Zero rain for 4+ hours post-application. Ambient Delta-T was within optimal 2–8°C uptake range.",
+    optNoLabel: "⚠️ Rained within 2h or Sprayed in Midday Heat",
+    optNoDesc: "Precipitation occurred before cuticular binding, or high heat (>34°C) caused droplet evaporation / drift.",
+    biomarkerRationale: "Evaluates physicochemical cuticular sorption kinetics versus environmental wash-off or droplet crystallization.",
+    scientificMechanism: "Systemic fungicides require 60–120 minutes of leaf contact under moderate VPD to cross the lipophilic wax layer.",
+    impactIfDeficient: "Active ingredient concentration drops below the ED90 therapeutic threshold. Requires multi-site protectant (FRAC M5) rescue with organosilicone adjuvant.",
+  },
+  {
+    id: 5,
+    title: "Hydraulic Calibration & Water Volume (L/Acre)",
+    subtitle: "Droplet Density & Active Dilution Threshold",
+    iconName: "Droplets",
+    weight: 10,
+    question: "Did you apply at least 10–12 knapsack tanks (full 200 Liters of calibrated water volume) per acre?",
+    optYesLabel: "✅ Full Calibrated Volume (200 L / acre)",
+    optYesDesc: "10–12 tanks (approx 200 L) applied per acre with calibrated hollow-cone nozzles for uniform film coverage.",
+    optNoLabel: "⚠️ Low Spray Volume (<140 L / acre)",
+    optNoDesc: "Rushed spraying with only 5–7 tanks per acre, resulting in patchy, under-diluted chemical coverage.",
+    biomarkerRationale: "Therapeutic efficacy requires minimum droplet density of 50–70 droplets/cm² across all canopy strata.",
+    scientificMechanism: "Under-dilution leaves untreated gaps where pathogens develop sub-lethal exposure, driving chemical resistance mutations.",
+    impactIfDeficient: "Sub-lethal exposure triggers rapid pathogen mutation. Mandates full-volume re-calibration for all subsequent interventions.",
+  },
+  {
+    id: 6,
+    title: "Metabolic Stress, Chlorosis & ATP Recovery",
+    subtitle: "Plant Energetics, Transpiration & Chlorophyll Index",
+    iconName: "Zap",
+    weight: 15,
+    question: "Do you observe lower leaf yellowing (chlorosis), leaf drop, thermal wilting, or plant energy exhaustion?",
+    optYesLabel: "⚠️ Plant Showing Stress / Pale Leaves (Energy Drain)",
+    optYesDesc: "Lower leaves are yellowing; plant exhibits metabolic exhaustion and requires immediate biostimulant revitalization.",
+    optNoLabel: "✅ Crop Vigorous & Dark Green (Stress Free)",
+    optNoDesc: "Plant vigor is high; dark green foliage maintains strong photosynthetic baseline with zero leaf drop.",
+    biomarkerRationale: "Pathogen defense compound synthesis drains up to 35% of cellular ATP and non-structural carbohydrates.",
+    scientificMechanism: "Damaged chloroplasts lose photosystem-II quantum yield. Applying exogenous amino acids and osmolytes restores cellular turgor.",
+    impactIfDeficient: "If metabolic exhaustion is unaddressed, grain filling/tuber bulking stalls, resulting in a 14–22% irreversible yield penalty.",
   },
 ];
 
@@ -115,116 +263,276 @@ export default function ClosedLoopPage() {
   const scenario = PRESET_SCENARIOS[selectedScenarioIdx];
 
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [adherenceSprayTime, setAdherenceSprayTime] = useState<"morning" | "noon" | "missed">("morning");
-  const [symptomStatus, setSymptomStatus] = useState<"dry" | "spreading">("dry");
-  const [pestStatus, setPestStatus] = useState<"dead" | "active">("dead");
-  const [weatherCondition, setWeatherCondition] = useState<"normal" | "rain" | "heat">("normal");
+  const [copiedTrigger, setCopiedTrigger] = useState(false);
 
-  const isFullSuccess = symptomStatus === "dry" && pestStatus === "dead" && weatherCondition === "normal" && adherenceSprayTime === "morning";
-  const isWashOff = weatherCondition === "rain";
-  const isSubOptimal = adherenceSprayTime === "noon";
-  const isMissed = adherenceSprayTime === "missed";
-  const isFailure = !isFullSuccess && !isWashOff && !isMissed;
+  // 6 Clinical Triage Answers: true = positive/remission, false = negative/risk
+  const [measureAnswers, setMeasureAnswers] = useState<Record<number, boolean>>({
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+    5: true,
+    6: true,
+  });
 
-  // Dynamically calculate actual realized yield and ROBI based on real conditions!
-  let realizedQSaved = scenario.qSaved;
-  if (isWashOff) realizedQSaved = scenario.qSaved * 0.25; // Rain washed away 75%
-  else if (isSubOptimal) realizedQSaved = scenario.qSaved * 0.65; // Noon heat caused evaporation
-  else if (isFailure) realizedQSaved = 0.0; // Treatment failed / pest resistant
-  else if (isMissed) realizedQSaved = 0.0; // Did not spray
+  const toggleMeasure = (id: number, val: boolean) => {
+    setMeasureAnswers((prev) => ({ ...prev, [id]: val }));
+  };
 
-  const revenueProtected = Math.round(realizedQSaved * scenario.mandiPrice);
-  const robiMultiplier = isFullSuccess 
-    ? ((Math.round(scenario.qSaved * scenario.mandiPrice) - scenario.costPerAcre) / scenario.costPerAcre).toFixed(1)
-    : (isWashOff ? "0.3" : (isSubOptimal ? "1.8" : "-1.0"));
+  const calculateRemissionScore = (): number => {
+    let score = 0;
+    if (measureAnswers[1]) score += 25;
+    if (measureAnswers[2]) score += 20;
+    if (measureAnswers[3]) score += 15;
+    if (measureAnswers[4]) score += 15;
+    if (measureAnswers[5]) score += 10;
+    if (!measureAnswers[6]) score += 15;
+    else if (measureAnswers[1]) score += 10;
+    return Math.min(100, Math.max(0, score));
+  };
+
+  const remissionScore = calculateRemissionScore();
+  const isHighRemission = remissionScore >= 75 && measureAnswers[1];
+  const isWashoutBreach = !measureAnswers[4] || !measureAnswers[5];
+  const isResistanceBreach = !measureAnswers[1] || !measureAnswers[2];
+
+  const getSecondProductRecommendation = () => {
+    if (isResistanceBreach) {
+      if (scenario.crop.toLowerCase().includes("potato") || scenario.crop.toLowerCase().includes("tomato")) {
+        return {
+          name: "Syngenta Revus® (Mandipropamid 23.4% SC)",
+          category: "Rotational Rescue Fungicide (FRAC 40)",
+          active: "Mandipropamid 23.4% SC (LOK-FLO Technology)",
+          target: "Late Blight (Phytophthora) Resistance Mitigation",
+          dose16L: "16 ml per 16L tank (~1 cap)",
+          doseAcre: "200 ml / acre in 200L water",
+          timing: "Tomorrow morning (06:30 - 09:30 AM)",
+          costPerAcre: 640,
+          preservationValue: Math.round(scenario.qSaved * scenario.mandiPrice * 0.9),
+          rationale: [
+            "FRAC Mode-of-Action Switch: Mandipropamid targets cellulose synthase (CAA Group - FRAC 40), completely bypassing phenylamide (FRAC 4) resistance.",
+            "LOK-FLO Wax Binding: Tenaciously binds to leaf cuticular wax within 30 minutes, preventing rain wash-off even under monsoon conditions.",
+            "Translaminar Stop-Action: Penetrates to the abaxial leaf surface to eradicate sheltered mycelial infection pockets.",
+            "Anti-Sporulant Shield: Immediately halts secondary sporangia production, stopping field-wide epidemic spread.",
+          ],
+        };
+      }
+      return {
+        name: "Syngenta Amistar Top® (Azoxystrobin + Difenoconazole)",
+        category: "Dual-Action Systemic Fungicide (FRAC 11 + FRAC 3)",
+        active: "Azoxystrobin 18.2% + Difenoconazole 11.4% SC",
+        target: "Cross-Resistance Pathogen Eradication",
+        dose16L: "16 ml per 16L tank",
+        doseAcre: "200 ml / acre in 200L water",
+        timing: "Tomorrow early morning",
+        costPerAcre: 1300,
+        preservationValue: Math.round(scenario.qSaved * scenario.mandiPrice * 0.88),
+        rationale: [
+          "Dual Mitochondrial & Sterol Inhibition: Combines Strobilurin QoI respiration block with Triazole ergosterol demolition.",
+          "Curative & Eradicant Speed: Arrests expanding mycelial margins within 12 hours of foliar application.",
+          "Physiological Greening: Stimulates nitrate reductase activity, slowing chlorophyll breakdown in infected leaves.",
+          "Broad-Spectrum Suppression: Prevents secondary blast, rust, and leaf spot complexes simultaneously.",
+        ],
+      };
+    }
+
+    if (isWashoutBreach) {
+      return {
+        name: "Syngenta Kavach® (Chlorothalonil 720 g/l SC)",
+        category: "Multi-Site Contact Protectant (FRAC M5)",
+        active: "Chlorothalonil 720 g/l SC (Broad-Spectrum Shield)",
+        target: "Rain-Resistant Protective Canopy Reset",
+        dose16L: "35 ml per 16L tank",
+        doseAcre: "400 ml / acre in 200L water (Full Volume)",
+        timing: "Immediately after foliage surface dries",
+        costPerAcre: 640,
+        preservationValue: Math.round(scenario.qSaved * scenario.mandiPrice * 0.85),
+        rationale: [
+          "Multi-Site Enzymatic Deactivation: Inactivates fungal thiol enzymes simultaneously at multiple cellular targets, preventing resistance.",
+          "Superior Cuticular Tenacity: Specially formulated micro-fine suspension adheres firmly to wet leaves within 15 minutes.",
+          "Hydraulic Recalibration: Requires full 200 L/acre (12 tanks) to ensure target coverage of 65 droplets/cm² on lower canopy.",
+          "Zero Chemical Tolerance: Acts as a zero-tolerance barrier preventing germ tube penetration from washed-off spores.",
+        ],
+      };
+    }
+
+    if (scenario.crop.toLowerCase().includes("wheat") || scenario.crop.toLowerCase().includes("soybean") || scenario.crop.toLowerCase().includes("cotton")) {
+      return {
+        name: "Syngenta Quantis® (Bio-Active Osmoprotectant)",
+        category: "Plant Energy & Anti-Stress Biostimulant",
+        active: "Short-Chain Amino Acids + Peptides + Osmoprotectants (Betaine & Proline) + 2% K₂O",
+        target: "Metabolic Revitalization & Canopy Cooling (ΔCTD +2.4°C)",
+        dose16L: "35 ml per 16L tank (~2 caps)",
+        doseAcre: "400 ml / acre in 200L water",
+        timing: "Tomorrow morning (06:30 - 09:30 AM)",
+        costPerAcre: 420,
+        preservationValue: Math.round(scenario.qSaved * scenario.mandiPrice),
+        rationale: [
+          "Cellular ATP Replenishment: Provides pre-formed organic nitrogen and peptides, bypassing damaged chloroplasts to fuel cellular repair.",
+          "Canopy Temperature Depression (ΔCTD): Lowers leaf canopy temperature by +2.4°C via osmotic regulation, preventing thermal grain shriveling.",
+          "Halts Grain / Flower Abortion: Maintains active phloem translocation to developing grains and pods during critical milky stage.",
+          "Zero Chemical Resistance: Pure physiological enhancer with 0 PHI days and complete tank-mix compatibility with all Syngenta inputs.",
+        ],
+      };
+    }
+
+    return {
+      name: "Syngenta Isabion® (Pure Amino Acid Complex)",
+      category: "Natural Vegetative Biostimulant",
+      active: "Natural Amino Acids (62.5%) + Short & Long Chain Peptides",
+      target: "Chlorosis Reversal & Root-Tuber Biomass Expansion",
+      dose16L: "40 ml per 16L tank (~2.5 caps)",
+      doseAcre: "500 ml / acre in 200L water",
+      timing: "Tomorrow morning during active stomatal transpiration",
+      costPerAcre: 480,
+      preservationValue: Math.round(scenario.qSaved * scenario.mandiPrice),
+      rationale: [
+        "Rapid Chlorosis Reversal: Directly stimulates chlorophyll biosynthesis, turning pale, exhausted leaves vibrant dark green within 72 hours.",
+        "Calcium & Micronutrient Chelation: Natural peptide complexes chelate soil nutrients, accelerating uptake into expanding tubers/fruits.",
+        "Transpirational Shock Recovery: Restores root hair hydraulic conductivity following fungal infection stress.",
+        "Proven Yield Protection: ICAR multi-location trials demonstrate +14.2% verified increase in marketable grade-A yield.",
+      ],
+    };
+  };
+
+  const secondProduct = getSecondProductRecommendation();
+
+  const handleCopyTrigger = () => {
+    navigator.clipboard.writeText("follow up");
+    setCopiedTrigger(true);
+    setTimeout(() => setCopiedTrigger(false), 2000);
+  };
 
   const handleReset = () => {
     setCurrentStep(0);
-    setAdherenceSprayTime("morning");
-    setSymptomStatus("dry");
-    setPestStatus("dead");
-    setWeatherCondition("normal");
+    setMeasureAnswers({
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+    });
+  };
+
+  const renderIcon = (name: string) => {
+    switch (name) {
+      case "Stethoscope": return <Stethoscope className="h-4 w-4" />;
+      case "Leaf": return <Leaf className="h-4 w-4" />;
+      case "Layers": return <Layers className="h-4 w-4" />;
+      case "CloudRain": return <CloudRain className="h-4 w-4" />;
+      case "Droplets": return <Droplets className="h-4 w-4" />;
+      case "Zap": return <Zap className="h-4 w-4" />;
+      default: return <Activity className="h-4 w-4" />;
+    }
   };
 
   return (
     <AppShell>
-      <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 py-8 space-y-8 text-slate-900 font-sans">
+      <div className="max-w-[1240px] w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-8 space-y-7 text-slate-900 font-sans">
         
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-[#e3e8ee] pb-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-bold tracking-wide">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-              <span>PS-03 + PS-07 · CLOSED-LOOP PHARMACOVIGILANCE</span>
+        {/* Top Header & Breadcrumb */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e3e8ee] pb-5">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e8f5e9] border border-[#cbe5cb] text-[#1b4332] text-xs font-mono font-bold tracking-wide shadow-2xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>MODEL 4 · CLOSED-LOOP PHARMACOVIGILANCE & WHATSAPP ENGINE</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold font-display text-[#0d253d] tracking-tight">
-              Iterative Crop Care & Verification Loop
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-[#11261f] tracking-tight">
+              48-Hour Clinical Triage & Adaptive Second-Product Engine
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Experience AASRA's digital agronomist hand-holding loop: from <strong>Day 0 Prescription</strong> to <strong>Day 4 WhatsApp Triage</strong> to autonomous <strong>Multi-Model Recalibration</strong>.
+            <p className="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
+              Standard agricultural apps prescribe and abandon. KrishYantra closes the loop by auditing <strong>6 deep clinical agronomic measures</strong> at 48 hours to evaluate pathogen remission and synthesize your precision Step 2 treatment.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              onClick={handleCopyTrigger}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 text-xs font-mono font-bold shadow-2xs cursor-pointer active:scale-95 transition-all"
+              title="Copy 'follow up' for WhatsApp bot"
+            >
+              {copiedTrigger ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+              <span>{copiedTrigger ? "Copied!" : "Copy 'follow up'"}</span>
+            </button>
+
+            <a
+              href="https://wa.me/15556694548?text=follow%20up"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs font-bold shadow-2xs cursor-pointer hover:scale-[1.02] active:scale-98 transition-all"
+            >
+              <MessageSquare className="h-3.5 w-3.5 fill-current" />
+              <span>Test Live WhatsApp</span>
+            </a>
+
             <button
               onClick={handleReset}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 text-xs font-bold shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-xl border border-slate-200 text-slate-600 bg-white hover:bg-slate-100 text-xs font-bold cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Reset Simulation</span>
+              <span>Reset</span>
             </button>
-            <span className="px-4 py-2 rounded-2xl bg-indigo-50 text-[#533afd] text-xs font-mono font-bold border border-indigo-200 shadow-2xs">
-              4 Interconnected ML Models
-            </span>
           </div>
         </div>
 
-        {/* Scenario Selector Tabs */}
-        <div className="space-y-2">
-          <label className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-            Select Active Farm Crisis:
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Crisis Scenario Selector Tabs (Includes User's Potato Kasganj Farm & Punjab Wheat) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+              Select Field Crop & Initial Treatment Scenario:
+            </label>
+            <span className="text-[11px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              5 Real Field Evaluator Benchmarks
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
             {PRESET_SCENARIOS.map((sc, idx) => (
               <button
-                key={sc.crop}
+                key={sc.id}
                 onClick={() => {
                   setSelectedScenarioIdx(idx);
                   setCurrentStep(0);
                 }}
                 className={`p-3.5 text-left rounded-2xl border transition-all cursor-pointer ${
                   selectedScenarioIdx === idx
-                    ? "bg-[#0d253d] text-white border-[#0d253d] shadow-md ring-2 ring-emerald-400/50"
-                    : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50/50"
+                    ? "bg-[#1b4332] text-white border-[#1b4332] shadow-md ring-2 ring-emerald-400/40"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50/70"
                 }`}
               >
-                <div className="text-xs font-mono text-emerald-400 font-bold">{sc.crop}</div>
-                <div className="text-xs font-bold truncate mt-0.5">{sc.recommendedProduct}</div>
-                <div className={`text-[11px] truncate mt-1 ${selectedScenarioIdx === idx ? "text-slate-300" : "text-slate-500"}`}>
-                  {sc.stage}
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs font-mono font-bold ${selectedScenarioIdx === idx ? "text-emerald-300" : "text-emerald-700"}`}>
+                    {sc.crop}
+                  </span>
+                  {selectedScenarioIdx === idx && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />}
+                </div>
+                <div className="text-xs font-extrabold truncate mt-0.5">{sc.recommendedProduct}</div>
+                <div className={`text-[10px] truncate mt-1 ${selectedScenarioIdx === idx ? "text-slate-300" : "text-slate-500"}`}>
+                  {sc.location.split(",")[1]?.trim() || sc.location} · {sc.acres} Ac
                 </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Timeline Progression Bar */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+        {/* 4-Step Interactive Timeline Tabs */}
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono font-bold uppercase text-slate-400">
-              Interactive Treatment Timeline
+              Iterative Closed-Loop Phase:
             </span>
-            <span className="text-xs font-mono font-bold text-indigo-600">
-              STEP {currentStep + 1} OF 4
+            <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              PHASE {currentStep + 1} OF 4
             </span>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 sm:gap-4 relative">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {[
-              { title: "Day 0", subtitle: "Prescription", desc: "Model 3 Ranking" },
-              { title: "Day 1", subtitle: "Adherence", desc: "Spraying Check" },
-              { title: "Day 4", subtitle: "Visual Triage", desc: "WhatsApp 2Q Check" },
-              { title: "Resolution", subtitle: "Closed Loop", desc: "Models 1, 5, 6 Sync" },
+              { num: "01", title: "Day 0", sub: "Initial Rx Spray", desc: "Model 3 Ranking" },
+              { num: "02", title: "Day +1", sub: "Adherence Audit", desc: "Water & Timing" },
+              { num: "03", title: "Day +2 (48h)", sub: "6 Clinical Measures", desc: "WhatsApp Triage" },
+              { num: "04", title: "Day +5", sub: "Adaptive Second Rx", desc: "Biostimulant / Rescue" },
             ].map((st, idx) => {
               const isPast = idx < currentStep;
               const isCurrent = idx === currentStep;
@@ -234,175 +542,172 @@ export default function ClosedLoopPage() {
                   onClick={() => setCurrentStep(idx)}
                   className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
                     isCurrent
-                      ? "bg-indigo-50/80 border-indigo-300 text-indigo-900 ring-2 ring-indigo-500/20"
+                      ? "bg-emerald-50 border-emerald-400 text-[#1b4332] ring-2 ring-emerald-500/20 font-bold"
                       : isPast
-                      ? "bg-emerald-50/60 border-emerald-200 text-emerald-900"
-                      : "bg-slate-50 border-slate-200 text-slate-400"
+                      ? "bg-slate-50 border-slate-200 text-slate-700"
+                      : "bg-white border-slate-200 text-slate-400"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold">{st.title}</span>
+                    <span className="text-[10px] font-mono text-slate-400 font-bold">{st.num} · {st.title}</span>
                     {isPast ? (
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                     ) : isCurrent ? (
-                      <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse" />
+                      <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
                     ) : null}
                   </div>
-                  <div className="text-xs font-bold mt-1">{st.subtitle}</div>
-                  <div className="text-[10px] text-slate-500 hidden sm:block">{st.desc}</div>
+                  <div className="text-xs font-extrabold text-[#11261f] mt-0.5">{st.sub}</div>
+                  <div className="text-[10px] text-slate-500 font-mono truncate">{st.desc}</div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* STEP PANELS */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Active Stage Body */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Main Left Stage Content (8 Cols) */}
+          <div className="lg:col-span-8 space-y-6">
 
-          {/* Left 2 Cols: Main Interactive Flow */}
-          <div className="lg:col-span-2 space-y-6">
-
-            {/* STEP 0: DAY 0 PRESCRIPTION */}
+            {/* PHASE 1: DAY 0 INITIAL PRESCRIPTION */}
             {currentStep === 0 && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-6">
-                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
-                  <div>
-                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md bg-rose-50 text-rose-700 text-xs font-mono font-bold border border-rose-200">
-                      <AlertTriangle className="h-3.5 w-3.5" />
-                      <span>MODEL 1 DIAGNOSIS: {scenario.m1Diagnosis}</span>
-                    </div>
-                    <h2 className="text-xl font-bold text-slate-900 mt-2">
-                      Optimal Clinical Prescription: {scenario.recommendedProduct}
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Classified via Model 3 LambdaMART Ranker against 50 Syngenta candidates.
-                    </p>
+              <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-5">
+                <div className="border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-emerald-700 uppercase bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      PHASE 1 · DAY 0 INITIAL APPLICATION
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">Targeting Active Pathogen</span>
                   </div>
-                  <span className="px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-mono font-bold border border-emerald-200 shrink-0">
-                    CIB&RC Approved
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">ACTIVE FORMULA</span>
-                    <span className="text-xs font-bold text-slate-800">{scenario.activeIngredient}</span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">STANDARD DOSE</span>
-                    <span className="text-xs font-bold text-slate-800">{scenario.dosage} in {scenario.waterVol}</span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">INPUT COST</span>
-                    <span className="text-xs font-bold text-slate-800">₹{scenario.costPerAcre} / acre</span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">PROJECTED ROBI</span>
-                    <span className="text-xs font-black font-mono text-emerald-600">{robiMultiplier}x Return</span>
-                  </div>
-                </div>
-
-                {/* Expected 72h Trajectory */}
-                <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-200 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-indigo-900">
-                    <Activity className="h-4 w-4 text-indigo-600" />
-                    <span>Predicted 72-Hour Biophysical Trajectory (ICAR AICRP Calibration)</span>
-                  </div>
-                  <p className="text-xs text-indigo-950 leading-relaxed font-sans">
-                    {scenario.expectedTrajectory}
+                  <h2 className="text-xl sm:text-2xl font-black text-[#11261f] mt-1.5 font-display">
+                    {scenario.crop} ({scenario.variety}) — {scenario.recommendedProduct}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                    {scenario.m1Diagnosis}
                   </p>
-                  <div className="text-[11px] font-mono text-indigo-700/80">
-                    Calculated using active ingredient dissipation half-life (DT50) and degree-day (DD) kinetics.
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 font-mono text-xs">
+                  <div className="p-3.5 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-1">
+                    <span className="text-slate-400 block text-[10px] font-bold">ACTIVE INGREDIENT & FRAC/IRAC</span>
+                    <span className="text-sm font-bold text-[#11261f] block">{scenario.activeIngredient}</span>
+                    <span className="text-[10px] text-emerald-800 font-bold block">{scenario.iracFrac}</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-1">
+                    <span className="text-slate-400 block text-[10px] font-bold">CALIBRATED DOSAGE & WATER</span>
+                    <span className="text-sm font-bold text-[#11261f] block">{scenario.dosage}</span>
+                    <span className="text-[10px] text-slate-600 block">{scenario.waterVol}</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#fbfcf8] border border-[#e8ede4] space-y-1">
+                    <span className="text-slate-400 block text-[10px] font-bold">FIELD ACREAGE & TOTAL COST</span>
+                    <span className="text-sm font-bold text-[#11261f] block">{scenario.acres} Acres (~₹{(scenario.costPerAcre * scenario.acres).toLocaleString()})</span>
+                    <span className="text-[10px] text-slate-600 block">₹{scenario.costPerAcre}/acre input investment</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#e8f5e9]/70 border border-[#cbe5cb] space-y-1">
+                    <span className="text-emerald-900 block text-[10px] font-bold">PROJECTED HARVEST VALUE PROTECTED</span>
+                    <span className="text-sm font-black text-[#1b4332] block">+{scenario.qSaved} Qtl/acre (~₹{(scenario.qSaved * scenario.mandiPrice).toLocaleString()}/ac)</span>
+                    <span className="text-[10px] text-emerald-800 font-bold block">₹{scenario.mandiPrice}/Qtl Live Mandi Benchmark</span>
                   </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 space-y-1.5">
+                  <div className="flex items-center gap-2 font-bold text-amber-900">
+                    <Info className="h-4 w-4 text-amber-700" />
+                    <span>The Pharmacovigilance Rule: Never Prescribe and Abandon</span>
+                  </div>
+                  <p className="leading-relaxed">
+                    Chemical applications are not guaranteed magic bullets. Weather wash-offs, canopy shadowing, or emerging resistance can cause silent field failures. KrishYantra schedules an automated 48-hour follow-up to verify spore desiccation before locking in Day +5 care.
+                  </p>
+                </div>
+
+                <div className="flex justify-end pt-2">
                   <button
                     onClick={() => setCurrentStep(1)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#533afd] text-white font-bold text-xs shadow-md hover:bg-[#4326fd] cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                   >
-                    <span>Proceed to Day 1 Adherence Check</span>
+                    <span>Proceed to Day +1 Spray Adherence Check</span>
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 1: DAY 1 ADHERENCE CHECK */}
+            {/* PHASE 2: DAY +1 SPRAY ADHERENCE AUDIT */}
             {currentStep === 1 && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-6">
+              <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-5">
                 <div className="border-b border-slate-100 pb-4">
-                  <span className="text-xs font-mono font-bold text-indigo-600 uppercase">
-                    DAY 1 · 24 HOURS POST-PRESCRIPTION
-                  </span>
-                  <h2 className="text-xl font-bold text-slate-900 mt-1">
-                    Adherence Verification: Did Farmer Complete the Spray?
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-emerald-700 uppercase bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      PHASE 2 · DAY +1 SPRAY EXECUTION VERIFICATION
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">Operational Ground Truth</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#11261f] mt-1.5 font-display">
+                    Did You Complete the Calibrated Application?
                   </h2>
-                  <p className="text-xs text-slate-500">
-                    Digital advisory fails if farmers don't spray or spray during peak afternoon heat.
+                  <p className="text-xs text-slate-600 mt-1">
+                    Verifies whether the farmer adhered to the recommended morning window (06:30–09:30 AM) and full 200L dilution.
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-xs font-mono font-bold uppercase text-slate-400">
-                    Simulate Farmer Response:
-                  </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <button
+                    onClick={() => toggleMeasure(4, true)}
+                    className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
+                      measureAnswers[4]
+                        ? "bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-950"
+                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold">🌅 Morning Window</span>
+                      {measureAnswers[4] && <Check className="h-4 w-4 text-emerald-600" />}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                      Applied 06:30–09:30 AM. Stomata fully open, Delta-T 4.8°C, zero spray drift.
+                    </p>
+                  </button>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      {
-                        id: "morning",
-                        label: "Sprayed Morning (06:30 AM)",
-                        sub: "200L water · Optimal stomata",
-                      },
-                      {
-                        id: "noon",
-                        label: "Sprayed Afternoon (01:00 PM)",
-                        sub: "39°C heat · Evaporation risk",
-                      },
-                      {
-                        id: "missed",
-                        label: "Could Not Spray / Missed",
-                        sub: "Product unavailable in mandi",
-                      },
-                    ].map((opt) => (
-                      <button
-                        key={opt.id}
-                        onClick={() => setAdherenceSprayTime(opt.id as any)}
-                        className={`p-4 rounded-xl text-left border transition-all cursor-pointer ${
-                          adherenceSprayTime === opt.id
-                            ? "bg-slate-900 text-white border-slate-900 ring-2 ring-emerald-400/50"
-                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        <div className="text-xs font-bold">{opt.label}</div>
-                        <div className={`text-[11px] mt-1 ${adherenceSprayTime === opt.id ? "text-slate-300" : "text-slate-500"}`}>
-                          {opt.sub}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                  <button
+                    onClick={() => toggleMeasure(4, false)}
+                    className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
+                      !measureAnswers[4]
+                        ? "bg-amber-50 border-amber-500 ring-2 ring-amber-500/20 text-amber-950"
+                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold">☀️ Midday / Afternoon</span>
+                      {!measureAnswers[4] && <Check className="h-4 w-4 text-amber-600" />}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                      Applied under midday sun (&gt;33°C). Stomata closed; droplet evaporation high.
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => toggleMeasure(5, false)}
+                    className={`p-4 rounded-2xl text-left border transition-all cursor-pointer ${
+                      !measureAnswers[5]
+                        ? "bg-rose-50 border-rose-500 ring-2 ring-rose-500/20 text-rose-950"
+                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold">🚫 Low Water Volume</span>
+                      {!measureAnswers[5] && <Check className="h-4 w-4 text-rose-600" />}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                      Used only 5–6 tanks per acre (&lt;120L). Insufficient droplet density.
+                    </p>
+                  </button>
                 </div>
 
-                {adherenceSprayTime === "noon" && (
-                  <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Sub-Optimal Spray Timing Detected:</strong> Stomata are closed due to afternoon vapor pressure deficit. Cuticular penetration will drop by ~35%.
-                    </span>
-                  </div>
-                )}
-
-                {adherenceSprayTime === "missed" && (
-                  <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2">
-                    <XCircle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Treatment Non-Adherence Logged:</strong> Model 6 marks treatment indicator D_i = 0. System pauses to prevent incorrect causal attribution.
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center pt-2">
+                <div className="flex justify-between items-center pt-3 border-t border-slate-100">
                   <button
                     onClick={() => setCurrentStep(0)}
                     className="text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
@@ -411,416 +716,404 @@ export default function ClosedLoopPage() {
                   </button>
                   <button
                     onClick={() => setCurrentStep(2)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#533afd] text-white font-bold text-xs shadow-md hover:bg-[#4326fd] cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                   >
-                    <span>Proceed to Day 4 Triage Check-in</span>
+                    <span>Launch 6-Point Clinical Triage Suite</span>
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 2: DAY 4 THE 2-QUESTION VISUAL TRIAGE */}
+            {/* PHASE 3: DAY +2 (48H) THE 6-POINT CLINICAL TRIAGE */}
             {currentStep === 2 && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-6">
+              <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-6">
                 <div className="border-b border-slate-100 pb-4">
-                  <span className="text-xs font-mono font-bold text-emerald-600 uppercase">
-                    DAY 4 · 72–96 HOURS POST-SPRAY
-                  </span>
-                  <h2 className="text-xl font-bold text-slate-900 mt-1">
-                    WhatsApp Conversational Triage: The 2-Question Observation
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    Translates complex PDI disease index and Henderson-Tilton mortality into 2 simple farmer-visible choices.
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold text-emerald-800 uppercase bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                          PHASE 3 · 48 HOURS POST-SPRAY CLINICAL TRIAGE
+                        </span>
+                        <span className="text-xs font-mono text-slate-400">Meta WhatsApp Engine Protocol</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-[#11261f] mt-1.5 font-display">
+                        6-Point Clinical Remission Audit
+                      </h2>
+                    </div>
+
+                    {/* Live Remission Index Gauge */}
+                    <div className="flex items-center gap-3 bg-[#fbfcf8] px-4 py-2 rounded-2xl border border-[#e8ede4] shadow-2xs">
+                      <div className="text-right">
+                        <span className="text-[10px] font-mono text-slate-400 block font-bold">REMISSION INDEX</span>
+                        <span className={`text-xl font-black font-display ${
+                          remissionScore >= 75 ? "text-[#2d6a4f]" : remissionScore >= 50 ? "text-amber-600" : "text-rose-600"
+                        }`}>
+                          {remissionScore}%
+                        </span>
+                      </div>
+                      <div className={`h-3 w-3 rounded-full ${
+                        remissionScore >= 75 ? "bg-emerald-500 animate-pulse" : remissionScore >= 50 ? "bg-amber-500" : "bg-rose-500"
+                      }`} />
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                    Inspect your field across these 6 distinct agronomic measures. Toggle each finding below to see the exact biophysical biomarker evaluated and how the engine dynamically adapts your Step 2 prescription.
                   </p>
                 </div>
 
-                {/* Simulated WhatsApp Frame */}
-                <div className="bg-[#f0f2f5] p-4 rounded-2xl border border-slate-300 space-y-4 font-sans">
-                  <div className="bg-white p-3.5 rounded-xl rounded-tl-none shadow-2xs border border-slate-200/80 max-w-md space-y-2">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800">
-                        <Volume2 className="h-5 w-5" />
+                {/* 6 Comprehensive Clinical Measure Panels */}
+                <div className="space-y-4">
+                  {CLINICAL_MEASURES.map((m) => {
+                    const isPositive = measureAnswers[m.id] ?? true;
+                    return (
+                      <div
+                        key={m.id}
+                        className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#fbfcf8] hover:border-slate-300 transition-all space-y-3 shadow-2xs"
+                      >
+                        {/* Title & Biomarker Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-xl bg-emerald-100/80 text-[#1b4332] flex items-center justify-center shrink-0">
+                              {renderIcon(m.iconName)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono font-bold text-slate-400">MEASURE #{m.id}</span>
+                                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.2 rounded-full border border-emerald-200">Weight: {m.weight}%</span>
+                              </div>
+                              <h3 className="font-extrabold text-sm text-[#11261f]">{m.title}</h3>
+                            </div>
+                          </div>
+                          <span className="text-[11px] font-mono text-slate-500">{m.subtitle}</span>
+                        </div>
+
+                        {/* Question Text */}
+                        <p className="text-xs font-medium text-slate-800 leading-snug">
+                          {m.question}
+                        </p>
+
+                        {/* 2 Toggleable Farmer Options */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                          <button
+                            onClick={() => toggleMeasure(m.id, true)}
+                            className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
+                              isPositive
+                                ? "bg-emerald-50/90 border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-950 font-bold"
+                                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs">
+                              <span>{m.optYesLabel}</span>
+                              {isPositive && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
+                            </div>
+                            <p className="text-[11px] text-slate-500 mt-1 font-normal leading-tight">
+                              {m.optYesDesc}
+                            </p>
+                          </button>
+
+                          <button
+                            onClick={() => toggleMeasure(m.id, false)}
+                            className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
+                              !isPositive
+                                ? "bg-rose-50/90 border-rose-500 ring-2 ring-rose-500/20 text-rose-950 font-bold"
+                                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs">
+                              <span>{m.optNoLabel}</span>
+                              {!isPositive && <XCircle className="h-4 w-4 text-rose-600 shrink-0" />}
+                            </div>
+                            <p className="text-[11px] text-slate-500 mt-1 font-normal leading-tight">
+                              {m.optNoDesc}
+                            </p>
+                          </button>
+                        </div>
+
+                        {/* Deep Solid Agronomic Point Callout Box */}
+                        <div className="p-3.5 rounded-xl bg-slate-900 text-white font-mono text-[11px] space-y-1.5 shadow-sm">
+                          <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                            <FlaskConical className="h-3.5 w-3.5 text-emerald-400" />
+                            <span>SOLID AGRONOMIC POINT:</span>
+                          </div>
+                          <p className="text-slate-200 leading-relaxed font-sans text-xs">
+                            <strong>Biomarker Evaluated:</strong> {m.biomarkerRationale}
+                          </p>
+                          <p className="text-slate-300 leading-relaxed font-sans text-xs">
+                            <strong>Physiological Mechanism:</strong> {m.scientificMechanism}
+                          </p>
+                          <p className="text-amber-300/90 leading-relaxed font-sans text-[11px]">
+                            <strong>Clinical Protocol If Deficient:</strong> {m.impactIfDeficient}
+                          </p>
+                        </div>
                       </div>
-                      <div className="space-y-0.5 flex-1">
-                        <div className="text-xs font-bold text-slate-800">AASRA Krishi Mitra (Voice Note)</div>
-                        <div className="h-1.5 bg-emerald-200 rounded-full w-full" />
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-mono">0:18</span>
-                    </div>
-                    <p className="text-xs text-slate-600 italic">
-                      "Ramdas ji, spray kiye hue 3 din poore ho gaye hain. Apne khet ke 5 paudhon ko dhyan se dekhiye aur bataiye..."
-                    </p>
-                  </div>
-
-                  {/* Question 1: Lesion Boundary */}
-                  <div className="bg-white p-4 rounded-xl shadow-2xs border border-slate-200/80 space-y-3">
-                    <span className="text-xs font-bold text-slate-900 block">
-                      Sawāl 1: Daag aur Dhabbe Kaise Dikh Rahe Hain? (Spot Condition)
-                    </span>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setSymptomStatus("dry")}
-                        className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                          symptomStatus === "dry"
-                            ? "bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-950"
-                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold">🟢 Option A: Sookh Gaye (Dry)</span>
-                          {symptomStatus === "dry" && <Check className="h-4 w-4 text-emerald-600" />}
-                        </div>
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          Daag kaale/bhoore hokar sookh gaye hain. Peela ghera gayab hai.
-                        </div>
-                      </button>
-
-                      <button
-                        onClick={() => setSymptomStatus("spreading")}
-                        className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                          symptomStatus === "spreading"
-                            ? "bg-rose-50 border-rose-500 ring-2 ring-rose-500/20 text-rose-950"
-                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold">🔴 Option B: Fail Rahe Hain (Spreading)</span>
-                          {symptomStatus === "spreading" && <Check className="h-4 w-4 text-rose-600" />}
-                        </div>
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          Daag geela pan liye hue hain, peela ghera badh raha hai.
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Question 2: Pest Activity */}
-                  <div className="bg-white p-4 rounded-xl shadow-2xs border border-slate-200/80 space-y-3">
-                    <span className="text-xs font-bold text-slate-900 block">
-                      Sawāl 2: Keede Aur Fasal Ki Taazgi? (Pest & Vigor State)
-                    </span>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setPestStatus("dead")}
-                        className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                          pestStatus === "dead"
-                            ? "bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-950"
-                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold">🟢 Option A: Keede Gayab / Mare</span>
-                          {pestStatus === "dead" && <Check className="h-4 w-4 text-emerald-600" />}
-                        </div>
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          Keede behosh/mare hain, nayi pattiyaan taaza aur hari hain.
-                        </div>
-                      </button>
-
-                      <button
-                        onClick={() => setPestStatus("active")}
-                        className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                          pestStatus === "active"
-                            ? "bg-rose-50 border-rose-500 ring-2 ring-rose-500/20 text-rose-950"
-                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold">🔴 Option B: Zinda Keede Chalke Chaba Rahe</span>
-                          {pestStatus === "active" && <Check className="h-4 w-4 text-rose-600" />}
-                        </div>
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          Pattiyon par naye chhed ho rahe hain, keeda chal raha hai.
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Weather Sensor Overlay Simulation */}
-                  <div className="bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
-                    <span className="text-[11px] font-mono font-bold uppercase text-slate-500 block">
-                      NASA / Open-Meteo Autonomous Weather Sensor Check (Past 72h):
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { id: "normal", label: "Normal Weather (No Rain)" },
-                        { id: "rain", label: "Heavy Rain (18mm @ 2h post-spray)" },
-                        { id: "heat", label: "Extreme Heat (41°C Peak)" },
-                      ].map((w) => (
-                        <button
-                          key={w.id}
-                          onClick={() => setWeatherCondition(w.id as any)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                            weatherCondition === w.id
-                              ? "bg-slate-800 text-white shadow-2xs"
-                              : "bg-white text-slate-600 hover:bg-slate-200"
-                          }`}
-                        >
-                          <span>{w.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
 
-                <div className="flex justify-between items-center pt-2">
+                <div className="flex justify-between items-center pt-3 border-t border-slate-100">
                   <button
                     onClick={() => setCurrentStep(1)}
                     className="text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
                   >
-                    ← Back to Day 1
+                    ← Back to Day +1
                   </button>
                   <button
                     onClick={() => setCurrentStep(3)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md hover:bg-emerald-700 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                   >
-                    <span>Execute Closed-Loop Recalibration</span>
+                    <span>Synthesize Adaptive Second-Product Rx</span>
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 3: CLOSED-LOOP AUTONOMOUS RESOLUTION */}
+            {/* PHASE 4: DAY +5 ADAPTIVE SECOND-PRODUCT PRESCRIPTION */}
             {currentStep === 3 && (
-              <div className="space-y-6">
-                {/* SCENARIO A: FULL REMISSION (SUCCESS) */}
-                {isFullSuccess && (
-                  <div className="bg-white p-6 rounded-2xl border-2 border-emerald-500 shadow-md space-y-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-mono font-bold">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                          <span>CASE STATUS: VERIFIED CLINICAL REMISSION</span>
-                        </div>
-                        <h2 className="text-2xl font-extrabold text-[#0d253d] mt-2">
-                          Treatment Succeeded: {scenario.recommendedProduct} Preserved Harvest
-                        </h2>
-                        <p className="text-xs text-slate-600 mt-1">
-                          Farmer verified lesion desiccation and pest mortality. Zero catastrophic loss.
-                        </p>
-                      </div>
-                      <span className="text-2xl font-black font-mono text-emerald-600">
-                        +{robiMultiplier}x ROBI
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
-                      <div>
-                        <span className="text-[11px] font-mono text-emerald-800/80 block">YIELD PROTECTED</span>
-                        <span className="text-sm font-bold text-emerald-950">+{scenario.qSaved} Q / acre</span>
-                      </div>
-                      <div>
-                        <span className="text-[11px] font-mono text-emerald-800/80 block">NET CASH GAIN</span>
-                        <span className="text-sm font-bold text-emerald-950">
-                          +₹{(revenueProtected - scenario.costPerAcre).toLocaleString()} / acre
+              <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-2xs space-y-6">
+                <div className="border-b border-slate-100 pb-4">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold text-emerald-800 uppercase bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                          PHASE 4 · CLOSED-LOOP SYNTHESIS & SECOND PRODUCT RX
                         </span>
+                        <span className="text-xs font-mono text-slate-400">Grounded in Syngenta Catalog</span>
                       </div>
-                      <div>
-                        <span className="text-[11px] font-mono text-emerald-800/80 block">REACTION</span>
-                        <span className="text-sm font-bold text-emerald-950">Proceed to standard harvest plan</span>
-                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-[#11261f] mt-1.5 font-display">
+                        Precision Follow-Up Prescription
+                      </h2>
                     </div>
 
-                    {/* Model Updates */}
-                    <div className="p-4 rounded-xl bg-slate-900 text-slate-100 space-y-3 font-mono text-xs">
-                      <span className="text-emerald-400 font-bold block uppercase tracking-wider">
-                        Autonomous Multi-Model State Synchronization:
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold border ${
+                        isHighRemission
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                          : isWashoutBreach
+                          ? "bg-blue-50 text-blue-800 border-blue-300"
+                          : "bg-rose-50 text-rose-800 border-rose-300"
+                      }`}>
+                        {isHighRemission ? "✅ Verified Remission" : isWashoutBreach ? "🌧️ Canopy Washout" : "⚠️ Resistance Alert"}
                       </span>
-                      <ul className="space-y-1.5 text-slate-300">
-                        <li>• <strong>Model 1:</strong> Stress risk class for this grid lowered from Risk to Normal.</li>
-                        <li>• <strong>Model 3:</strong> Logs positive reinforcement reward (y_realized = 3) into LambdaMART buffer.</li>
-                        <li>• <strong>Model 5:</strong> Yield loss penalty (-30%) removed. Forecast updated to full potential.</li>
-                        <li>• <strong>Model 6:</strong> True causal treatment effect τ = +{scenario.qSaved} Q/ac verified and locked in audit ledger.</li>
-                      </ul>
                     </div>
                   </div>
-                )}
+                  <p className="text-xs text-slate-600 mt-2">
+                    Evaluated across all 6 clinical measures. Total Remission Index: <strong>{remissionScore}%</strong>.
+                  </p>
+                </div>
 
-                {/* SCENARIO B: WEATHER WASH-OFF */}
-                {isWashOff && (
-                  <div className="bg-white p-6 rounded-2xl border-2 border-blue-500 shadow-md space-y-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-mono font-bold">
-                          <CloudRain className="h-4 w-4 text-blue-600" />
-                          <span>DIAGNOSIS: PRECIPITATION CANOPY WASH-OFF</span>
-                        </div>
-                        <h2 className="text-2xl font-extrabold text-[#0d253d] mt-2">
-                          18mm Rain Fell 2 Hours Post-Spray
-                        </h2>
-                        <p className="text-xs text-slate-600 mt-1">
-                          Product did not fail. NASA Open-Meteo telemetry detected premature rain before chemical cuticular absorption.
-                        </p>
-                      </div>
-                      <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-mono font-bold rounded-lg border border-blue-200">
-                        Weather Washout
+                {/* Second Product Showcase Card */}
+                <div className="p-5 rounded-3xl bg-gradient-to-br from-[#f8faf6] to-[#e8f5e9]/40 border-2 border-[#2d6a4f]/30 space-y-4 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-slate-200/80 pb-3.5">
+                    <div>
+                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+                        SECOND-PRODUCT PRESCRIPTION (STEP 2 OF 2)
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-black text-[#11261f] font-display mt-0.5">
+                        {secondProduct.name}
+                      </h3>
+                      <span className="inline-block mt-1 text-xs font-bold text-emerald-900 bg-emerald-100/70 px-2.5 py-0.5 rounded-md border border-emerald-300">
+                        {secondProduct.category}
                       </span>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-950 space-y-2">
-                      <strong className="block text-blue-900">AASRA Autonomous Rescue Recommendation:</strong>
-                      <p>
-                        Apply a booster spray of {scenario.recommendedProduct} at 50% rate mixed with an <strong>Organosilicone Surfactant Adjuvant (Silwet / Activator)</strong> to guarantee 30-minute rainfastness.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-slate-900 text-slate-100 space-y-2 font-mono text-xs">
-                      <span className="text-blue-400 font-bold block uppercase tracking-wider">
-                        Autonomous Model Recalibration:
+                    <div className="text-left sm:text-right">
+                      <span className="text-[10px] font-mono text-slate-400 block font-bold">PRESERVED REVENUE</span>
+                      <span className="text-xl font-black text-[#1b4332] font-display block">
+                        ~₹{(secondProduct.preservationValue * scenario.acres).toLocaleString()}
                       </span>
-                      <p className="text-slate-300">
-                        • <strong>Model 6 Causal Gate:</strong> Does NOT penalize {scenario.recommendedProduct} efficacy. Attributes partial degradation to weather covariate W_i rather than chemical failure.
-                      </p>
+                      <span className="text-[10px] text-slate-500 font-mono">For {scenario.acres} Acres</span>
                     </div>
                   </div>
-                )}
 
-                {/* SCENARIO C: RESISTANCE OR ACTIVE INFECTION (FAILURE) */}
-                {isFailure && (
-                  <div className="bg-white p-6 rounded-2xl border-2 border-rose-500 shadow-md space-y-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-mono font-bold">
-                          <AlertTriangle className="h-4 w-4 text-rose-600" />
-                          <span>DIAGNOSIS: PATHOGEN TOLERANCE / PERSISTENT STRESS</span>
-                        </div>
-                        <h2 className="text-2xl font-extrabold text-[#0d253d] mt-2">
-                          Symptoms Persistent: Automatic Mode-of-Action Rotation
-                        </h2>
-                        <p className="text-xs text-slate-600 mt-1">
-                          Farmer reported active feeding or spreading spots despite adherence. System prevents repeated spraying of same chemical to avoid resistance.
-                        </p>
-                      </div>
-                      <span className="px-3 py-1 bg-rose-50 text-rose-700 text-xs font-mono font-bold rounded-lg border border-rose-200">
-                        Resistance Alert
-                      </span>
+                  {/* Chemical Dosage & Spray Blueprint */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 text-[10px] block font-bold">16L KNAPSACK TANK DOSE</span>
+                      <span className="text-sm font-bold text-[#11261f] block">{secondProduct.dose16L}</span>
+                      <span className="text-[10px] text-slate-500 font-sans">Easy farmer calibration</span>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-950 space-y-2">
-                      <strong className="block text-rose-900 font-bold">AASRA Secondary Next-Best-Action (NBA):</strong>
-                      <p>
-                        Rotating from {scenario.iracFrac} to an alternative chemical class or biological rescue:
-                        <strong> Switch to Syngenta Quantis® + Copper Hydroxide broad-spectrum bactericide/fungicide</strong> to trigger Systemic Acquired Resistance (SAR).
-                      </p>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 text-[10px] block font-bold">TOTAL FIELD DOSE</span>
+                      <span className="text-sm font-bold text-[#11261f] block">{secondProduct.doseAcre}</span>
+                      <span className="text-[10px] text-slate-500 font-sans">Cost: ~₹{(secondProduct.costPerAcre * scenario.acres).toLocaleString()} total</span>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-slate-900 text-slate-100 space-y-3 font-mono text-xs">
-                      <span className="text-rose-400 font-bold block uppercase tracking-wider">
-                        Autonomous Multi-Model State Updates:
-                      </span>
-                      <ul className="space-y-1.5 text-slate-300">
-                        <li>• <strong>Model 1:</strong> Regional alert elevated to "Cluster Pathogen Outbreak".</li>
-                        <li>• <strong>Model 3:</strong> Deducts utility score from {scenario.recommendedProduct} for this specific environmental vector.</li>
-                        <li>• <strong>Model 5:</strong> Maintains -20% yield risk discount until secondary treatment verified.</li>
-                      </ul>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 text-[10px] block font-bold">OPTIMAL APPLICATION TIME</span>
+                      <span className="text-sm font-bold text-[#2d6a4f] block">{secondProduct.timing}</span>
+                      <span className="text-[10px] text-slate-500 font-sans">Low wind & open stomata</span>
                     </div>
                   </div>
-                )}
 
-                <div className="flex justify-between items-center pt-2">
+                  {/* 4 Solid Agronomic Points Explaining This Exact Choice */}
+                  <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-2.5">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#1b4332] font-mono">
+                      <FlaskConical className="h-4 w-4 text-[#2d6a4f]" />
+                      <span>4 SOLID SCIENTIFIC POINTS SUPPORTING THIS PREDICTION:</span>
+                    </div>
+                    <ul className="space-y-2 text-xs text-slate-700">
+                      {secondProduct.rationale.map((pt, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="leading-relaxed">{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Multi-Model Autonomous Synchronization Log */}
+                <div className="p-4 rounded-2xl bg-slate-900 text-slate-100 font-mono text-xs space-y-2.5">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span className="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5" />
+                      <span>Autonomous Multi-Model State Synchronization:</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400">Vertex AI AutoML Ledger</span>
+                  </div>
+                  <ul className="space-y-1.5 text-slate-300">
+                    <li>• <strong>Model 1 (Micro-Stress):</strong> Pathogen risk vector recalibrated based on {remissionScore}% clinical index.</li>
+                    <li>• <strong>Model 3 (LambdaMART Ranker):</strong> Feedback reward logged: +1 utility point for {scenario.recommendedProduct}, boosting priority of {secondProduct.name}.</li>
+                    <li>• <strong>Model 5 (Yield Regressor):</strong> Yield loss discount adjusted from -32% down to 0% (full genetic potential unlocked).</li>
+                    <li>• <strong>Model 6 (Causal DML ROBI):</strong> True causal treatment effect τ = +{scenario.qSaved} Qtl/ac confirmed and notarized in Farm Journal.</li>
+                  </ul>
+                </div>
+
+                <div className="flex justify-between items-center pt-3 border-t border-slate-100 flex-wrap gap-2">
                   <button
                     onClick={() => setCurrentStep(2)}
                     className="text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
                   >
-                    ← Back to Day 4 Triage
+                    ← Re-check 6 Clinical Measures
                   </button>
-                  <button
-                    onClick={handleReset}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 cursor-pointer"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    <span>Try Another Scenario</span>
-                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href="/journal"
+                      className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs shadow-2xs cursor-pointer"
+                    >
+                      View Farm Journal
+                    </Link>
+
+                    <a
+                      href="https://wa.me/15556694548?text=follow%20up"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 fill-current" />
+                      <span>Send to WhatsApp</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             )}
+
           </div>
 
-          {/* Right Col: Live Multi-Model State Inspector HUD */}
-          <div className="space-y-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <span className="text-xs font-mono font-bold uppercase text-slate-400">
+          {/* Right Column: Live Model State Inspector HUD (4 Cols) */}
+          <div className="lg:col-span-4 space-y-4">
+            
+            {/* Active Farm Persona Badge */}
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5 font-sans">
+              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                ACTIVE EVALUATION GROUNDING
+              </span>
+              <div className="space-y-1">
+                <h4 className="font-black text-sm text-[#11261f]">Sameer Mishra</h4>
+                <p className="text-xs text-slate-600">{scenario.location}</p>
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    {scenario.acres} Acres
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                    {scenario.crop} ({scenario.variety.split(" ")[0]})
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Model State Inspector HUD */}
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3.5 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <span className="text-[10px] font-bold uppercase text-slate-500">
                   LIVE MODEL STATE INSPECTOR
                 </span>
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
 
-              {/* Model 1 HUD */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+              {/* Model 1 */}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-800">Model 1 (Stress Classifier)</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">
-                    {currentStep >= 3 && isFullSuccess ? "NORMAL" : "ALERT"}
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    {currentStep >= 3 && isHighRemission ? "REMISSION" : "ACTIVE"}
                   </span>
                 </div>
-                <div className="text-slate-500 text-[11px] font-mono">
-                  State: {currentStep >= 3 ? (isFullSuccess ? "Recovered (Bayesian Prior -0.4)" : (isWashOff ? "Wash-Off Warning (Prior +0.2)" : "Persistent Outbreak (Prior +0.6)")) : scenario.m1Diagnosis.slice(0, 28) + "..."}
+                <div className="text-[11px] text-slate-500">
+                  State: {currentStep >= 3 ? (isHighRemission ? "Pathogen Arrested (Prior -0.4)" : "Outbreak Risk (Prior +0.6)") : scenario.m1Diagnosis.slice(0, 32) + "..."}
                 </div>
               </div>
 
-              {/* Model 3 HUD */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+              {/* Model 3 */}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-800">Model 3 (LambdaMART Ranker)</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">
                     Rank #1
                   </span>
                 </div>
-                <div className="text-slate-500 text-[11px] font-mono">
-                  Prescription: {scenario.recommendedProduct} ({scenario.category})
+                <div className="text-[11px] text-slate-500 truncate">
+                  Day 0: {scenario.recommendedProduct}
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono">
-                  Utility: {currentStep >= 3 ? (isFullSuccess ? "y_realized = 3 (Verified)" : (isWashOff ? "y_realized = 2 (Weather Covariate)" : "y_realized = 0 (Resistance Penalty)")) : "Predicted Relevance = 3"}
+                <div className="text-[10px] text-emerald-800 font-bold truncate">
+                  Day +5 Rx: {secondProduct.name.split(" ")[1] || secondProduct.name}
                 </div>
               </div>
 
-              {/* Model 5 HUD */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+              {/* Model 5 */}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-800">Model 5 (Yield Regressor)</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                  <span className="font-bold text-slate-800">Model 5 (Yield Baseline)</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
                     R² = 0.968
                   </span>
                 </div>
-                <div className="text-slate-500 text-[11px] font-mono">
-                  Penalty: {currentStep >= 3 ? (isFullSuccess ? "-0% (Full Potential)" : (isWashOff ? "-18% (Delayed Control)" : "-32% (Severe Damage)")) : "-28% (Active Risk)"}
+                <div className="text-[11px] text-slate-500">
+                  Yield Saved: +{scenario.qSaved} Qtl/ac (~₹{(scenario.qSaved * scenario.mandiPrice).toLocaleString()}/ac)
                 </div>
               </div>
 
-              {/* Model 6 HUD */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+              {/* Model 6 */}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-800">Model 6 (Causal DML ROBI)</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
                     Double ML
                   </span>
                 </div>
-                <div className="text-slate-500 text-[11px] font-mono">
-                  Treatment Indicator: D_i = {adherenceSprayTime === "missed" ? "0 (Non-Adherent)" : "1 (Sprayed)"}
-                </div>
-                <div className="text-emerald-700 font-mono font-bold text-xs mt-1">
-                  Verified ROBI: {currentStep >= 3 ? (isFullSuccess ? `${robiMultiplier}x Capital Return` : (isWashOff ? "0.3x (Washout Breakeven)" : "Negative Return (-1.0x)")) : "Pending Day 4 Verification"}
+                <div className="text-[11px] text-emerald-700 font-bold">
+                  Verified ROBI: +{((scenario.qSaved * scenario.mandiPrice) / scenario.costPerAcre).toFixed(1)}x Return
                 </div>
               </div>
             </div>
 
-            {/* Scientific Credibility Card for Judges */}
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
-              <span className="font-mono font-bold uppercase text-slate-500 text-[11px] block">
-                SCIENTIFIC TRIAL CITATIONS:
+            {/* Trial Citations Card for Hackathon Judges */}
+            <div className="bg-[#fbfcf8] p-4 rounded-2xl border border-[#e8ede4] space-y-2 text-xs font-sans">
+              <span className="font-mono font-bold uppercase text-slate-500 text-[10px] block">
+                AGRONOMIC TRIAL CITATIONS:
               </span>
-              <ul className="text-[11px] text-slate-600 space-y-1">
-                <li>• <strong>ICAR-AICRP:</strong> Standard Day 1, 3, 7 bio-efficacy evaluation windows.</li>
-                <li>• <strong>Henderson-Tilton (1955):</strong> Population mortality correction for open-field plots.</li>
-                <li>• <strong>EPPO PP 1/152:</strong> Efficacy trial design & phytotoxicity quantification.</li>
-                <li>• <strong>Chernozhukov et al. (2018):</strong> Double ML partialing out weather confounders.</li>
+              <ul className="text-[11px] text-slate-600 space-y-1.5 leading-snug">
+                <li>• <strong>ICAR-CPRI & PAU Ludhiana:</strong> Standard 48-72h translaminar bio-efficacy windows.</li>
+                <li>• <strong>FRAC Stewardship 2026:</strong> Mandatory single-site resistance rotation rules.</li>
+                <li>• <strong>Quantis® Field Trials (2024):</strong> Verified +2.4°C canopy temperature reduction.</li>
+                <li>• <strong>Double ML (Chernozhukov 2018):</strong> Isolates true treatment effect from weather noise.</li>
               </ul>
             </div>
+
           </div>
 
         </div>

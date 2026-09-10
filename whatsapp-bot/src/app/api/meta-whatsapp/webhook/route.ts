@@ -2049,36 +2049,55 @@ async function generateGeminiComprehensiveTriagePrescription(
   cachedDiag?: CachedFarmerDiagnosis
 ): Promise<string> {
   const isEn = farmer.language === "en";
-  const crop = cachedDiag?.crop || farmer.primaryCrop || "Wheat";
+  const crop = cachedDiag?.crop || farmer.primaryCrop || "Potato";
 
   const positiveCount = answers.filter((a) => a.isPositive).length;
   const efficacyScore = Math.round((positiveCount / Math.max(answers.length, 1)) * 100);
 
+  const m1Positive = answers.find((a) => a.qIndex === 1)?.isPositive ?? true;
+  const m2Positive = answers.find((a) => a.qIndex === 2)?.isPositive ?? true;
+  const m3Positive = answers.find((a) => a.qIndex === 3)?.isPositive ?? true;
+  const m4Positive = answers.find((a) => a.qIndex === 4)?.isPositive ?? true;
+  const m5Positive = answers.find((a) => a.qIndex === 5)?.isPositive ?? true;
+  const m6Stressed = answers.find((a) => a.qIndex === 6)?.isPositive ?? true;
+
+  const isResistanceBreach = !m1Positive || !m2Positive;
+  const isWashoutBreach = !m3Positive || !m4Positive || !m5Positive;
+  const cropLower = crop.toLowerCase();
+
   const prompt = `You are the KrishYantra Agronomic Intelligence Engine (Syngenta India Hackathon 2026, Team 02).
 Generate the Final Comprehensive Closed-Loop Second-Product Audit based on a completed 6-measure clinical triage for:
 Farmer: ${farmer.fullName} ji
-Location: ${farmer.village || "Chamkaur Sahib"}, ${farmer.district || "Rupnagar"}, ${farmer.state || "Punjab"}
+Location: ${farmer.village || "Bilram / Chamkaur Sahib"}, ${farmer.district || "Kasganj / Rupnagar"}, ${farmer.state || "Uttar Pradesh / Punjab"}
 Field Area: ${farmer.fieldAreaAcres} Acres
 Crop: ${crop}
-Previous Day 0 Treatment: Syngenta Ridomil Gold® (Metalaxyl-M + Mancozeb) against fungal blight.
+Previous Day 0 Treatment: Syngenta Ridomil Gold® / Score® against fungal pathogen.
 
 6 CLINICAL TRIAGE MEASURES COMPLETED BY FARMER:
 ${answers.map((a, i) => `${i + 1}. ${a.qName}: ${a.answerText} (${a.isPositive ? "Optimal / Positive" : "Deficient / High Risk"})`).join("\n")}
 Calculated Efficacy Score: ${efficacyScore}%
 
-MANDATORY AGRONOMIC AUDIT & PRESCRIPTION RULES:
+MANDATORY AGRONOMIC AUDIT & 4 SOLID SCIENTIFIC POINTS RULES:
 1. Provide a concise Clinical Triage Verdict reviewing the 6 measures (Lesion status, Apical growth, Rainfastness, Underside coverage, Water volume, Cellular stress).
-2. Second Product Prescription:
-   - If pathogen is arrested (Measure 1 is positive) and crop shows metabolic exhaustion/chlorosis: Prescribe SYNGENTA ISABION® (Natural Amino Acids + Peptides Biostimulant). Explain that blight infection drains cellular ATP and chlorophyll, and Isabion restores vigor within 4 days, preventing a 12-15% yield penalty.
-   - If pathogen is still expanding (Measure 1 is negative): Prescribe SYNGENTA REVUS® (Mandipropamid - FRAC 40) or SYNGENTA AMISTAR TOP® (Azoxystrobin + Difenoconazole - FRAC 11+3) as rotational rescue to break phenylamide resistance.
-3. Precise Sprayer Dilution:
-   - For Isabion: 35 ml per 16L hand pump (500 ml/acre, Total ${(0.5 * farmer.fieldAreaAcres).toFixed(1)} Liters for ${farmer.fieldAreaAcres} Acres).
-   - For Revus/Amistar: 16 ml per 16L hand pump (200 ml/acre, Total ${(0.2 * farmer.fieldAreaAcres).toFixed(1)} Liters for ${farmer.fieldAreaAcres} Acres).
-4. Optimal Spray Window: Tomorrow morning (06:30 - 09:30 AM) in Rupnagar, Punjab.
+2. Dynamic Second Product Selection from Syngenta portfolio:
+   - If Resistance Breach (Measure 1 or 2 is deficient / wet margins / spots on crown):
+     * If Potato or Tomato/Chilli: Prescribe SYNGENTA REVUS® (Mandipropamid 23.4% SC - FRAC 40 CAA). Bypasses metalaxyl resistance.
+     * If Wheat, Rice, or other cereals: Prescribe SYNGENTA AMISTAR TOP® (Azoxystrobin 18.2% + Difenoconazole 11.4% SC - FRAC 11+3).
+   - If Washout or Under-Dilution (Measure 3, 4, or 5 is deficient / rain <2h / low water):
+     * Prescribe SYNGENTA KAVACH® (Chlorothalonil 720 g/l SC - FRAC M5 Multi-Site contact shield) with full 200 L/acre recalibration.
+   - If Remission is high (Measure 1 is crusted/dry) and crop shows metabolic stress/chlorosis (Measure 6):
+     * If Wheat, Cotton, or Heat-stressed: Prescribe SYNGENTA QUANTIS® (Bio-Active Osmoprotectant, Peptides & 2% K₂O, Canopy Temp Depression ΔCTD +2.4°C).
+     * If Potato, Vegetables, or Rice: Prescribe SYNGENTA ISABION® (Natural Amino Acids 62.5% + Peptides for photosystem-II restoration).
+3. EVERY prediction MUST present the 4 SOLID SCIENTIFIC POINTS:
+   - Point 1: Biomarker Evaluated & Target Site (exact FRAC/IRAC code and enzyme target)
+   - Point 2: Physiological Mode of Action & Cuticular Foliar Absorption
+   - Point 3: Field Yield & Financial Salvage (+₹... calculated for ${farmer.fieldAreaAcres} Acres)
+   - Point 4: Precision Sprayer Dilution (ml per 16L hand pump and total liters in 200 L/acre water)
+4. Optimal Spray Window: Tomorrow morning (06:30 - 09:30 AM) in ${farmer.district}.
 5. Language: ${isEn ? "Professional, clear English. No Hindi tokens." : "100% natural, respectful Hindi (Devanagari script)."}.
 6. STRICT IDENTITY & BRANDING RULE: NEVER mention "Gemini", "Google", "LLM", "AI", or "model" in the response. You are purely the *KrishYantra Agronomic Intelligence Engine* (Syngenta India Hackathon 2026, Team 02).
 
-Format: Premium WhatsApp markdown with bold terms and dividers (━━━━━━━━━━━━━━━━━━━━━━━━━━). Keep under 1300 characters.`;
+Format: Premium WhatsApp markdown with bold terms and dividers (━━━━━━━━━━━━━━━━━━━━━━━━━━). Keep under 1400 characters.`;
 
   for (const model of ["gemini-3.6-flash", "gemini-3.1-flash-lite"]) {
     for (const key of ACTIVE_GOOGLE_KEYS) {
@@ -2104,27 +2123,209 @@ Format: Premium WhatsApp markdown with bold terms and dividers (━━━━━�
     }
   }
 
-  // Resilient offline fallback if AI API times out
+  // Resilient deterministic fallback dynamically matching Syngenta portfolio with 4 Solid Points
+  const fieldArea = farmer.fieldAreaAcres;
+  const totalWater = Math.round(200 * fieldArea);
+  const totalTanks = Math.ceil(totalWater / 16);
+
+  if (isResistanceBreach) {
+    if (cropLower.includes("potato") || cropLower.includes("tomato") || cropLower.includes("chilli")) {
+      const totChem = (0.2 * fieldArea).toFixed(1);
+      const estSav = Math.round(fieldArea * 8 * 1720);
+      if (isEn) {
+        return (
+          `🌿 *KrishYantra Agronomic Engine* | Syngenta Hackathon 2026 (Team 02)\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `*48H CLINICAL TRIAGE AUDIT & SECOND PRODUCT RX*\n\n` +
+          `👤 *Farmer:* ${farmer.fullName} ji\n` +
+          `📍 *Field:* ${farmer.village || "Bilram"}, ${farmer.district} (${farmer.state || "UP"})\n` +
+          `🌾 *Crop:* ${crop} (${fieldArea} Acres)\n` +
+          `📊 *Remission Score:* ${efficacyScore}% (⚠️ Pathogen Resistance Breach)\n\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `💊 *RECOMMENDED RESCUE PRODUCT:*\n` +
+          `*SYNGENTA REVUS®* (Mandipropamid 23.4% SC · FRAC 40)\n\n` +
+          `🔬 *4 SOLID AGRONOMIC POINTS:*\n` +
+          `1️⃣ *Biomarker & Target Site:* Targets CAA group cellulose synthase (FRAC 40). Bypasses metalaxyl phenylamide resistance.\n` +
+          `2️⃣ *Physiological Wax Action:* LOK-FLO technology tenaciously locks onto cuticular wax within 30 min, stopping mycelial invasion.\n` +
+          `3️⃣ *Yield & Financial Salvage:* Halts spore sporulation in 12h, protecting +₹${estSav.toLocaleString("en-IN")} across ${fieldArea} Acres.\n` +
+          `4️⃣ *Precision Dilution:* *16 ml* / 16L pump. Total *${totChem} L* in ${totalWater}L water (${totalTanks} tanks).\n\n` +
+          `⏰ *Optimal Window:* Tomorrow 06:30 – 09:30 AM (${farmer.district})\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+        );
+      }
+      return (
+        `🌿 *KrishYantra कृषि इंजन* | सिंजेंटा हैकाथॉन 2026 (टीम 02)\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `*48 घंटे क्लिनिकल जांच व दूसरा अनुशंसित उत्पाद*\n\n` +
+        `👤 *किसान:* ${farmer.fullName} जी\n` +
+        `📍 *खेत:* ${farmer.village || "बिलराम"}, ${farmer.district} (${farmer.state || "उ.प्र."})\n` +
+        `🌾 *फसल:* ${crop} (${fieldArea} एकड़)\n` +
+        `📊 *सुधार दर:* ${efficacyScore}% (⚠️ फंगस फैलाव / दवा प्रतिरोध की चेतावनी)\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `💊 *दूसरा अनुशंसित बचाव उत्पाद:*\n` +
+        `*सिंजेंटा रेवुस® (Syngenta Revus®)* (मैंडिप्रोपामाइड 23.4% SC · FRAC 40)\n\n` +
+        `🔬 *4 ठोस वैज्ञानिक आधार (Solid Points):*\n` +
+        `1️⃣ *जैविक लक्ष्य:* सेलूलोज़ सिंथेस एंजाइम (FRAC 40) पर अचूक वार कर पुरानी दवाओं के प्रति फंगस की प्रतिरोधक क्षमता को तुरंत तोड़ता है।\n` +
+        `2️⃣ *पत्ती पर सुरक्षा कवच:* LOK-FLO तकनीक दवा को 30 मिनट में मोमी सतह से चिपका देती है, जिससे 100% बारिश-रोधी सुरक्षा मिलती है।\n` +
+        `3️⃣ *पैदावार व आर्थिक सुरक्षा:* नए बीजाणुओं को रोककर ${fieldArea} एकड़ में +₹${estSav.toLocaleString("en-IN")} की फसल सुरक्षित करता है।\n` +
+        `4️⃣ *स्प्रे नाप व घोल:* *16 ml* प्रति 16L टंकी। कुल *${totChem} लीटर* दवा ${totalWater} लीटर पानी में (${totalTanks} टंकी)।\n\n` +
+        `⏰ *छिड़काव समय:* कल सुबह 06:30 से 09:30 बजे (${farmer.district})\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+      );
+    }
+
+    // Cereal / Wheat / Rice Resistance Breach -> Amistar Top
+    const totChem = (0.2 * fieldArea).toFixed(1);
+    const estSav = Math.round(fieldArea * 2.8 * 2425);
+    if (isEn) {
+      return (
+        `🌿 *KrishYantra Agronomic Engine* | Syngenta Hackathon 2026 (Team 02)\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `*48H CLINICAL TRIAGE AUDIT & SECOND PRODUCT RX*\n\n` +
+        `👤 *Farmer:* ${farmer.fullName} ji\n` +
+        `📍 *Field:* ${farmer.village || "Chamkaur Sahib"}, ${farmer.district} (${farmer.state || "Punjab"})\n` +
+        `🌾 *Crop:* ${crop} (${fieldArea} Acres)\n` +
+        `📊 *Remission Score:* ${efficacyScore}% (⚠️ Resistance Escalation)\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `💊 *RECOMMENDED SECOND PRODUCT:*\n` +
+        `*SYNGENTA AMISTAR TOP®* (Azoxystrobin + Difenoconazole · FRAC 11 + 3)\n\n` +
+        `🔬 *4 SOLID AGRONOMIC POINTS:*\n` +
+        `1️⃣ *Dual Mode of Action:* Combines QoI mitochondrial respiration block with sterol synthesis demolition.\n` +
+        `2️⃣ *Physiological Greening:* Boosts nitrate reductase enzyme, maintaining active photosynthesis in green canopy.\n` +
+        `3️⃣ *Yield Salvage:* Eliminates surviving fungal pockets, safeguarding +₹${estSav.toLocaleString("en-IN")} across ${fieldArea} Acres.\n` +
+        `4️⃣ *Precision Dilution:* *16 ml* / 16L pump. Total *${totChem} L* in ${totalWater}L water (${totalTanks} tanks).\n\n` +
+        `⏰ *Optimal Window:* Tomorrow morning 06:30 – 09:30 AM\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+      );
+    }
+    return (
+      `🌿 *KrishYantra कृषि इंजन* | सिंजेंटा हैकाथॉन 2026 (टीम 02)\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `*48 घंटे क्लिनिकल जांच व दूसरा अनुशंसित उत्पाद*\n\n` +
+      `👤 *किसान:* ${farmer.fullName} जी\n` +
+      `📍 *स्थान:* ${farmer.village || "चमकौर साहिब"}, ${farmer.district} (${farmer.state || "पंजाब"})\n` +
+      `🌾 *फसल:* ${crop} (${fieldArea} एकड़)\n` +
+      `📊 *सुधार दर:* ${efficacyScore}% (⚠️ फंगस फैलाव चेतावनी)\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💊 *दूसरा अनुशंसित उत्पाद:*\n` +
+      `*सिंजेंटा एमिस्टार टॉप® (Syngenta Amistar Top®)* (एज़ोक्सीस्ट्रोबिन + डिफेनोकोनाज़ोल · FRAC 11+3)\n\n` +
+      `🔬 *4 ठोस वैज्ञानिक आधार:*\n` +
+      `1️⃣ *दोहरी क्रिया:* फंगस की श्वसन क्रिया और सेल वॉल दोनों को एक साथ रोककर जीवित बीजाणुओं को पूरी तरह नष्ट करता है।\n` +
+      `2️⃣ *हरी पत्ती प्रभाव:* नाइट्रेट रिडक्टेस को सक्रिय कर पत्तियों को गहरा हरा रखता है और दानों की चमक बढ़ाता है।\n` +
+      `3️⃣ *पैदावार सुरक्षा:* संक्रमण को जड़ से रोककर ${fieldArea} एकड़ में +₹${estSav.toLocaleString("en-IN")} की उपज बचाता है।\n` +
+      `4️⃣ *स्प्रे नाप:* *16 ml* प्रति 16L टंकी। कुल *${totChem} लीटर* दवा ${totalWater} लीटर पानी में (${totalTanks} टंकी)।\n\n` +
+      `⏰ *सर्वोत्तम समय:* कल सुबह 06:30 से 09:30 बजे\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+    );
+  }
+
+  if (isWashoutBreach) {
+    const totChem = (0.4 * fieldArea).toFixed(1);
+    const estSav = Math.round(fieldArea * 2500);
+    if (isEn) {
+      return (
+        `🌿 *KrishYantra Agronomic Engine* | Syngenta Hackathon 2026 (Team 02)\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `*48H CLINICAL TRIAGE AUDIT & SECOND PRODUCT RX*\n\n` +
+        `👤 *Farmer:* ${farmer.fullName} ji\n` +
+        `🌾 *Crop:* ${crop} (${fieldArea} Acres) · ${farmer.district}\n` +
+        `📊 *Remission Score:* ${efficacyScore}% (⚠️ Rain Wash-off / Low Water Volume)\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `💊 *RECOMMENDED SECOND PRODUCT:*\n` +
+        `*SYNGENTA KAVACH®* (Chlorothalonil 720 g/l SC · FRAC M5)\n\n` +
+        `🔬 *4 SOLID AGRONOMIC POINTS:*\n` +
+        `1️⃣ *Multi-Site Target Site:* Inactivates multiple fungal thiol enzymes simultaneously; zero resistance risk.\n` +
+        `2️⃣ *Superior Foliar Tenacity:* Micro-fine suspension bonds to damp foliage in 15 minutes, resetting protection.\n` +
+        `3️⃣ *Yield Protection:* Shields newly exposed canopy after rainwash, safeguarding +₹${estSav.toLocaleString("en-IN")}.\n` +
+        `4️⃣ *Sprayer Recalibration:* *35 ml* / 16L pump. Must apply full *${totalWater}L water* (${totalTanks} tanks) at 2.8 bar.\n\n` +
+        `⏰ *Window:* Apply as soon as leaf surface dries\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+      );
+    }
+    return (
+      `🌿 *KrishYantra कृषि इंजन* | सिंजेंटा हैकाथॉन 2026 (टीम 02)\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `*48 घंटे क्लिनिकल जांच व दूसरा अनुशंसित उत्पाद*\n\n` +
+      `👤 *किसान:* ${farmer.fullName} जी\n` +
+      `🌾 *फसल:* ${crop} (${fieldArea} एकड़) · ${farmer.district}\n` +
+      `📊 *सुधार दर:* ${efficacyScore}% (⚠️ बारिश से धुलने या कम पानी की कमी)\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💊 *दूसरा अनुशंसित उत्पाद:*\n` +
+      `*सिंजेंटा कवच® (Syngenta Kavach®)* (क्लोरोथैलोनिल 720 g/l SC · FRAC M5)\n\n` +
+      `🔬 *4 ठोस वैज्ञानिक आधार:*\n` +
+      `1️⃣ *मल्टी-साइट सुरक्षा:* फंगस के कई एंजाइमों को एक साथ निष्क्रिय करता है, जिससे कोई प्रतिरोध नहीं बनता।\n` +
+      `2️⃣ *बारिश-रोधी चिपकन:* सूक्ष्म कण पत्तियों पर 15 मिनट में चिपक जाते हैं और दोबारा धुलने नहीं देते।\n` +
+      `3️⃣ *फसल सुरक्षा:* बारिश के बाद खुले पत्तों को ढाल देकर +₹${estSav.toLocaleString("en-IN")} का नुकसान रोकता है।\n` +
+      `4️⃣ *पानी की सही मात्रा:* *35 ml* प्रति टंकी। पूरे *${totalWater} लीटर पानी* (${totalTanks} टंकी) का ही उपयोग करें।\n\n` +
+      `⏰ *सर्वोत्तम समय:* पत्तियों की ऊपरी सतह सूखते ही छिड़काव करें\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+    );
+  }
+
+  // High Remission + Stress -> Quantis (Wheat/Cotton) or Isabion (Potato/Veg)
+  if (cropLower.includes("wheat") || cropLower.includes("cotton") || cropLower.includes("soybean")) {
+    const totChem = (0.4 * fieldArea).toFixed(1);
+    const estSav = Math.round(fieldArea * 2.8 * 2425);
+    if (isEn) {
+      return (
+        `🌿 *KrishYantra Agronomic Engine* | Syngenta Hackathon 2026 (Team 02)\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `*48H CLINICAL TRIAGE AUDIT & SECOND PRODUCT RX*\n\n` +
+        `👤 *Farmer:* ${farmer.fullName} ji\n` +
+        `🌾 *Crop:* ${crop} (${fieldArea} Acres) · ${farmer.district}\n` +
+        `📊 *Remission Score:* ${efficacyScore}% (✅ Pathogen Arrested · Stress Recovery)\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `💊 *RECOMMENDED SECOND PRODUCT:*\n` +
+        `*SYNGENTA QUANTIS®* (Bio-Active Osmoprotectant + Peptides + 2% K₂O)\n\n` +
+        `🔬 *4 SOLID AGRONOMIC POINTS:*\n` +
+        `1️⃣ *Cellular ATP Restoration:* Directly replenishes metabolic ATP and free proline depleted during fungal battle.\n` +
+        `2️⃣ *Canopy Temperature Depression:* Lowers leaf canopy temperature by +2.4°C (ΔCTD), shielding grain filling.\n` +
+        `3️⃣ *Yield Protection:* Secures 1,000-grain weight, preserving +₹${estSav.toLocaleString("en-IN")} across ${fieldArea} Acres.\n` +
+        `4️⃣ *Precision Dilution:* *35 ml* / 16L pump (~2 caps). Total *${totChem} L* in ${totalWater}L water (${totalTanks} tanks).\n\n` +
+        `⏰ *Optimal Window:* Tomorrow morning 06:30 – 09:30 AM\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+      );
+    }
+    return (
+      `🌿 *KrishYantra कृषि इंजन* | सिंजेंटा हैकाथॉन 2026 (टीम 02)\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `*48 घंटे क्लिनिकल जांच व दूसरा अनुशंसित उत्पाद*\n\n` +
+      `👤 *किसान:* ${farmer.fullName} जी\n` +
+      `🌾 *फसल:* ${crop} (${fieldArea} एकड़) · ${farmer.district}\n` +
+      `📊 *सुधार दर:* ${efficacyScore}% (✅ फंगस समाप्त · वानस्पतिक तनाव मुक्ति)\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💊 *दूसरा अनुशंसित उत्पाद:*\n` +
+      `*सिंजेंटा क्वांटिस® (Syngenta Quantis®)* (बायो-एक्टिव ऑस्मोप्रोटेक्टेंट + पेप्टाइड्स + 2% K₂O)\n\n` +
+      `🔬 *4 ठोस वैज्ञानिक आधार:*\n` +
+      `1️⃣ *कोशिकीय ऊर्जा (ATP) पुनःपूर्ति:* बीमारी से लड़ने में खर्च हुई ऊर्जा और प्रोलिन की तुरंत भरपाई करता है।\n` +
+      `2️⃣ *तापमान नियंत्रण (ΔCTD +2.4°C):* पत्तियों के तापमान को 2.4°C ठंडा रखकर गर्म हवाओं से दानों को पिचकने से बचाता है।\n` +
+      `3️⃣ *दाने का भराव व पैदावार:* 1,000 दानों के वजन को बढ़ाकर ${fieldArea} एकड़ में +₹${estSav.toLocaleString("en-IN")} का मुनाफा सुनिश्चित करता है।\n` +
+      `4️⃣ *स्प्रे नाप:* *35 ml* प्रति 16L टंकी। कुल *${totChem} लीटर* दवा ${totalWater} लीटर पानी में (${totalTanks} टंकी)।\n\n` +
+      `⏰ *सर्वोत्तम समय:* कल सुबह 06:30 से 09:30 बजे (${farmer.district})\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+    );
+  }
+
+  // Default: Syngenta Isabion for Potato, Tomato, Vegetables, Rice
+  const totChem = (0.5 * fieldArea).toFixed(1);
+  const estSav = Math.round(fieldArea * 8 * 1720);
   if (isEn) {
     return (
       `🌿 *KrishYantra Agronomic Engine* | Syngenta Hackathon 2026 (Team 02)\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `*FINAL CLOSED-LOOP SECOND-PRODUCT AUDIT*\n\n` +
+      `*48H CLINICAL TRIAGE AUDIT & SECOND PRODUCT RX*\n\n` +
       `👤 *Farmer:* ${farmer.fullName} ji\n` +
-      `📍 *Location:* ${farmer.village || "Chamkaur Sahib"}, ${farmer.district} (${farmer.state})\n` +
-      `🌾 *Crop & Acreage:* ${crop} (${farmer.fieldAreaAcres} Acres)\n` +
-      `🛡️ *Prev. Treatment:* Syngenta Ridomil Gold®\n\n` +
+      `🌾 *Crop:* ${crop} (${fieldArea} Acres) · ${farmer.district}\n` +
+      `📊 *Remission Score:* ${efficacyScore}% (✅ Pathogen Arrested · Chlorosis Reversal)\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `📊 *CLINICAL TRIAGE VERDICT (Efficacy: ${efficacyScore}%):*\n` +
-      `${answers.map((a, i) => `• *${a.qName}:* ${a.answerText}`).join("\n")}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `💊 *SECOND-PRODUCT PRESCRIPTION:*\n` +
-      `*SYNGENTA ISABION®* (Natural Amino Acids + Peptides)\n` +
-      `• *Clinical Rationale:* Pathogen is successfully eliminated, but crop exhibits metabolic exhaustion. Isabion® will revive leaf canopy, stimulate chlorophyll production, and maximize yield.\n\n` +
-      `📐 *DOSAGE & SPRAY MEASURES (${farmer.fieldAreaAcres} ACRES):*\n` +
-      `• *16L Pump Dose:* *35 ml* per tank (~2 caps)\n` +
-      `• *Total Volume:* *${(0.5 * farmer.fieldAreaAcres).toFixed(1)} Liters* in ${Math.round(200 * farmer.fieldAreaAcres)}L Water (~${Math.ceil((200 * farmer.fieldAreaAcres) / 16)} tanks)\n` +
-      `⏰ *Optimal Window:* 06:30 AM – 09:30 AM (${farmer.district} Local)\n` +
+      `💊 *RECOMMENDED SECOND PRODUCT:*\n` +
+      `*SYNGENTA ISABION®* (Natural Amino Acids 62.5% + Peptides)\n\n` +
+      `🔬 *4 SOLID AGRONOMIC POINTS:*\n` +
+      `1️⃣ *Biomarker & Chlorosis Reversal:* Stimulates chlorophyll synthase, turning pale leaves dark green in 72 hours.\n` +
+      `2️⃣ *Nutrient Translocation Surge:* Peptide complexes chelate calcium and potassium, surging food into developing tubers.\n` +
+      `3️⃣ *Yield Protection:* Reverses metabolic stalling, safeguarding +₹${estSav.toLocaleString("en-IN")} across ${fieldArea} Acres.\n` +
+      `4️⃣ *Precision Dilution:* *40 ml* / 16L pump (~2.5 caps). Total *${totChem} L* in ${totalWater}L water (${totalTanks} tanks).\n\n` +
+      `⏰ *Optimal Window:* Tomorrow morning 06:30 – 09:30 AM\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━`
     );
   }
@@ -2132,21 +2333,18 @@ Format: Premium WhatsApp markdown with bold terms and dividers (━━━━━�
   return (
     `🌿 *KrishYantra कृषि इंजन* | सिंजेंटा हैकाथॉन 2026 (टीम 02)\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `*6-मापदंड क्लोज्ड-लूप अंतिम उपचार व दूसरा उत्पाद*\n\n` +
+    `*48 घंटे क्लिनिकल जांच व दूसरा अनुशंसित उत्पाद*\n\n` +
     `👤 *किसान:* ${farmer.fullName} जी\n` +
-    `📍 *स्थान:* ${farmer.village || "चमकौर साहिब"}, ${farmer.district} (${farmer.state})\n` +
-    `🌾 *फसल व रकबा:* ${crop} (${farmer.fieldAreaAcres} एकड़)\n` +
-    `🛡️ *पहली दवा:* सिंजेंटा रिडोमिल गोल्ड®\n\n` +
+    `🌾 *फसल:* ${crop} (${fieldArea} एकड़) · ${farmer.district}\n` +
+    `📊 *सुधार दर:* ${efficacyScore}% (✅ फंगस पूरी तरह नियंत्रित · पीलापन निवारण)\n\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `📊 *6 क्लिनिकल जांच परिणाम (सुधार दर: ${efficacyScore}%):*\n` +
-    `${answers.map((a, i) => `• *${a.qName}:* ${a.answerText}`).join("\n")}\n\n` +
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `💊 *दूसरा अनुशंसित उत्पाद (Second Product):*\n` +
-    `*सिंजेंटा इसाबियन® (Syngenta Isabion®)* (प्राकृतिक अमीनो एसिड + पेप्टाइड्स)\n` +
-    `• *वैज्ञानिक कारण:* फंगस का फैलाव रुक चुका है, किंतु फसल कमजोरी व पोषक तत्वों की कमी से जूझ रही है। इसाबियन नई पत्तियों को तेजी से विकसित कर 12-15% पैदावार सुरक्षित करेगा।\n\n` +
-    `📐 *स्प्रे पंप नाप व कुल दवा (${farmer.fieldAreaAcres} एकड़):*\n` +
-    `• *16 लीटर टंकी नाप:* *35 ml* प्रति टंकी (लगभग 2 ढक्कन)\n` +
-    `• *कुल दवा:* *${(0.5 * farmer.fieldAreaAcres).toFixed(1)} लीटर* (${Math.round(200 * farmer.fieldAreaAcres)} लीटर पानी में)\n` +
+    `💊 *दूसरा अनुशंसित उत्पाद:*\n` +
+    `*सिंजेंटा इसाबियन® (Syngenta Isabion®)* (प्राकृतिक अमीनो एसिड 62.5% + पेप्टाइड्स)\n\n` +
+    `🔬 *4 ठोस वैज्ञानिक आधार:*\n` +
+    `1️⃣ *पीलापन निवारण व क्लोरोफिल:* प्रकाश संश्लेषण को तुरंत बहाल कर पीली पत्तियों को 72 घंटे में गहरा हरा बनाता है।\n` +
+    `2️⃣ *पोषक तत्वों का संचरण:* प्राकृतिक पेप्टाइड्स मिट्टी से कैल्शियम व पोटाश खींचकर आलू के कंदों/फलों में तेजी से पहुंचाते हैं।\n` +
+    `3️⃣ *बंपर पैदावार सुरक्षा:* 14–22% की उपज हानि को रोककर ${fieldArea} एकड़ में +₹${estSav.toLocaleString("en-IN")} की आय सुरक्षित करता है।\n` +
+    `4️⃣ *स्प्रे नाप:* *40 ml* प्रति 16L टंकी (~2.5 ढक्कन)। कुल *${totChem} लीटर* दवा ${totalWater} लीटर पानी में (${totalTanks} टंकी)।\n\n` +
     `⏰ *सर्वोत्तम समय:* कल सुबह 06:30 से 09:30 बजे (${farmer.district})\n` +
     `━━━━━━━━━━━━━━━━━━━━━━━━━━`
   );
